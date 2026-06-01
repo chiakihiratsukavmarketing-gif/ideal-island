@@ -1004,16 +1004,16 @@
           <p class="stat-value" id="statTodayPercent">0%</p>
         </article>
         <article class="stat-card">
-          <p class="stat-label">継続日数</p>
-          <p class="stat-value">12日</p>
+          <p class="stat-label">目標総数</p>
+          <p class="stat-value" id="statTotalGoals">0個</p>
         </article>
         <article class="stat-card">
-          <p class="stat-label">今週の行動</p>
-          <p class="stat-value" id="statWeeklyActions">0個</p>
+          <p class="stat-label">達成済み</p>
+          <p class="stat-value" id="statDoneGoals">0個</p>
         </article>
         <article class="stat-card">
-          <p class="stat-label">次の一歩</p>
-          <p class="stat-value" id="statNextAction">10分だけ作業する</p>
+          <p class="stat-label">未達成</p>
+          <p class="stat-value" id="statUndoneGoals">0個</p>
         </article>
       </section>
 
@@ -1129,8 +1129,9 @@
       const overallCount = document.getElementById("overallCount");
       const categoryProgress = document.getElementById("categoryProgress");
       const statTodayPercent = document.getElementById("statTodayPercent");
-      const statWeeklyActions = document.getElementById("statWeeklyActions");
-      const statNextAction = document.getElementById("statNextAction");
+      const statTotalGoals = document.getElementById("statTotalGoals");
+      const statDoneGoals = document.getElementById("statDoneGoals");
+      const statUndoneGoals = document.getElementById("statUndoneGoals");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -1331,12 +1332,14 @@
 
       function renderStats() {
         const todayProgress = getProgress(goalsByTab.today);
-        const totalActions = Object.values(goalsByTab).reduce((sum, goals) => sum + goals.length, 0);
-        const nextGoal = goalsByTab.today.find((goal) => !goal.done) || goalsByTab.month.find((goal) => !goal.done);
+        const allGoals = Object.values(goalsByTab).flat();
+        const allProgress = getProgress(allGoals);
+        const undone = allProgress.total - allProgress.done;
 
         statTodayPercent.textContent = `${todayProgress.percent}%`;
-        statWeeklyActions.textContent = `${totalActions}個`;
-        statNextAction.textContent = nextGoal ? nextGoal.title : "10分だけ作業する";
+        statTotalGoals.textContent = `${allProgress.total}個`;
+        statDoneGoals.textContent = `${allProgress.done}個`;
+        statUndoneGoals.textContent = `${undone}個`;
       }
 
       function render() {
