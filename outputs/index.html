@@ -243,7 +243,8 @@
       .goal-form,
       .goal-list,
       .progress-card,
-      .stat-card {
+      .stat-card,
+      .next-step-card {
         border: 1px solid var(--line);
         border-radius: 24px;
         background: linear-gradient(180deg, rgba(16, 25, 50, 0.92), rgba(8, 13, 28, 0.92));
@@ -467,6 +468,84 @@
         font-size: 1.42rem;
         font-weight: 900;
         overflow-wrap: anywhere;
+      }
+
+      .next-step-card {
+        display: grid;
+        gap: 12px;
+        margin: -12px 0 34px;
+        padding: 22px;
+        border-color: rgba(54, 201, 255, 0.38);
+        box-shadow:
+          var(--shadow-soft),
+          0 0 30px rgba(54, 201, 255, 0.12);
+      }
+
+      .next-step-card.is-active {
+        border-color: rgba(54, 201, 255, 0.62);
+      }
+
+      .next-step-card.is-clear {
+        border-color: rgba(50, 232, 137, 0.54);
+        box-shadow:
+          var(--shadow-soft),
+          0 0 34px rgba(50, 232, 137, 0.16);
+      }
+
+      .next-step-card.is-empty {
+        opacity: 0.78;
+        border-color: rgba(141, 155, 181, 0.24);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .next-step-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .next-step-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 850;
+        letter-spacing: 0.22em;
+      }
+
+      .next-step-status {
+        width: fit-content;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        background: rgba(54, 201, 255, 0.09);
+        color: var(--cyan);
+        padding: 5px 12px;
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .next-step-card.is-clear .next-step-status {
+        color: var(--green);
+        background: rgba(50, 232, 137, 0.1);
+      }
+
+      .next-step-card.is-empty .next-step-status {
+        color: var(--muted);
+        background: rgba(141, 155, 181, 0.08);
+      }
+
+      .next-step-title {
+        margin: 0;
+        color: var(--text);
+        font-size: clamp(1.3rem, 3vw, 1.85rem);
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .next-step-description {
+        margin: 0;
+        color: var(--muted);
+        font-weight: 650;
       }
 
       .console-heading {
@@ -847,7 +926,8 @@
         .goal-form,
         .goal-list,
         .progress-card,
-        .stat-card {
+        .stat-card,
+        .next-step-card {
           border-radius: 20px;
           box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
         }
@@ -890,6 +970,21 @@
           grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 12px;
           margin: 24px 0;
+        }
+
+        .next-step-card {
+          margin: -8px 0 26px;
+          padding: 18px;
+        }
+
+        .next-step-head {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .next-step-title {
+          font-size: 1.28rem;
         }
 
         .stat-card {
@@ -1035,6 +1130,15 @@
         </article>
       </section>
 
+      <section class="next-step-card is-empty" id="nextStepCard" aria-label="次の一歩">
+        <div class="next-step-head">
+          <p class="next-step-label">次の一歩</p>
+          <span class="next-step-status" id="nextStepStatus">未設定</span>
+        </div>
+        <h2 class="next-step-title" id="nextStepTitle">今日の一歩を決めましょう</h2>
+        <p class="next-step-description" id="nextStepDescription">まずは小さな目標を1つ追加してみましょう。</p>
+      </section>
+
       <section class="goal-console" id="goal-console" aria-label="目標管理コンソール">
         <h2 class="section-heading console-heading">目標管理</h2>
 
@@ -1151,6 +1255,10 @@
       const statDoneGoals = document.getElementById("statDoneGoals");
       const statUndoneGoals = document.getElementById("statUndoneGoals");
       const stageCards = document.querySelectorAll(".stage-card[data-stage]");
+      const nextStepCard = document.getElementById("nextStepCard");
+      const nextStepStatus = document.getElementById("nextStepStatus");
+      const nextStepTitle = document.getElementById("nextStepTitle");
+      const nextStepDescription = document.getElementById("nextStepDescription");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -1405,6 +1513,35 @@
         });
       }
 
+      function renderNextStep() {
+        const todayGoals = goalsByTab.today;
+        const nextGoal = todayGoals.find((goal) => !goal.done);
+        let status = "empty";
+        let label = "未設定";
+        let title = "今日の一歩を決めましょう";
+        let description = "まずは小さな目標を1つ追加してみましょう。";
+
+        if (nextGoal) {
+          status = "active";
+          label = "進行中";
+          title = nextGoal.title;
+          description = "まずはこの目標から進めましょう。";
+        } else if (todayGoals.length > 0) {
+          status = "clear";
+          label = "CLEAR";
+          title = "今日の目標はすべて達成済みです";
+          description = "お疲れさま！今日はもう十分前に進んでいます。";
+        }
+
+        nextStepCard.classList.toggle("is-active", status === "active");
+        nextStepCard.classList.toggle("is-clear", status === "clear");
+        nextStepCard.classList.toggle("is-empty", status === "empty");
+        nextStepCard.setAttribute("data-status", status);
+        nextStepStatus.textContent = label;
+        nextStepTitle.textContent = title;
+        nextStepDescription.textContent = description;
+      }
+
       function render() {
         renderSlogan();
         renderTabs();
@@ -1412,6 +1549,7 @@
         renderProgress();
         renderStats();
         renderStages();
+        renderNextStep();
       }
 
       function escapeHtml(value) {
