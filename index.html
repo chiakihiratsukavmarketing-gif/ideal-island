@@ -1,0 +1,1567 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>理想の島</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #050812;
+        --bg-2: #0a1020;
+        --panel: #0c1224;
+        --panel-soft: #101932;
+        --text: #eef7ff;
+        --muted: #8d9bb5;
+        --line: rgba(80, 208, 255, 0.22);
+        --cyan: #36c9ff;
+        --cyan-soft: rgba(54, 201, 255, 0.12);
+        --green: #32e889;
+        --orange: #ff8a2a;
+        --purple: #ae5cff;
+        --yellow: #ffd232;
+        --danger: #ff6f7b;
+        --shadow-cyan: 0 0 35px rgba(54, 201, 255, 0.22);
+        --shadow-soft: 0 22px 60px rgba(0, 0, 0, 0.34);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 50% 0%, rgba(54, 201, 255, 0.18), transparent 24rem),
+          radial-gradient(circle at 8% 18%, rgba(174, 92, 255, 0.1), transparent 22rem),
+          radial-gradient(circle at 85% 28%, rgba(255, 210, 50, 0.08), transparent 20rem),
+          linear-gradient(180deg, #050812 0%, #070b18 42%, #0a1020 100%);
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.7;
+      }
+
+      body::before,
+      body::after {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        content: "";
+        pointer-events: none;
+      }
+
+      body::before {
+        background-image:
+          radial-gradient(circle, rgba(54, 201, 255, 0.8) 0 1px, transparent 2px),
+          radial-gradient(circle, rgba(238, 247, 255, 0.55) 0 1px, transparent 2px);
+        background-position:
+          10% 14%,
+          70% 18%;
+        background-size:
+          220px 260px,
+          310px 330px;
+        opacity: 0.38;
+      }
+
+      body::after {
+        background:
+          linear-gradient(90deg, transparent, rgba(54, 201, 255, 0.08), transparent) 0 24rem / 100% 1px no-repeat,
+          radial-gradient(circle at 50% 11rem, rgba(54, 201, 255, 0.18), transparent 12rem);
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      select:focus-visible {
+        outline: 2px solid var(--cyan);
+        outline-offset: 4px;
+      }
+
+      .app {
+        width: min(1120px, 100%);
+        margin: 0 auto;
+        padding: 34px 18px 64px;
+      }
+
+      .hero {
+        display: grid;
+        justify-items: center;
+        gap: 18px;
+        min-height: 680px;
+        padding: 34px 0 52px;
+        text-align: center;
+      }
+
+      .hero-icon {
+        display: grid;
+        width: 118px;
+        height: 118px;
+        place-items: center;
+        border: 1px solid rgba(54, 201, 255, 0.55);
+        border-radius: 34px;
+        background: linear-gradient(180deg, rgba(54, 201, 255, 0.16), rgba(54, 201, 255, 0.04));
+        box-shadow:
+          inset 0 0 0 8px rgba(54, 201, 255, 0.04),
+          0 0 42px rgba(54, 201, 255, 0.24);
+        color: var(--cyan);
+        font-size: 3.1rem;
+      }
+
+      .app-title {
+        max-width: 860px;
+        margin: 24px 0 0;
+        color: var(--cyan);
+        font-size: clamp(2.3rem, 7vw, 4.35rem);
+        line-height: 1.14;
+        letter-spacing: 0;
+        text-shadow: 0 0 28px rgba(54, 201, 255, 0.22);
+      }
+
+      .hero-kicker {
+        margin: 0;
+        color: var(--muted);
+        font-size: clamp(0.95rem, 2vw, 1.2rem);
+        font-weight: 800;
+        letter-spacing: 0.42em;
+      }
+
+      .hero-copy {
+        display: grid;
+        gap: 10px;
+        max-width: 760px;
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: clamp(1.02rem, 2vw, 1.18rem);
+        font-weight: 650;
+      }
+
+      .hero-copy p {
+        margin: 0;
+      }
+
+      .cta-button,
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        border-radius: 999px;
+        padding: 10px 18px;
+        color: var(--text);
+        font-weight: 800;
+        text-decoration: none;
+        transition:
+          border-color 180ms ease,
+          box-shadow 180ms ease,
+          transform 180ms ease,
+          background 180ms ease;
+      }
+
+      .cta-button {
+        gap: 12px;
+        min-width: min(100%, 360px);
+        min-height: 64px;
+        margin-top: 22px;
+        border: 1px solid rgba(54, 201, 255, 0.72);
+        background: rgba(54, 201, 255, 0.08);
+        color: var(--cyan);
+        box-shadow: 0 0 26px rgba(54, 201, 255, 0.16);
+      }
+
+      .cta-button:hover,
+      .cta-button:active,
+      .button:hover,
+      .button:active,
+      .quest-card:hover,
+      .stage-card:hover,
+      .goal-item:hover {
+        transform: translateY(-4px);
+      }
+
+      .cta-button:hover {
+        border-color: var(--cyan);
+        background: rgba(54, 201, 255, 0.14);
+        box-shadow: 0 0 40px rgba(54, 201, 255, 0.34);
+      }
+
+      .cta-button:active,
+      .button:active {
+        transform: translateY(-1px);
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 20px;
+        color: var(--cyan);
+        font-size: 1.2rem;
+        letter-spacing: 0.12em;
+      }
+
+      .section-heading::before {
+        width: 18px;
+        height: 18px;
+        content: "";
+        border: 2px solid currentColor;
+        border-radius: 5px;
+        box-shadow: 0 0 18px currentColor;
+        transform: rotate(45deg);
+      }
+
+      .quest-map,
+      .goal-console {
+        margin-top: 22px;
+      }
+
+      .quest-card,
+      .stage-card,
+      .slogan-card,
+      .panel,
+      .goal-form,
+      .goal-list,
+      .progress-card,
+      .stat-card,
+      .next-step-card {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(16, 25, 50, 0.92), rgba(8, 13, 28, 0.92));
+        box-shadow: var(--shadow-soft);
+      }
+
+      .quest-card,
+      .stage-card,
+      .goal-item {
+        transition:
+          border-color 180ms ease,
+          box-shadow 180ms ease,
+          transform 180ms ease,
+          opacity 180ms ease;
+      }
+
+      .quest-card {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 26px;
+        align-items: center;
+        padding: 26px;
+        border-color: rgba(255, 210, 50, 0.42);
+        box-shadow:
+          var(--shadow-soft),
+          0 0 34px rgba(255, 210, 50, 0.1);
+      }
+
+      .quest-card:hover {
+        border-color: rgba(255, 210, 50, 0.78);
+        box-shadow:
+          var(--shadow-soft),
+          0 0 42px rgba(255, 210, 50, 0.22);
+      }
+
+      .quest-icon,
+      .stage-icon {
+        display: grid;
+        place-items: center;
+        border-radius: 22px;
+        font-size: 2rem;
+      }
+
+      .quest-icon {
+        width: 72px;
+        height: 72px;
+        border: 1px solid rgba(255, 210, 50, 0.55);
+        background: rgba(255, 210, 50, 0.1);
+        color: var(--yellow);
+        box-shadow: 0 0 24px rgba(255, 210, 50, 0.16);
+      }
+
+      .quest-title,
+      .stage-title {
+        margin: 0;
+        font-size: 1.45rem;
+      }
+
+      .quest-title {
+        color: var(--yellow);
+      }
+
+      .quest-description,
+      .stage-description,
+      .progress-note,
+      .slogan-text,
+      .empty {
+        color: var(--muted);
+      }
+
+      .quest-description,
+      .stage-description {
+        margin: 8px 0 0;
+      }
+
+      .quest-arrow {
+        display: grid;
+        width: 52px;
+        height: 52px;
+        place-items: center;
+        border: 1px solid rgba(255, 210, 50, 0.52);
+        border-radius: 50%;
+        color: var(--yellow);
+        font-size: 1.6rem;
+        box-shadow: 0 0 22px rgba(255, 210, 50, 0.14);
+      }
+
+      .stage-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-top: 28px;
+      }
+
+      .stage-card {
+        display: grid;
+        min-height: 330px;
+        align-content: start;
+        gap: 18px;
+        padding: 26px;
+      }
+
+      .stage-card[data-tone="green"] {
+        border-color: rgba(50, 232, 137, 0.34);
+        box-shadow: var(--shadow-soft), 0 0 24px rgba(50, 232, 137, 0.1);
+      }
+
+      .stage-card[data-tone="orange"] {
+        border-color: rgba(255, 138, 42, 0.34);
+        box-shadow: var(--shadow-soft), 0 0 24px rgba(255, 138, 42, 0.1);
+      }
+
+      .stage-card[data-tone="purple"] {
+        border-color: rgba(174, 92, 255, 0.34);
+        box-shadow: var(--shadow-soft), 0 0 24px rgba(174, 92, 255, 0.12);
+      }
+
+      .stage-card:hover {
+        border-color: currentColor;
+      }
+
+      .stage-card.is-not-started {
+        opacity: 0.66;
+        filter: saturate(0.75);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .stage-card.is-in-progress {
+        opacity: 1;
+        filter: none;
+      }
+
+      .stage-card.is-complete {
+        opacity: 1;
+        filter: brightness(1.08);
+        box-shadow:
+          var(--shadow-soft),
+          0 0 36px color-mix(in srgb, currentColor 24%, transparent);
+      }
+
+      .stage-card[data-tone="green"],
+      .stage-card[data-tone="green"] .stage-title,
+      .stage-card[data-tone="green"] .stage-icon {
+        color: var(--green);
+      }
+
+      .stage-card[data-tone="orange"],
+      .stage-card[data-tone="orange"] .stage-title,
+      .stage-card[data-tone="orange"] .stage-icon {
+        color: var(--orange);
+      }
+
+      .stage-card[data-tone="purple"],
+      .stage-card[data-tone="purple"] .stage-title,
+      .stage-card[data-tone="purple"] .stage-icon {
+        color: var(--purple);
+      }
+
+      .stage-icon {
+        width: 68px;
+        height: 68px;
+        border: 1px solid currentColor;
+        background: color-mix(in srgb, currentColor 13%, transparent);
+        box-shadow: 0 0 22px color-mix(in srgb, currentColor 18%, transparent);
+      }
+
+      .stage-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 850;
+        letter-spacing: 0.28em;
+      }
+
+      .state-pill {
+        width: fit-content;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        padding: 5px 12px;
+        background: color-mix(in srgb, currentColor 10%, transparent);
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .stage-card.is-complete .state-pill::before {
+        content: "CLEAR ";
+      }
+
+      .stage-button {
+        width: fit-content;
+        margin-top: auto;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        background: color-mix(in srgb, currentColor 10%, transparent);
+        color: inherit;
+        padding: 8px 15px;
+        font-weight: 850;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin: 32px 0;
+      }
+
+      .stat-card {
+        padding: 18px;
+      }
+
+      .stat-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 800;
+      }
+
+      .stat-value {
+        margin: 6px 0 0;
+        color: var(--cyan);
+        font-size: 1.42rem;
+        font-weight: 900;
+        overflow-wrap: anywhere;
+      }
+
+      .next-step-card {
+        display: grid;
+        gap: 12px;
+        margin: -12px 0 34px;
+        padding: 22px;
+        border-color: rgba(54, 201, 255, 0.38);
+        box-shadow:
+          var(--shadow-soft),
+          0 0 30px rgba(54, 201, 255, 0.12);
+      }
+
+      .next-step-card.is-active {
+        border-color: rgba(54, 201, 255, 0.62);
+      }
+
+      .next-step-card.is-clear {
+        border-color: rgba(50, 232, 137, 0.54);
+        box-shadow:
+          var(--shadow-soft),
+          0 0 34px rgba(50, 232, 137, 0.16);
+      }
+
+      .next-step-card.is-empty {
+        opacity: 0.78;
+        border-color: rgba(141, 155, 181, 0.24);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .next-step-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .next-step-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 850;
+        letter-spacing: 0.22em;
+      }
+
+      .next-step-status {
+        width: fit-content;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        background: rgba(54, 201, 255, 0.09);
+        color: var(--cyan);
+        padding: 5px 12px;
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .next-step-card.is-clear .next-step-status {
+        color: var(--green);
+        background: rgba(50, 232, 137, 0.1);
+      }
+
+      .next-step-card.is-empty .next-step-status {
+        color: var(--muted);
+        background: rgba(141, 155, 181, 0.08);
+      }
+
+      .next-step-title {
+        margin: 0;
+        color: var(--text);
+        font-size: clamp(1.3rem, 3vw, 1.85rem);
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .next-step-description {
+        margin: 0;
+        color: var(--muted);
+        font-weight: 650;
+      }
+
+      .console-heading {
+        margin-top: 38px;
+      }
+
+      .slogan-card {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 18px;
+        padding: 20px;
+      }
+
+      .slogan-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .slogan-text {
+        margin: 0;
+        font-size: 1.02rem;
+      }
+
+      .slogan-edit {
+        display: none;
+        gap: 10px;
+      }
+
+      .slogan-edit.is-active {
+        display: grid;
+      }
+
+      .slogan-display.is-hidden {
+        display: none;
+      }
+
+      .slogan-actions,
+      .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .tabs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 18px 0;
+        padding: 8px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(54, 201, 255, 0.06);
+      }
+
+      .tab-button {
+        min-height: 48px;
+        border-radius: 14px;
+        background: transparent;
+        color: var(--muted);
+        font-weight: 850;
+      }
+
+      .tab-button.is-active {
+        background: rgba(54, 201, 255, 0.14);
+        color: var(--cyan);
+        box-shadow: 0 0 20px rgba(54, 201, 255, 0.18);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .section-title {
+        margin: 0 0 14px;
+        color: var(--text);
+        font-size: 1.18rem;
+      }
+
+      .goal-form {
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+        margin-bottom: 16px;
+        background: rgba(5, 8, 18, 0.34);
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .field label {
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 800;
+      }
+
+      input,
+      select {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid rgba(54, 201, 255, 0.24);
+        border-radius: 14px;
+        background: rgba(4, 8, 18, 0.72);
+        color: var(--text);
+        padding: 10px 13px;
+        outline: none;
+      }
+
+      input::placeholder {
+        color: #63708d;
+      }
+
+      select {
+        accent-color: var(--cyan);
+      }
+
+      input:focus,
+      select:focus {
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 4px rgba(54, 201, 255, 0.12);
+      }
+
+      .button {
+        border: 1px solid rgba(54, 201, 255, 0.28);
+        background: rgba(54, 201, 255, 0.1);
+        color: var(--cyan);
+        box-shadow: 0 0 18px rgba(54, 201, 255, 0.1);
+      }
+
+      .button:hover {
+        border-color: var(--cyan);
+        background: rgba(54, 201, 255, 0.16);
+        box-shadow: var(--shadow-cyan);
+      }
+
+      .button.secondary {
+        border-color: rgba(141, 155, 181, 0.28);
+        background: rgba(141, 155, 181, 0.08);
+        color: var(--text);
+        box-shadow: none;
+      }
+
+      .button.secondary:hover {
+        border-color: rgba(54, 201, 255, 0.46);
+        color: var(--cyan);
+      }
+
+      .button.danger {
+        border-color: rgba(255, 111, 123, 0.28);
+        background: rgba(255, 111, 123, 0.08);
+        color: var(--danger);
+        box-shadow: none;
+      }
+
+      .button.danger:hover {
+        border-color: rgba(255, 111, 123, 0.56);
+        box-shadow: 0 0 22px rgba(255, 111, 123, 0.12);
+      }
+
+      .goal-list {
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .goal-item {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 14px;
+        border: 1px solid rgba(54, 201, 255, 0.18);
+        border-radius: 18px;
+        background: rgba(5, 8, 18, 0.38);
+      }
+
+      .goal-item:hover {
+        border-color: rgba(54, 201, 255, 0.48);
+        box-shadow: 0 0 26px rgba(54, 201, 255, 0.12);
+      }
+
+      .goal-check {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border: 2px solid var(--cyan);
+        border-radius: 50%;
+        background: transparent;
+        color: var(--text);
+        font-weight: 900;
+      }
+
+      .goal-item.is-done .goal-check {
+        background: var(--cyan);
+        color: #03111d;
+      }
+
+      .goal-title {
+        margin: 0;
+        overflow-wrap: anywhere;
+        font-weight: 800;
+      }
+
+      .goal-item.is-done .goal-title {
+        color: var(--muted);
+        text-decoration: line-through;
+      }
+
+      .goal-meta {
+        display: inline-flex;
+        width: fit-content;
+        margin-top: 4px;
+        border: 1px solid rgba(54, 201, 255, 0.24);
+        border-radius: 999px;
+        background: rgba(54, 201, 255, 0.08);
+        color: var(--cyan);
+        padding: 2px 9px;
+        font-size: 0.8rem;
+        font-weight: 800;
+      }
+
+      .empty {
+        margin: 0;
+        padding: 24px 18px;
+        text-align: center;
+      }
+
+      .progress-stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .progress-card {
+        padding: 18px;
+      }
+
+      .progress-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 9px;
+      }
+
+      .progress-label {
+        margin: 0;
+        font-weight: 850;
+      }
+
+      .progress-number {
+        color: var(--cyan);
+        font-size: 1.35rem;
+        font-weight: 950;
+      }
+
+      .progress-note {
+        margin: 6px 0 0;
+        font-size: 0.88rem;
+      }
+
+      .bar {
+        height: 12px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(141, 155, 181, 0.14);
+      }
+
+      .bar-fill {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--cyan), var(--purple));
+        box-shadow: 0 0 18px rgba(54, 201, 255, 0.32);
+        transition: width 180ms ease;
+      }
+
+      .category-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .category-row {
+        display: grid;
+        gap: 6px;
+      }
+
+      .category-row .progress-head {
+        margin-bottom: 0;
+      }
+
+      .small-number {
+        color: var(--cyan);
+        font-weight: 850;
+      }
+
+      @media (max-width: 900px) {
+        .hero {
+          min-height: auto;
+        }
+
+        .stage-grid,
+        .stats-grid,
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .app {
+          padding: 22px 14px 44px;
+        }
+
+        .hero {
+          gap: 14px;
+          padding: 18px 2px 40px;
+        }
+
+        .hero-icon {
+          width: 82px;
+          height: 82px;
+          border-radius: 24px;
+          font-size: 2.05rem;
+          box-shadow:
+            inset 0 0 0 6px rgba(54, 201, 255, 0.04),
+            0 0 28px rgba(54, 201, 255, 0.18);
+        }
+
+        .app-title {
+          max-width: 11em;
+          margin-top: 14px;
+          font-size: clamp(2.25rem, 14vw, 3.55rem);
+          line-height: 1.08;
+        }
+
+        .hero-kicker {
+          font-size: 1rem;
+          letter-spacing: 0.14em;
+        }
+
+        .hero-copy {
+          max-width: 31em;
+          gap: 8px;
+          font-size: 0.98rem;
+          line-height: 1.8;
+        }
+
+        .cta-button {
+          min-height: 54px;
+          margin-top: 12px;
+          padding: 10px 16px;
+        }
+
+        .section-heading {
+          margin-bottom: 14px;
+          font-size: 1rem;
+        }
+
+        .quest-map,
+        .goal-console {
+          margin-top: 10px;
+        }
+
+        .quest-card,
+        .stage-card,
+        .slogan-card,
+        .panel,
+        .goal-form,
+        .goal-list,
+        .progress-card,
+        .stat-card,
+        .next-step-card {
+          border-radius: 20px;
+          box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+        }
+
+        .quest-card,
+        .slogan-display,
+        .goal-item {
+          grid-template-columns: 1fr;
+        }
+
+        .quest-card {
+          gap: 16px;
+          padding: 20px;
+        }
+
+        .quest-icon,
+        .stage-icon {
+          width: 58px;
+          height: 58px;
+          border-radius: 18px;
+          font-size: 1.65rem;
+        }
+
+        .quest-arrow {
+          justify-self: end;
+        }
+
+        .stage-grid {
+          gap: 14px;
+          margin-top: 18px;
+        }
+
+        .stage-card {
+          min-height: auto;
+          gap: 13px;
+          padding: 20px;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+          margin: 24px 0;
+        }
+
+        .next-step-card {
+          margin: -8px 0 26px;
+          padding: 18px;
+        }
+
+        .next-step-head {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .next-step-title {
+          font-size: 1.28rem;
+        }
+
+        .stat-card {
+          padding: 15px;
+        }
+
+        .stat-value {
+          font-size: clamp(1.05rem, 7vw, 1.28rem);
+          line-height: 1.35;
+        }
+
+        .slogan-card,
+        .panel {
+          padding: 18px;
+        }
+
+        .tabs {
+          gap: 6px;
+          padding: 6px;
+        }
+
+        input,
+        select {
+          min-height: 50px;
+          font-size: 1rem;
+        }
+
+        .tab-button,
+        .button {
+          min-height: 44px;
+          padding-inline: 12px;
+        }
+
+        .form-actions .button,
+        .goal-item .button {
+          width: 100%;
+        }
+
+        .goal-list {
+          padding: 10px;
+        }
+
+        .goal-item {
+          gap: 10px;
+          padding: 14px;
+        }
+
+        .goal-check {
+          width: 34px;
+          height: 34px;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .app {
+          padding-inline: 12px;
+        }
+
+        .app-title {
+          font-size: clamp(2rem, 13vw, 3.1rem);
+        }
+
+        .hero-kicker {
+          letter-spacing: 0.1em;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <div class="hero-icon" aria-hidden="true">★</div>
+        <h1 class="app-title">理想の自分へ</h1>
+        <p class="hero-kicker">目標達成アプリ</p>
+        <div class="hero-copy">
+          <p>目標をクエストに変えて、毎日の小さな行動を積み重ねよう。</p>
+          <p>進捗を見える化しながら、理想の未来へ一歩ずつ近づくためのアプリです。</p>
+        </div>
+        <a class="cta-button" href="#goal-console">今日の目標を確認する <span aria-hidden="true">→</span></a>
+      </header>
+
+      <section class="quest-map" aria-label="目標マップ">
+        <h2 class="section-heading">目標マップ</h2>
+        <article class="quest-card">
+          <div class="quest-icon" aria-hidden="true">◇</div>
+          <div>
+            <h3 class="quest-title">現在のゴールを確認する</h3>
+            <p class="quest-description">最終ゴールまでの道のり、今いるステージ、次にやるべき行動をひと目で確認できます。</p>
+          </div>
+          <a class="quest-arrow" href="#goal-console" aria-label="現在の目標管理へ進む">›</a>
+        </article>
+
+        <div class="stage-grid" aria-label="ステージ別カード">
+          <article class="stage-card" data-stage="stage1" data-tone="green">
+            <div class="stage-icon" aria-hidden="true">⚑</div>
+            <p class="stage-label">STAGE 1</p>
+            <span class="state-pill">未着手</span>
+            <h3 class="stage-title">目標を決める</h3>
+            <p class="stage-description">達成したい未来を言語化し、具体的なゴールを設定するステージです。</p>
+            <a class="stage-button" href="#goal-console">これから始める</a>
+          </article>
+
+          <article class="stage-card" data-stage="stage2" data-tone="orange">
+            <div class="stage-icon" aria-hidden="true">✓</div>
+            <p class="stage-label">STAGE 2</p>
+            <span class="state-pill">未着手</span>
+            <h3 class="stage-title">行動を積み上げる</h3>
+            <p class="stage-description">毎日のタスクや習慣を記録し、目標達成に必要な行動を継続するステージです。</p>
+            <a class="stage-button" href="#goal-console">これから始める</a>
+          </article>
+
+          <article class="stage-card" data-stage="stage3" data-tone="purple">
+            <div class="stage-icon" aria-hidden="true">✦</div>
+            <p class="stage-label">STAGE 3</p>
+            <span class="state-pill">未着手</span>
+            <h3 class="stage-title">進捗を振り返る</h3>
+            <p class="stage-description">達成率や行動ログを見ながら、次に改善するポイントを見つけるステージです。</p>
+            <a class="stage-button" href="#goal-console">これから始める</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="進捗サマリー">
+        <article class="stat-card">
+          <p class="stat-label">今日の達成率</p>
+          <p class="stat-value" id="statTodayPercent">0%</p>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">目標総数</p>
+          <p class="stat-value" id="statTotalGoals">0個</p>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">達成済み</p>
+          <p class="stat-value" id="statDoneGoals">0個</p>
+        </article>
+        <article class="stat-card">
+          <p class="stat-label">未達成</p>
+          <p class="stat-value" id="statUndoneGoals">0個</p>
+        </article>
+      </section>
+
+      <section class="next-step-card is-empty" id="nextStepCard" aria-label="次の一歩">
+        <div class="next-step-head">
+          <p class="next-step-label">次の一歩</p>
+          <span class="next-step-status" id="nextStepStatus">未設定</span>
+        </div>
+        <h2 class="next-step-title" id="nextStepTitle">今日の一歩を決めましょう</h2>
+        <p class="next-step-description" id="nextStepDescription">まずは小さな目標を1つ追加してみましょう。</p>
+      </section>
+
+      <section class="goal-console" id="goal-console" aria-label="目標管理コンソール">
+        <h2 class="section-heading console-heading">目標管理</h2>
+
+        <section class="slogan-card" aria-label="スローガン">
+          <div class="slogan-display" id="sloganDisplay">
+            <p class="slogan-text" id="sloganText">理想の島を、今日の一歩からつくる</p>
+            <button class="button secondary" type="button" id="editSloganButton">編集</button>
+          </div>
+
+          <div class="slogan-edit" id="sloganEdit">
+            <div class="field">
+              <label for="sloganInput">スローガン</label>
+              <input id="sloganInput" type="text" maxlength="80" />
+            </div>
+            <div class="slogan-actions">
+              <button class="button" type="button" id="saveSloganButton">保存</button>
+              <button class="button secondary" type="button" id="cancelSloganButton">キャンセル</button>
+            </div>
+          </div>
+        </section>
+
+        <nav class="tabs" aria-label="目標の期間">
+          <button class="tab-button is-active" type="button" data-tab="year">年間</button>
+          <button class="tab-button" type="button" data-tab="month">今月</button>
+          <button class="tab-button" type="button" data-tab="today">今日</button>
+        </nav>
+
+        <div class="layout">
+          <section class="panel" aria-label="目標管理">
+            <h2 class="section-title" id="currentTabTitle">年間の目標</h2>
+
+            <form class="goal-form" id="goalForm">
+              <div class="field">
+                <label for="goalTitle">目標タイトル</label>
+                <input id="goalTitle" type="text" placeholder="例：資格の勉強を30分する" maxlength="80" />
+              </div>
+              <div class="field">
+                <label for="goalCategory">カテゴリー</label>
+                <select id="goalCategory">
+                  <option value="仕事">仕事</option>
+                  <option value="お金">お金</option>
+                  <option value="プライベート">プライベート</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button class="button" type="submit">目標を追加</button>
+              </div>
+            </form>
+
+            <div class="goal-list" id="goalList"></div>
+          </section>
+
+          <aside class="progress-stack" aria-label="進捗">
+            <section class="progress-card">
+              <div class="progress-head">
+                <p class="progress-label">全体進捗</p>
+                <span class="progress-number" id="overallPercent">0%</span>
+              </div>
+              <div class="bar" aria-hidden="true">
+                <div class="bar-fill" id="overallBar"></div>
+              </div>
+              <p class="progress-note" id="overallCount">0個中0個達成</p>
+            </section>
+
+            <section class="progress-card">
+              <h2 class="section-title">カテゴリー別</h2>
+              <div class="category-grid" id="categoryProgress"></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const DEFAULT_SLOGAN = "理想の島を、今日の一歩からつくる";
+      const SLOGAN_STORAGE_KEY = "idealIslandSlogan";
+      const GOALS_STORAGE_KEY = "idealIslandGoals";
+      const TAB_LABELS = {
+        year: "年間",
+        month: "今月",
+        today: "今日",
+      };
+      const CATEGORIES = ["仕事", "お金", "プライベート"];
+
+      const initialGoals = {
+        year: [],
+        month: [],
+        today: [],
+      };
+
+      let activeTab = "year";
+      let slogan = loadSlogan();
+      let goalsByTab = loadGoals();
+
+      const sloganText = document.getElementById("sloganText");
+      const sloganInput = document.getElementById("sloganInput");
+      const sloganDisplay = document.getElementById("sloganDisplay");
+      const sloganEdit = document.getElementById("sloganEdit");
+      const editSloganButton = document.getElementById("editSloganButton");
+      const saveSloganButton = document.getElementById("saveSloganButton");
+      const cancelSloganButton = document.getElementById("cancelSloganButton");
+      const tabButtons = document.querySelectorAll(".tab-button");
+      const currentTabTitle = document.getElementById("currentTabTitle");
+      const goalForm = document.getElementById("goalForm");
+      const goalTitle = document.getElementById("goalTitle");
+      const goalCategory = document.getElementById("goalCategory");
+      const goalList = document.getElementById("goalList");
+      const overallPercent = document.getElementById("overallPercent");
+      const overallBar = document.getElementById("overallBar");
+      const overallCount = document.getElementById("overallCount");
+      const categoryProgress = document.getElementById("categoryProgress");
+      const statTodayPercent = document.getElementById("statTodayPercent");
+      const statTotalGoals = document.getElementById("statTotalGoals");
+      const statDoneGoals = document.getElementById("statDoneGoals");
+      const statUndoneGoals = document.getElementById("statUndoneGoals");
+      const stageCards = document.querySelectorAll(".stage-card[data-stage]");
+      const nextStepCard = document.getElementById("nextStepCard");
+      const nextStepStatus = document.getElementById("nextStepStatus");
+      const nextStepTitle = document.getElementById("nextStepTitle");
+      const nextStepDescription = document.getElementById("nextStepDescription");
+
+      editSloganButton.addEventListener("click", startSloganEdit);
+      saveSloganButton.addEventListener("click", saveSlogan);
+      cancelSloganButton.addEventListener("click", cancelSloganEdit);
+      goalForm.addEventListener("submit", addGoal);
+
+      tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeTab = button.dataset.tab;
+          render();
+        });
+      });
+
+      goalList.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+
+        const goalId = button.dataset.id;
+        const action = button.dataset.action;
+
+        if (action === "toggle") {
+          toggleGoal(goalId);
+        }
+
+        if (action === "delete") {
+          deleteGoal(goalId);
+        }
+      });
+
+      function loadSlogan() {
+        const savedSlogan = localStorage.getItem(SLOGAN_STORAGE_KEY);
+        return savedSlogan && savedSlogan.trim() ? savedSlogan : DEFAULT_SLOGAN;
+      }
+
+      function loadGoals() {
+        const savedGoals = localStorage.getItem(GOALS_STORAGE_KEY);
+        if (!savedGoals) return { ...initialGoals };
+
+        try {
+          const parsedGoals = JSON.parse(savedGoals);
+          return {
+            year: Array.isArray(parsedGoals.year) ? parsedGoals.year : [],
+            month: Array.isArray(parsedGoals.month) ? parsedGoals.month : [],
+            today: Array.isArray(parsedGoals.today) ? parsedGoals.today : [],
+          };
+        } catch {
+          return { ...initialGoals };
+        }
+      }
+
+      function saveGoals() {
+        localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goalsByTab));
+      }
+
+      function startSloganEdit() {
+        sloganInput.value = slogan;
+        sloganDisplay.classList.add("is-hidden");
+        sloganEdit.classList.add("is-active");
+        sloganInput.focus();
+      }
+
+      function saveSlogan() {
+        const nextSlogan = sloganInput.value.trim() || DEFAULT_SLOGAN;
+        slogan = nextSlogan;
+        localStorage.setItem(SLOGAN_STORAGE_KEY, slogan);
+        closeSloganEdit();
+        renderSlogan();
+      }
+
+      function cancelSloganEdit() {
+        sloganInput.value = slogan;
+        closeSloganEdit();
+      }
+
+      function closeSloganEdit() {
+        sloganDisplay.classList.remove("is-hidden");
+        sloganEdit.classList.remove("is-active");
+      }
+
+      function addGoal(event) {
+        event.preventDefault();
+
+        const title = goalTitle.value.trim();
+        if (!title) {
+          goalTitle.focus();
+          return;
+        }
+
+        const goal = {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          title,
+          category: goalCategory.value,
+          done: false,
+          createdAt: new Date().toISOString(),
+        };
+
+        goalsByTab[activeTab].push(goal);
+        saveGoals();
+        goalForm.reset();
+        goalCategory.value = "仕事";
+        goalTitle.focus();
+        render();
+      }
+
+      function toggleGoal(goalId) {
+        goalsByTab[activeTab] = goalsByTab[activeTab].map((goal) =>
+          goal.id === goalId ? { ...goal, done: !goal.done } : goal
+        );
+        saveGoals();
+        render();
+      }
+
+      function deleteGoal(goalId) {
+        goalsByTab[activeTab] = goalsByTab[activeTab].filter((goal) => goal.id !== goalId);
+        saveGoals();
+        render();
+      }
+
+      function getProgress(goals) {
+        const total = goals.length;
+        const done = goals.filter((goal) => goal.done).length;
+        const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+        return { total, done, percent };
+      }
+
+      function renderSlogan() {
+        sloganText.textContent = slogan;
+      }
+
+      function renderTabs() {
+        tabButtons.forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.tab === activeTab);
+        });
+        currentTabTitle.textContent = `${TAB_LABELS[activeTab]}の目標`;
+      }
+
+      function renderGoals() {
+        const goals = goalsByTab[activeTab];
+
+        if (goals.length === 0) {
+          goalList.innerHTML = `<p class="empty">まだ目標がありません。小さな一歩を追加してみましょう。</p>`;
+          return;
+        }
+
+        goalList.innerHTML = goals
+          .map(
+            (goal) => `
+              <article class="goal-item ${goal.done ? "is-done" : ""}">
+                <button
+                  class="goal-check"
+                  type="button"
+                  data-action="toggle"
+                  data-id="${escapeHtml(goal.id)}"
+                  aria-label="${goal.done ? "未達成に戻す" : "達成にする"}"
+                >${goal.done ? "✓" : ""}</button>
+                <div>
+                  <p class="goal-title">${escapeHtml(goal.title)}</p>
+                  <span class="goal-meta">${escapeHtml(goal.category)}</span>
+                </div>
+                <button
+                  class="button danger"
+                  type="button"
+                  data-action="delete"
+                  data-id="${escapeHtml(goal.id)}"
+                >削除</button>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function renderProgress() {
+        const goals = goalsByTab[activeTab];
+        const progress = getProgress(goals);
+
+        overallPercent.textContent = `${progress.percent}%`;
+        overallBar.style.width = `${progress.percent}%`;
+        overallCount.textContent = `${progress.total}個中${progress.done}個達成`;
+
+        categoryProgress.innerHTML = CATEGORIES.map((category) => {
+          const categoryGoals = goals.filter((goal) => goal.category === category);
+          const categoryResult = getProgress(categoryGoals);
+
+          return `
+            <div class="category-row">
+              <div class="progress-head">
+                <p class="progress-label">${category}</p>
+                <span class="small-number">${categoryResult.percent}%</span>
+              </div>
+              <div class="bar" aria-hidden="true">
+                <div class="bar-fill" style="width: ${categoryResult.percent}%"></div>
+              </div>
+              <p class="progress-note">${categoryResult.total}個中${categoryResult.done}個達成</p>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function renderStats() {
+        const todayProgress = getProgress(goalsByTab.today);
+        const allGoals = Object.values(goalsByTab).flat();
+        const allProgress = getProgress(allGoals);
+        const undone = allProgress.total - allProgress.done;
+
+        statTodayPercent.textContent = `${todayProgress.percent}%`;
+        statTotalGoals.textContent = `${allProgress.total}個`;
+        statDoneGoals.textContent = `${allProgress.done}個`;
+        statUndoneGoals.textContent = `${undone}個`;
+      }
+
+      function getStageStatus() {
+        const allGoals = Object.values(goalsByTab).flat();
+        const allProgress = getProgress(allGoals);
+        const todayProgress = getProgress(goalsByTab.today);
+
+        const stage1 = allProgress.total === 0 ? "not-started" : "in-progress";
+        const stage2 =
+          todayProgress.total === 0 ? "not-started" : todayProgress.done > 0 ? "complete" : "in-progress";
+        const stage3 =
+          allProgress.done === 0 ? "not-started" : allProgress.percent === 100 ? "complete" : "in-progress";
+
+        return { stage1, stage2, stage3 };
+      }
+
+      function getStageButtonText(status) {
+        if (status === "complete") return "達成済み";
+        if (status === "in-progress") return "続きを進める";
+        return "これから始める";
+      }
+
+      function getStageLabel(status) {
+        if (status === "complete") return "達成";
+        if (status === "in-progress") return "進行中";
+        return "未着手";
+      }
+
+      function renderStages() {
+        const statuses = getStageStatus();
+
+        stageCards.forEach((card) => {
+          const status = statuses[card.dataset.stage] || "not-started";
+          const label = card.querySelector(".state-pill");
+          const button = card.querySelector(".stage-button");
+
+          card.classList.toggle("is-not-started", status === "not-started");
+          card.classList.toggle("is-in-progress", status === "in-progress");
+          card.classList.toggle("is-complete", status === "complete");
+          card.setAttribute("data-status", status);
+
+          if (label) label.textContent = getStageLabel(status);
+          if (button) button.textContent = getStageButtonText(status);
+        });
+      }
+
+      function renderNextStep() {
+        const todayGoals = goalsByTab.today;
+        const nextGoal = todayGoals.find((goal) => !goal.done);
+        let status = "empty";
+        let label = "未設定";
+        let title = "今日の一歩を決めましょう";
+        let description = "まずは小さな目標を1つ追加してみましょう。";
+
+        if (nextGoal) {
+          status = "active";
+          label = "進行中";
+          title = nextGoal.title;
+          description = "まずはこの目標から進めましょう。";
+        } else if (todayGoals.length > 0) {
+          status = "clear";
+          label = "CLEAR";
+          title = "今日の目標はすべて達成済みです";
+          description = "お疲れさま！今日はもう十分前に進んでいます。";
+        }
+
+        nextStepCard.classList.toggle("is-active", status === "active");
+        nextStepCard.classList.toggle("is-clear", status === "clear");
+        nextStepCard.classList.toggle("is-empty", status === "empty");
+        nextStepCard.setAttribute("data-status", status);
+        nextStepStatus.textContent = label;
+        nextStepTitle.textContent = title;
+        nextStepDescription.textContent = description;
+      }
+
+      function render() {
+        renderSlogan();
+        renderTabs();
+        renderGoals();
+        renderProgress();
+        renderStats();
+        renderStages();
+        renderNextStep();
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      render();
+    </script>
+  </body>
+</html>
