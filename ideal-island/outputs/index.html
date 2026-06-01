@@ -365,9 +365,23 @@
         border-color: currentColor;
       }
 
-      .stage-card.is-locked {
-        opacity: 0.72;
-        filter: saturate(0.8);
+      .stage-card.is-not-started {
+        opacity: 0.66;
+        filter: saturate(0.75);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .stage-card.is-in-progress {
+        opacity: 1;
+        filter: none;
+      }
+
+      .stage-card.is-complete {
+        opacity: 1;
+        filter: brightness(1.08);
+        box-shadow:
+          var(--shadow-soft),
+          0 0 36px color-mix(in srgb, currentColor 24%, transparent);
       }
 
       .stage-card[data-tone="green"],
@@ -412,6 +426,10 @@
         background: color-mix(in srgb, currentColor 10%, transparent);
         font-size: 0.78rem;
         font-weight: 850;
+      }
+
+      .stage-card.is-complete .state-pill::before {
+        content: "CLEAR ";
       }
 
       .stage-button {
@@ -969,31 +987,31 @@
         </article>
 
         <div class="stage-grid" aria-label="ステージ別カード">
-          <article class="stage-card" data-tone="green">
+          <article class="stage-card" data-stage="stage1" data-tone="green">
             <div class="stage-icon" aria-hidden="true">⚑</div>
             <p class="stage-label">STAGE 1</p>
-            <span class="state-pill">進行中</span>
+            <span class="state-pill">未着手</span>
             <h3 class="stage-title">目標を決める</h3>
             <p class="stage-description">達成したい未来を言語化し、具体的なゴールを設定するステージです。</p>
-            <a class="stage-button" href="#goal-console">設定する</a>
+            <a class="stage-button" href="#goal-console">これから始める</a>
           </article>
 
-          <article class="stage-card" data-tone="orange">
+          <article class="stage-card" data-stage="stage2" data-tone="orange">
             <div class="stage-icon" aria-hidden="true">✓</div>
             <p class="stage-label">STAGE 2</p>
-            <span class="state-pill">進行中</span>
+            <span class="state-pill">未着手</span>
             <h3 class="stage-title">行動を積み上げる</h3>
             <p class="stage-description">毎日のタスクや習慣を記録し、目標達成に必要な行動を継続するステージです。</p>
-            <a class="stage-button" href="#goal-console">記録する</a>
+            <a class="stage-button" href="#goal-console">これから始める</a>
           </article>
 
-          <article class="stage-card is-locked" data-tone="purple">
+          <article class="stage-card" data-stage="stage3" data-tone="purple">
             <div class="stage-icon" aria-hidden="true">✦</div>
             <p class="stage-label">STAGE 3</p>
             <span class="state-pill">未着手</span>
             <h3 class="stage-title">進捗を振り返る</h3>
             <p class="stage-description">達成率や行動ログを見ながら、次に改善するポイントを見つけるステージです。</p>
-            <a class="stage-button" href="#goal-console">振り返る</a>
+            <a class="stage-button" href="#goal-console">これから始める</a>
           </article>
         </div>
       </section>
@@ -1132,6 +1150,7 @@
       const statTotalGoals = document.getElementById("statTotalGoals");
       const statDoneGoals = document.getElementById("statDoneGoals");
       const statUndoneGoals = document.getElementById("statUndoneGoals");
+      const stageCards = document.querySelectorAll(".stage-card[data-stage]");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -1342,12 +1361,57 @@
         statUndoneGoals.textContent = `${undone}個`;
       }
 
+      function getStageStatus() {
+        const allGoals = Object.values(goalsByTab).flat();
+        const allProgress = getProgress(allGoals);
+        const todayProgress = getProgress(goalsByTab.today);
+
+        const stage1 = allProgress.total === 0 ? "not-started" : "in-progress";
+        const stage2 =
+          todayProgress.total === 0 ? "not-started" : todayProgress.done > 0 ? "complete" : "in-progress";
+        const stage3 =
+          allProgress.done === 0 ? "not-started" : allProgress.percent === 100 ? "complete" : "in-progress";
+
+        return { stage1, stage2, stage3 };
+      }
+
+      function getStageButtonText(status) {
+        if (status === "complete") return "達成済み";
+        if (status === "in-progress") return "続きを進める";
+        return "これから始める";
+      }
+
+      function getStageLabel(status) {
+        if (status === "complete") return "達成";
+        if (status === "in-progress") return "進行中";
+        return "未着手";
+      }
+
+      function renderStages() {
+        const statuses = getStageStatus();
+
+        stageCards.forEach((card) => {
+          const status = statuses[card.dataset.stage] || "not-started";
+          const label = card.querySelector(".state-pill");
+          const button = card.querySelector(".stage-button");
+
+          card.classList.toggle("is-not-started", status === "not-started");
+          card.classList.toggle("is-in-progress", status === "in-progress");
+          card.classList.toggle("is-complete", status === "complete");
+          card.setAttribute("data-status", status);
+
+          if (label) label.textContent = getStageLabel(status);
+          if (button) button.textContent = getStageButtonText(status);
+        });
+      }
+
       function render() {
         renderSlogan();
         renderTabs();
         renderGoals();
         renderProgress();
         renderStats();
+        renderStages();
       }
 
       function escapeHtml(value) {
