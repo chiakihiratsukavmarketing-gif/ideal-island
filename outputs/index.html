@@ -2087,6 +2087,36 @@
         gap: 10px;
       }
 
+      .completed-task-section {
+        display: grid;
+        gap: 8px;
+      }
+
+      .completed-toggle {
+        display: flex;
+        width: 100%;
+        min-height: 46px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 18px;
+        background: #f8f9f5;
+        color: var(--text);
+        padding: 10px 13px;
+        font-weight: 850;
+      }
+
+      .completed-toggle span {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .completed-task-list {
+        display: grid;
+        gap: 8px;
+      }
+
       .goal-check {
         border: 1.5px solid var(--line);
         background: #ffffff;
@@ -3669,6 +3699,7 @@
       let reflectionStatusTimer = 0;
       let editingMonthlyGoalId = "";
       let editingGoalId = "";
+      let isCompletedTasksOpen = false;
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -3821,6 +3852,12 @@
 
         const goalId = button.dataset.id;
         const action = button.dataset.action;
+
+        if (action === "toggle-completed") {
+          isCompletedTasksOpen = !isCompletedTasksOpen;
+          renderGoals();
+          return;
+        }
 
         if (action === "edit") {
           startGoalEdit(goalId);
@@ -4601,6 +4638,9 @@
       }
 
       function toggleGoal(goalId) {
+        if (editingGoalId === goalId) {
+          editingGoalId = "";
+        }
         goalsByTab[activeTab] = goalsByTab[activeTab].map((goal) =>
           goal.id === goalId
             ? { ...goal, done: !goal.done, completedAt: !goal.done ? new Date().toISOString() : "" }
@@ -4868,9 +4908,106 @@
         });
       }
 
+      function renderGoalItem(goal) {
+        const dueMeta = getDueMeta(goal);
+        const dueBadge = dueMeta
+          ? `<span class="due-badge is-${dueMeta.tone}">${escapeHtml(dueMeta.label)}</span>`
+          : "";
+        const linkedMonthlyGoal = findMonthlyGoal(goal.monthlyGoalId);
+        const monthlyGoalBadge = linkedMonthlyGoal
+          ? `<span class="goal-monthly-link">今月の目標：${escapeHtml(linkedMonthlyGoal.title)}</span>`
+          : "";
+        const isEditing = goal.id === editingGoalId;
+
+        return `
+          <article class="goal-item ${goal.done ? "is-done" : ""} ${isEditing ? "is-editing" : ""}">
+            <button
+              class="goal-check"
+              type="button"
+              data-action="toggle"
+              data-id="${escapeHtml(goal.id)}"
+              aria-label="${goal.done ? "未達成に戻す" : "達成にする"}"
+            >${goal.done ? "✓" : ""}</button>
+            <div class="goal-content">
+              <p class="goal-title">${escapeHtml(goal.title)}</p>
+              <div class="goal-meta-row">
+                <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+                ${dueBadge}
+                ${monthlyGoalBadge}
+              </div>
+            </div>
+            <div class="goal-actions">
+              <button
+                class="button secondary goal-edit-button"
+                type="button"
+                data-action="edit"
+                data-id="${escapeHtml(goal.id)}"
+              >編集</button>
+              <button
+                class="button danger goal-delete-button"
+                type="button"
+                data-action="delete"
+                data-id="${escapeHtml(goal.id)}"
+                aria-label="${escapeHtml(goal.title)}を削除"
+              >削除</button>
+            </div>
+            ${
+              isEditing
+                ? `<form class="goal-edit-form" data-id="${escapeHtml(goal.id)}">
+                    <div class="field">
+                      <label for="goal-edit-title-${escapeHtml(goal.id)}">タスク名</label>
+                      <input
+                        id="goal-edit-title-${escapeHtml(goal.id)}"
+                        type="text"
+                        maxlength="80"
+                        value="${escapeHtml(goal.title)}"
+                        data-goal-edit-title="${escapeHtml(goal.id)}"
+                      />
+                    </div>
+                    <div class="field">
+                      <label for="goal-edit-due-${escapeHtml(goal.id)}">期限</label>
+                      <input
+                        id="goal-edit-due-${escapeHtml(goal.id)}"
+                        type="date"
+                        value="${escapeHtml(goal.dueDate || "")}"
+                        data-goal-edit-due-date="${escapeHtml(goal.id)}"
+                      />
+                    </div>
+                    <div class="field">
+                      <label for="goal-edit-category-${escapeHtml(goal.id)}">カテゴリ</label>
+                      <select
+                        id="goal-edit-category-${escapeHtml(goal.id)}"
+                        data-goal-edit-category="${escapeHtml(goal.id)}"
+                      >
+                        ${renderCategoryOptions(goal.category)}
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="goal-edit-monthly-${escapeHtml(goal.id)}">今月の目標</label>
+                      <select
+                        id="goal-edit-monthly-${escapeHtml(goal.id)}"
+                        data-goal-edit-monthly-goal="${escapeHtml(goal.id)}"
+                      >
+                        ${renderMonthlyGoalOptions(goal.monthlyGoalId)}
+                      </select>
+                    </div>
+                    <div class="goal-edit-actions">
+                      <button class="button" type="submit">保存する</button>
+                      <button class="button secondary" type="button" data-action="cancel-edit">キャンセル</button>
+                    </div>
+                  </form>`
+                : ""
+            }
+          </article>
+        `;
+      }
+
       function renderGoals() {
         const goals = goalsByTab[activeTab];
         const visibleGoals = filterGoals(goals);
+        const sortedVisibleGoals = sortGoals(visibleGoals);
+        const activeGoals = sortedVisibleGoals.filter((goal) => !goal.done);
+        const completedGoals = sortedVisibleGoals.filter((goal) => goal.done);
 
         if (visibleGoals.length === 0) {
           goalList.innerHTML = `
@@ -4883,103 +5020,37 @@
           return;
         }
 
-        goalList.innerHTML = sortGoals(visibleGoals)
-          .map(
-            (goal) => {
-              const dueMeta = getDueMeta(goal);
-              const dueBadge = dueMeta
-                ? `<span class="due-badge is-${dueMeta.tone}">${escapeHtml(dueMeta.label)}</span>`
-                : "";
-              const linkedMonthlyGoal = findMonthlyGoal(goal.monthlyGoalId);
-              const monthlyGoalBadge = linkedMonthlyGoal
-                ? `<span class="goal-monthly-link">今月の目標：${escapeHtml(linkedMonthlyGoal.title)}</span>`
-                : "";
-              const isEditing = goal.id === editingGoalId;
-
-              return `
-              <article class="goal-item ${goal.done ? "is-done" : ""} ${isEditing ? "is-editing" : ""}">
+        const activeGoalRows = activeGoals.map(renderGoalItem).join("");
+        const completedSection =
+          completedGoals.length > 0
+            ? `
+              <div class="completed-task-section">
                 <button
-                  class="goal-check"
+                  class="completed-toggle"
                   type="button"
-                  data-action="toggle"
-                  data-id="${escapeHtml(goal.id)}"
-                  aria-label="${goal.done ? "未達成に戻す" : "達成にする"}"
-                >${goal.done ? "✓" : ""}</button>
-                <div class="goal-content">
-                  <p class="goal-title">${escapeHtml(goal.title)}</p>
-                  <div class="goal-meta-row">
-                    <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
-                    ${dueBadge}
-                    ${monthlyGoalBadge}
-                  </div>
-                </div>
-                <div class="goal-actions">
-                  <button
-                    class="button secondary goal-edit-button"
-                    type="button"
-                    data-action="edit"
-                    data-id="${escapeHtml(goal.id)}"
-                  >編集</button>
-                  <button
-                    class="button danger goal-delete-button"
-                    type="button"
-                    data-action="delete"
-                    data-id="${escapeHtml(goal.id)}"
-                    aria-label="${escapeHtml(goal.title)}を削除"
-                  >削除</button>
-                </div>
+                  data-action="toggle-completed"
+                  aria-expanded="${isCompletedTasksOpen}"
+                >
+                  <strong>${isCompletedTasksOpen ? "完了済みタスクを閉じる" : `完了済みタスク ${completedGoals.length}件`}</strong>
+                  <span aria-hidden="true">${isCompletedTasksOpen ? "▲" : "▼"}</span>
+                </button>
                 ${
-                  isEditing
-                    ? `<form class="goal-edit-form" data-id="${escapeHtml(goal.id)}">
-                        <div class="field">
-                          <label for="goal-edit-title-${escapeHtml(goal.id)}">タスク名</label>
-                          <input
-                            id="goal-edit-title-${escapeHtml(goal.id)}"
-                            type="text"
-                            maxlength="80"
-                            value="${escapeHtml(goal.title)}"
-                            data-goal-edit-title="${escapeHtml(goal.id)}"
-                          />
-                        </div>
-                        <div class="field">
-                          <label for="goal-edit-due-${escapeHtml(goal.id)}">期限</label>
-                          <input
-                            id="goal-edit-due-${escapeHtml(goal.id)}"
-                            type="date"
-                            value="${escapeHtml(goal.dueDate || "")}"
-                            data-goal-edit-due-date="${escapeHtml(goal.id)}"
-                          />
-                        </div>
-                        <div class="field">
-                          <label for="goal-edit-category-${escapeHtml(goal.id)}">カテゴリ</label>
-                          <select
-                            id="goal-edit-category-${escapeHtml(goal.id)}"
-                            data-goal-edit-category="${escapeHtml(goal.id)}"
-                          >
-                            ${renderCategoryOptions(goal.category)}
-                          </select>
-                        </div>
-                        <div class="field">
-                          <label for="goal-edit-monthly-${escapeHtml(goal.id)}">今月の目標</label>
-                          <select
-                            id="goal-edit-monthly-${escapeHtml(goal.id)}"
-                            data-goal-edit-monthly-goal="${escapeHtml(goal.id)}"
-                          >
-                            ${renderMonthlyGoalOptions(goal.monthlyGoalId)}
-                          </select>
-                        </div>
-                        <div class="goal-edit-actions">
-                          <button class="button" type="submit">保存する</button>
-                          <button class="button secondary" type="button" data-action="cancel-edit">キャンセル</button>
-                        </div>
-                      </form>`
+                  isCompletedTasksOpen
+                    ? `<div class="completed-task-list">${completedGoals.map(renderGoalItem).join("")}</div>`
                     : ""
                 }
-              </article>
-            `;
-            }
-          )
-          .join("");
+              </div>
+            `
+            : "";
+
+        goalList.innerHTML =
+          `${activeGoalRows}${completedSection}` ||
+          `<div class="empty">
+            <span class="empty-icon" aria-hidden="true">☑</span>
+            <p class="empty-title">${getEmptyMessage()}</p>
+            <p class="empty-text">${getEmptyDescription()}</p>
+          </div>`;
+        return;
       }
 
       function renderProgress() {
