@@ -1528,7 +1528,8 @@
         font-size: 0.98rem;
       }
 
-      .task-filter {
+      .task-filter,
+      .category-filter {
         display: flex;
         gap: 8px;
         margin: 14px 0 4px;
@@ -1537,11 +1538,17 @@
         scrollbar-width: none;
       }
 
-      .task-filter::-webkit-scrollbar {
+      .category-filter {
+        margin-top: 2px;
+      }
+
+      .task-filter::-webkit-scrollbar,
+      .category-filter::-webkit-scrollbar {
         display: none;
       }
 
-      .task-filter-button {
+      .task-filter-button,
+      .category-filter-button {
         flex: 0 0 auto;
         min-height: 38px;
         border: 1.5px solid var(--line);
@@ -1557,12 +1564,21 @@
           transform 180ms ease;
       }
 
+      .category-filter-button {
+        min-height: 34px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+
       .task-filter-button:hover,
-      .task-filter-button:active {
+      .task-filter-button:active,
+      .category-filter-button:hover,
+      .category-filter-button:active {
         transform: translateY(-1px);
       }
 
-      .task-filter-button.is-active {
+      .task-filter-button.is-active,
+      .category-filter-button.is-active {
         border-color: rgba(36, 38, 34, 0.16);
         background: var(--lime);
         color: #1f2718;
@@ -1608,6 +1624,42 @@
         background: #f4f6ef;
         color: var(--muted);
         font-size: 0.74rem;
+      }
+
+      .goal-meta.is-work {
+        border-color: rgba(107, 178, 171, 0.34);
+        background: #eef9f7;
+        color: #4c7f79;
+      }
+
+      .goal-meta.is-study {
+        border-color: rgba(143, 179, 63, 0.28);
+        background: #f4f9e8;
+        color: #6f8733;
+      }
+
+      .goal-meta.is-health {
+        border-color: rgba(117, 178, 121, 0.28);
+        background: #eff8ee;
+        color: #5f835f;
+      }
+
+      .goal-meta.is-family {
+        border-color: rgba(226, 181, 72, 0.34);
+        background: #fff8e6;
+        color: #856a23;
+      }
+
+      .goal-meta.is-money {
+        border-color: rgba(166, 154, 132, 0.28);
+        background: #f5f2eb;
+        color: #776d5d;
+      }
+
+      .goal-meta.is-other {
+        border-color: var(--line-soft);
+        background: #f3f4f1;
+        color: var(--muted);
       }
 
       .goal-meta-row {
@@ -2206,8 +2258,11 @@
                 <label for="goalCategory">カテゴリー</label>
                 <select id="goalCategory">
                   <option value="仕事">仕事</option>
+                  <option value="学習">学習</option>
+                  <option value="健康">健康</option>
+                  <option value="家族">家族</option>
                   <option value="お金">お金</option>
-                  <option value="プライベート">プライベート</option>
+                  <option value="その他" selected>その他</option>
                 </select>
               </div>
               <div class="field">
@@ -2224,6 +2279,15 @@
               <button class="task-filter-button" type="button" data-filter="today">今日</button>
               <button class="task-filter-button" type="button" data-filter="week">今週</button>
               <button class="task-filter-button" type="button" data-filter="noDue">期限なし</button>
+            </nav>
+            <nav class="category-filter" aria-label="カテゴリフィルター">
+              <button class="category-filter-button is-active" type="button" data-category-filter="all">すべて</button>
+              <button class="category-filter-button" type="button" data-category-filter="仕事">仕事</button>
+              <button class="category-filter-button" type="button" data-category-filter="学習">学習</button>
+              <button class="category-filter-button" type="button" data-category-filter="健康">健康</button>
+              <button class="category-filter-button" type="button" data-category-filter="家族">家族</button>
+              <button class="category-filter-button" type="button" data-category-filter="お金">お金</button>
+              <button class="category-filter-button" type="button" data-category-filter="その他">その他</button>
             </nav>
             <div class="goal-list" id="goalList"></div>
           </section>
@@ -2277,7 +2341,7 @@
         month: "今月",
         today: "今日",
       };
-      const CATEGORIES = ["仕事", "お金", "プライベート"];
+      const CATEGORIES = ["仕事", "学習", "健康", "家族", "お金", "その他"];
 
       const initialGoals = {
         year: [],
@@ -2287,6 +2351,7 @@
 
       let activeTab = "year";
       let activeFilter = "all";
+      let activeCategoryFilter = "all";
       let slogan = loadSlogan();
       let goalsByTab = loadGoals();
 
@@ -2300,6 +2365,7 @@
       const tabButtons = document.querySelectorAll(".tab-button");
       const bottomNavButtons = document.querySelectorAll(".bottom-nav-item");
       const taskFilterButtons = document.querySelectorAll(".task-filter-button");
+      const categoryFilterButtons = document.querySelectorAll(".category-filter-button");
       const currentTabTitle = document.getElementById("currentTabTitle");
       const goalForm = document.getElementById("goalForm");
       const goalTitle = document.getElementById("goalTitle");
@@ -2370,6 +2436,14 @@
         });
       });
 
+      categoryFilterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeCategoryFilter = button.dataset.categoryFilter;
+          renderGoals();
+          renderFilters();
+        });
+      });
+
       goalList.addEventListener("click", (event) => {
         const button = event.target.closest("button[data-action]");
         if (!button) return;
@@ -2415,7 +2489,7 @@
         return goals.map((goal) => ({
           ...goal,
           title: goal.title || goal.text || "",
-          category: goal.category || "仕事",
+          category: CATEGORIES.includes(goal.category) ? goal.category : "その他",
           done: Boolean(goal.done ?? goal.completed),
           dueDate: typeof goal.dueDate === "string" ? goal.dueDate : "",
           createdAt: goal.createdAt || new Date().toISOString(),
@@ -2478,7 +2552,7 @@
         goalsByTab[activeTab].push(goal);
         saveGoals();
         goalForm.reset();
-        goalCategory.value = "仕事";
+        goalCategory.value = "その他";
         goalDueDate.value = "";
         goalTitle.focus();
         render();
@@ -2559,30 +2633,53 @@
         });
       }
 
+      function getCategoryTone(category) {
+        const tones = {
+          仕事: "work",
+          学習: "study",
+          健康: "health",
+          家族: "family",
+          お金: "money",
+          その他: "other",
+        };
+        return tones[category] || "other";
+      }
+
       function filterGoals(goals) {
         const today = getTodayKey();
         const weekEnd = addDays(today, 6);
+        let filteredGoals = goals;
 
         if (activeFilter === "today") {
-          return goals.filter((goal) => goal.dueDate === today);
+          filteredGoals = filteredGoals.filter((goal) => goal.dueDate === today);
         }
 
         if (activeFilter === "week") {
-          return goals.filter((goal) => goal.dueDate && goal.dueDate >= today && goal.dueDate <= weekEnd);
+          filteredGoals = filteredGoals.filter((goal) => goal.dueDate && goal.dueDate >= today && goal.dueDate <= weekEnd);
         }
 
         if (activeFilter === "noDue") {
-          return goals.filter((goal) => !goal.dueDate);
+          filteredGoals = filteredGoals.filter((goal) => !goal.dueDate);
         }
 
-        return goals;
+        if (activeCategoryFilter !== "all") {
+          filteredGoals = filteredGoals.filter((goal) => goal.category === activeCategoryFilter);
+        }
+
+        return filteredGoals;
       }
 
       function getEmptyMessage() {
+        if (activeCategoryFilter !== "all") return "該当するタスクはありません";
         if (activeFilter === "today") return "今日が期限のタスクはありません";
         if (activeFilter === "week") return "今週が期限のタスクはありません";
         if (activeFilter === "noDue") return "期限なしのタスクはありません";
         return "まだタスクがありません";
+      }
+
+      function getEmptyDescription() {
+        if (activeCategoryFilter !== "all") return "条件を変えるか、新しいタスクを追加してください。";
+        return "今日やることを追加してください。";
       }
 
       function renderSlogan() {
@@ -2600,6 +2697,9 @@
         taskFilterButtons.forEach((button) => {
           button.classList.toggle("is-active", button.dataset.filter === activeFilter);
         });
+        categoryFilterButtons.forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.categoryFilter === activeCategoryFilter);
+        });
       }
 
       function renderGoals() {
@@ -2611,7 +2711,7 @@
             <div class="empty">
               <span class="empty-icon" aria-hidden="true">☑</span>
               <p class="empty-title">${getEmptyMessage()}</p>
-              <p class="empty-text">今日やることを追加してください。</p>
+              <p class="empty-text">${getEmptyDescription()}</p>
             </div>
           `;
           return;
@@ -2637,7 +2737,7 @@
                 <div class="goal-content">
                   <p class="goal-title">${escapeHtml(goal.title)}</p>
                   <div class="goal-meta-row">
-                    <span class="goal-meta">${escapeHtml(goal.category)}</span>
+                    <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
                     ${dueBadge}
                   </div>
                 </div>
