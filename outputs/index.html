@@ -2024,6 +2024,69 @@
         opacity: 0.78;
       }
 
+      .goal-item.is-editing {
+        background: #ffffff;
+        opacity: 1;
+      }
+
+      .goal-actions {
+        display: flex;
+        flex: 0 0 auto;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+
+      .goal-edit-button,
+      .goal-delete-button {
+        min-height: 34px;
+        padding: 0 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+      }
+
+      .goal-edit-button {
+        border-color: var(--line-soft);
+        background: #ffffff;
+        color: var(--muted);
+      }
+
+      .goal-edit-form {
+        display: grid;
+        grid-column: 1 / -1;
+        gap: 10px;
+        margin-top: 2px;
+        padding: 12px;
+        border: 1px solid var(--line-soft);
+        border-radius: 18px;
+        background: #ffffff;
+      }
+
+      .goal-edit-form input,
+      .goal-edit-form select {
+        width: 100%;
+        min-height: 48px;
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        background: #ffffff;
+        color: var(--text);
+        padding: 12px 14px;
+        font: inherit;
+        line-height: 1.6;
+        outline: none;
+      }
+
+      .goal-edit-form input:focus,
+      .goal-edit-form select:focus {
+        box-shadow: 0 0 0 4px rgba(184, 217, 106, 0.22);
+      }
+
+      .goal-edit-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+      }
+
       .goal-check {
         border: 1.5px solid var(--line);
         background: #ffffff;
@@ -2351,6 +2414,16 @@
         border-color: rgba(217, 107, 95, 0.5);
         background: #fff7f6;
         box-shadow: none;
+      }
+
+      .goal-item .goal-delete-button {
+        width: auto;
+        min-width: auto;
+        height: auto;
+        min-height: 34px;
+        padding: 0 10px;
+        font-size: 0.75rem;
+        line-height: 1.2;
       }
 
       .goal-item.is-done {
@@ -3100,7 +3173,22 @@
         }
 
         .goal-item {
-          grid-template-columns: 34px minmax(0, 1fr) 36px;
+          grid-template-columns: 34px minmax(0, 1fr) auto;
+        }
+
+        .goal-actions {
+          align-content: start;
+          flex-direction: column;
+        }
+
+        .goal-edit-button,
+        .goal-delete-button {
+          min-height: 32px;
+          padding: 0 9px;
+        }
+
+        .goal-edit-actions {
+          grid-template-columns: 1fr;
         }
 
         .goal-form {
@@ -3580,6 +3668,7 @@
       let goalPlan = loadGoalPlan();
       let reflectionStatusTimer = 0;
       let editingMonthlyGoalId = "";
+      let editingGoalId = "";
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -3673,6 +3762,7 @@
       toggleGoalFormButton.addEventListener("click", toggleGoalForm);
       closeGoalFormButton.addEventListener("click", closeGoalForm);
       goalForm.addEventListener("submit", addGoal);
+      goalList.addEventListener("submit", saveGoalEdit);
 
       tabButtons.forEach((button) => {
         button.addEventListener("click", () => {
@@ -3731,6 +3821,14 @@
 
         const goalId = button.dataset.id;
         const action = button.dataset.action;
+
+        if (action === "edit") {
+          startGoalEdit(goalId);
+        }
+
+        if (action === "cancel-edit") {
+          cancelGoalEdit();
+        }
 
         if (action === "toggle") {
           toggleGoal(goalId);
@@ -3793,6 +3891,7 @@
           monthlyGoalId: typeof goal.monthlyGoalId === "string" ? goal.monthlyGoalId : "",
           createdAt: goal.createdAt || new Date().toISOString(),
           completedAt: typeof goal.completedAt === "string" ? goal.completedAt : "",
+          updatedAt: typeof goal.updatedAt === "string" ? goal.updatedAt : goal.createdAt || "",
         }));
       }
 
@@ -4251,6 +4350,22 @@
         ).join("");
       }
 
+      function renderMonthlyGoalOptions(selectedGoalId = "") {
+        const currentGoals = getCurrentMonthlyGoals();
+
+        return `
+          <option value=""${selectedGoalId ? "" : " selected"}>紐づけなし</option>
+          ${currentGoals
+            .map(
+              (goal) =>
+                `<option value="${escapeHtml(goal.id)}"${goal.id === selectedGoalId ? " selected" : ""}>${escapeHtml(
+                  goal.title
+                )}</option>`
+            )
+            .join("")}
+        `;
+      }
+
       function renderMonthlyGoals() {
         const currentMonth = getCurrentMonthKey();
         const goals = getCurrentMonthlyGoals();
@@ -4368,6 +4483,7 @@
       }
 
       function openGoalForm() {
+        editingGoalId = "";
         isGoalFormOpen = true;
         renderGoalFormState();
         goalTitle.focus();
@@ -4408,6 +4524,7 @@
           done: false,
           createdAt: new Date().toISOString(),
           completedAt: "",
+          updatedAt: "",
         };
 
         goalsByTab[activeTab].push(goal);
@@ -4424,6 +4541,65 @@
         render();
       }
 
+      function startGoalEdit(goalId) {
+        const goal = goalsByTab[activeTab].find((item) => item.id === goalId);
+        if (!goal) return;
+
+        editingGoalId = goalId;
+        closeGoalForm();
+        render();
+
+        window.requestAnimationFrame(() => {
+          const input = [...document.querySelectorAll("[data-goal-edit-title]")].find(
+            (item) => item.dataset.goalEditTitle === goalId
+          );
+          if (input) input.focus();
+        });
+      }
+
+      function cancelGoalEdit() {
+        editingGoalId = "";
+        render();
+      }
+
+      function saveGoalEdit(event) {
+        const form = event.target.closest(".goal-edit-form");
+        if (!form) return;
+
+        event.preventDefault();
+
+        const goalId = form.dataset.id;
+        const titleInput = form.querySelector("[data-goal-edit-title]");
+        const dueDateInput = form.querySelector("[data-goal-edit-due-date]");
+        const categoryInput = form.querySelector("[data-goal-edit-category]");
+        const monthlyGoalInput = form.querySelector("[data-goal-edit-monthly-goal]");
+        const title = titleInput.value.trim();
+
+        if (!title) {
+          titleInput.focus();
+          return;
+        }
+
+        const now = new Date().toISOString();
+
+        goalsByTab[activeTab] = goalsByTab[activeTab].map((goal) =>
+          goal.id === goalId
+            ? {
+                ...goal,
+                title,
+                dueDate: dueDateInput.value,
+                category: categoryInput.value,
+                monthlyGoalId: monthlyGoalInput.value,
+                updatedAt: now,
+              }
+            : goal
+        );
+
+        editingGoalId = "";
+        saveGoals();
+        render();
+      }
+
       function toggleGoal(goalId) {
         goalsByTab[activeTab] = goalsByTab[activeTab].map((goal) =>
           goal.id === goalId
@@ -4435,6 +4611,9 @@
       }
 
       function deleteGoal(goalId) {
+        if (editingGoalId === goalId) {
+          editingGoalId = "";
+        }
         goalsByTab[activeTab] = goalsByTab[activeTab].filter((goal) => goal.id !== goalId);
         saveGoals();
         render();
@@ -4715,9 +4894,10 @@
               const monthlyGoalBadge = linkedMonthlyGoal
                 ? `<span class="goal-monthly-link">今月の目標：${escapeHtml(linkedMonthlyGoal.title)}</span>`
                 : "";
+              const isEditing = goal.id === editingGoalId;
 
               return `
-              <article class="goal-item ${goal.done ? "is-done" : ""}">
+              <article class="goal-item ${goal.done ? "is-done" : ""} ${isEditing ? "is-editing" : ""}">
                 <button
                   class="goal-check"
                   type="button"
@@ -4733,13 +4913,68 @@
                     ${monthlyGoalBadge}
                   </div>
                 </div>
-                <button
-                  class="button danger"
-                  type="button"
-                  data-action="delete"
-                  data-id="${escapeHtml(goal.id)}"
-                  aria-label="${escapeHtml(goal.title)}を削除"
-                >×</button>
+                <div class="goal-actions">
+                  <button
+                    class="button secondary goal-edit-button"
+                    type="button"
+                    data-action="edit"
+                    data-id="${escapeHtml(goal.id)}"
+                  >編集</button>
+                  <button
+                    class="button danger goal-delete-button"
+                    type="button"
+                    data-action="delete"
+                    data-id="${escapeHtml(goal.id)}"
+                    aria-label="${escapeHtml(goal.title)}を削除"
+                  >削除</button>
+                </div>
+                ${
+                  isEditing
+                    ? `<form class="goal-edit-form" data-id="${escapeHtml(goal.id)}">
+                        <div class="field">
+                          <label for="goal-edit-title-${escapeHtml(goal.id)}">タスク名</label>
+                          <input
+                            id="goal-edit-title-${escapeHtml(goal.id)}"
+                            type="text"
+                            maxlength="80"
+                            value="${escapeHtml(goal.title)}"
+                            data-goal-edit-title="${escapeHtml(goal.id)}"
+                          />
+                        </div>
+                        <div class="field">
+                          <label for="goal-edit-due-${escapeHtml(goal.id)}">期限</label>
+                          <input
+                            id="goal-edit-due-${escapeHtml(goal.id)}"
+                            type="date"
+                            value="${escapeHtml(goal.dueDate || "")}"
+                            data-goal-edit-due-date="${escapeHtml(goal.id)}"
+                          />
+                        </div>
+                        <div class="field">
+                          <label for="goal-edit-category-${escapeHtml(goal.id)}">カテゴリ</label>
+                          <select
+                            id="goal-edit-category-${escapeHtml(goal.id)}"
+                            data-goal-edit-category="${escapeHtml(goal.id)}"
+                          >
+                            ${renderCategoryOptions(goal.category)}
+                          </select>
+                        </div>
+                        <div class="field">
+                          <label for="goal-edit-monthly-${escapeHtml(goal.id)}">今月の目標</label>
+                          <select
+                            id="goal-edit-monthly-${escapeHtml(goal.id)}"
+                            data-goal-edit-monthly-goal="${escapeHtml(goal.id)}"
+                          >
+                            ${renderMonthlyGoalOptions(goal.monthlyGoalId)}
+                          </select>
+                        </div>
+                        <div class="goal-edit-actions">
+                          <button class="button" type="submit">保存する</button>
+                          <button class="button secondary" type="button" data-action="cancel-edit">キャンセル</button>
+                        </div>
+                      </form>`
+                    : ""
+                }
               </article>
             `;
             }
