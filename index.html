@@ -552,15 +552,25 @@
       }
 
       .console-heading {
-        margin-top: 38px;
+        margin-top: 24px;
+      }
+
+      .goal-flow-hint {
+        width: min(100%, 720px);
+        margin: 10px auto 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 750;
+        line-height: 1.55;
+        text-align: center;
       }
 
       .yearly-goal-card {
         display: grid;
         width: min(100%, 720px);
-        gap: 16px;
-        margin: 22px auto 0;
-        padding: 20px;
+        gap: 12px;
+        margin: 14px auto 0;
+        padding: 16px;
         background: #ffffff;
       }
 
@@ -573,8 +583,8 @@
 
       .yearly-goal-display {
         display: grid;
-        gap: 8px;
-        padding: 16px;
+        gap: 6px;
+        padding: 12px;
         border: 1px solid var(--line-soft);
         border-radius: 20px;
         background: #fbfcf8;
@@ -583,8 +593,8 @@
       .yearly-goal-title {
         margin: 0;
         color: var(--text);
-        font-size: 1.08rem;
-        line-height: 1.55;
+        font-size: 1rem;
+        line-height: 1.45;
         overflow-wrap: anywhere;
       }
 
@@ -592,9 +602,16 @@
       .yearly-goal-note {
         margin: 0;
         color: var(--muted);
-        font-size: 0.9rem;
-        line-height: 1.7;
+        font-size: 0.84rem;
+        line-height: 1.55;
         overflow-wrap: anywhere;
+      }
+
+      .yearly-goal-memo {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
       }
 
       .yearly-goal-note {
@@ -611,9 +628,9 @@
 
       .yearly-goal-progress {
         display: grid;
-        gap: 8px;
-        margin-top: 6px;
-        padding-top: 12px;
+        gap: 6px;
+        margin-top: 3px;
+        padding-top: 9px;
         border-top: 1px solid var(--line-soft);
       }
 
@@ -634,7 +651,7 @@
 
       .yearly-goal-progress-rate {
         color: var(--text);
-        font-size: 1.28rem;
+        font-size: 1.12rem;
         font-weight: 900;
         letter-spacing: 0;
       }
@@ -656,8 +673,8 @@
       .yearly-goal-progress-note {
         margin: 0;
         color: var(--muted);
-        font-size: 0.82rem;
-        line-height: 1.6;
+        font-size: 0.76rem;
+        line-height: 1.45;
       }
 
       .yearly-goal-form {
@@ -713,9 +730,9 @@
       .monthly-goal-card {
         display: grid;
         width: min(100%, 720px);
-        gap: 16px;
-        margin: 16px auto 0;
-        padding: 20px;
+        gap: 12px;
+        margin: 12px auto 0;
+        padding: 16px;
         background: #ffffff;
       }
 
@@ -723,7 +740,21 @@
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 14px;
+        gap: 12px;
+      }
+
+      .yearly-goal-head .button,
+      .monthly-goal-head .button {
+        min-height: 40px;
+        padding: 8px 12px;
+        font-size: 0.82rem;
+      }
+
+      .monthly-goal-count {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 800;
       }
 
       .monthly-goal-form {
@@ -777,13 +808,13 @@
 
       .monthly-goal-list {
         display: grid;
-        gap: 10px;
+        gap: 8px;
       }
 
       .monthly-goal-item {
         display: grid;
-        gap: 8px;
-        padding: 14px;
+        gap: 6px;
+        padding: 11px;
         border: 1px solid var(--line-soft);
         border-radius: 20px;
         background: #fbfcf8;
@@ -800,17 +831,21 @@
       .monthly-goal-title {
         margin: 0;
         color: var(--text);
-        font-size: 1rem;
-        line-height: 1.5;
+        font-size: 0.94rem;
+        line-height: 1.42;
         overflow-wrap: anywhere;
       }
 
       .monthly-goal-memo {
         margin: 0;
         color: var(--muted);
-        font-size: 0.86rem;
-        line-height: 1.65;
+        font-size: 0.78rem;
+        line-height: 1.45;
         overflow-wrap: anywhere;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
       }
 
       .monthly-goal-meta {
@@ -822,8 +857,8 @@
 
       .monthly-goal-progress {
         display: grid;
-        gap: 7px;
-        margin-top: 2px;
+        gap: 5px;
+        margin-top: 0;
       }
 
       .monthly-goal-progress-head {
@@ -840,8 +875,8 @@
       .monthly-goal-progress-note {
         margin: 0;
         color: var(--muted);
-        font-size: 0.82rem;
-        line-height: 1.55;
+        font-size: 0.78rem;
+        line-height: 1.4;
       }
 
       .monthly-goal-progress-rate {
@@ -2358,6 +2393,19 @@
         gap: 12px;
       }
 
+      .progress-stack .stats-grid {
+        margin: 0;
+      }
+
+      .goal-console .next-step-card {
+        margin: 10px 0 12px;
+        padding: 16px;
+      }
+
+      .goal-console .next-step-title {
+        font-size: clamp(1.08rem, 4vw, 1.45rem);
+      }
+
       .stat-summary-row {
         display: grid;
         grid-column: 1 / -1;
@@ -2950,6 +2998,37 @@
           grid-template-columns: 1fr;
         }
 
+        .yearly-goal-card,
+        .monthly-goal-card {
+          gap: 10px;
+          padding: 14px;
+          border-radius: 24px;
+        }
+
+        .yearly-goal-display {
+          padding: 11px;
+        }
+
+        .yearly-goal-head .button,
+        .monthly-goal-head .button {
+          width: auto;
+          min-height: 38px;
+          justify-self: start;
+          padding: 7px 11px;
+        }
+
+        .monthly-goal-item {
+          padding: 10px;
+          border-radius: 18px;
+        }
+
+        .monthly-goal-delete {
+          width: 30px;
+          min-width: 30px;
+          height: 30px;
+          min-height: 30px;
+        }
+
         .goal-item {
           grid-template-columns: 34px minmax(0, 1fr) 36px;
         }
@@ -3015,6 +3094,8 @@
         <a class="cta-button" href="#goal-console">今日のタスクを確認する <span aria-hidden="true">→</span></a>
       </header>
 
+      <p class="goal-flow-hint">年間目標から、今月の目標と今日の行動を整理します。</p>
+
       <section class="yearly-goal-card" id="yearly-goal-section" aria-label="年間目標">
         <div class="yearly-goal-head">
           <div>
@@ -3077,6 +3158,7 @@
           <div>
             <p class="form-eyebrow" id="monthlyGoalPeriod">今月の目標</p>
             <h2 class="section-title">今月取り組むこと</h2>
+            <p class="monthly-goal-count" id="monthlyGoalCount">0件の目標</p>
           </div>
           <button class="button secondary" type="button" id="toggleMonthlyGoalFormButton" aria-expanded="false">
             今月の目標を追加
@@ -3122,87 +3204,18 @@
         <div class="monthly-goal-list" id="monthlyGoalList"></div>
       </section>
 
-      <section class="stats-grid" aria-label="進捗サマリー">
-        <article class="stat-card stat-card-primary">
-          <p class="stat-label">今日の達成率</p>
-          <p class="stat-value" id="statTodayPercent">0%</p>
-          <div class="summary-bar" aria-hidden="true">
-            <div class="summary-bar-fill" id="statTodayBar"></div>
-          </div>
-          <p class="stat-note" id="statTodayNote">0 / 0 完了</p>
-        </article>
-        <div class="stat-summary-row" aria-label="タスク数サマリー">
-          <article class="stat-card">
-            <p class="stat-label">目標総数</p>
-            <p class="stat-value" id="statTotalGoals">0個</p>
-          </article>
-          <article class="stat-card">
-            <p class="stat-label">達成済み</p>
-            <p class="stat-value" id="statDoneGoals">0個</p>
-          </article>
-          <article class="stat-card">
-            <p class="stat-label">未完了</p>
-            <p class="stat-value" id="statUndoneGoals">0個</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="next-step-card is-empty" id="nextStepCard" aria-label="次にやること">
-        <div class="next-step-head">
-          <p class="next-step-label">次にやること</p>
-          <span class="next-step-status" id="nextStepStatus">未設定</span>
-        </div>
-        <h2 class="next-step-title" id="nextStepTitle">今日の一歩を決めましょう</h2>
-        <p class="next-step-description" id="nextStepDescription">まずは小さな目標を1つ追加してみましょう。</p>
-      </section>
-
       <section class="goal-console" id="goal-console" aria-label="目標管理コンソール">
-        <h2 class="section-heading console-heading">目標管理</h2>
+        <h2 class="section-heading console-heading">今日やること</h2>
 
-        <section class="slogan-card" id="settings-section" aria-label="スローガン">
-          <div class="slogan-display" id="sloganDisplay">
-            <p class="slogan-text" id="sloganText">目標達成までの一歩を、今日から整える</p>
-              <button class="button secondary" type="button" id="editSloganButton">スローガン編集</button>
+        <section class="next-step-card is-empty" id="nextStepCard" aria-label="次にやること">
+          <div class="next-step-head">
+            <p class="next-step-label">次にやること</p>
+            <span class="next-step-status" id="nextStepStatus">未設定</span>
           </div>
-
-          <div class="slogan-edit" id="sloganEdit">
-            <div class="field">
-              <label for="sloganInput">スローガン</label>
-              <input id="sloganInput" type="text" maxlength="80" />
-            </div>
-            <div class="slogan-actions">
-              <button class="button" type="button" id="saveSloganButton">保存</button>
-              <button class="button secondary" type="button" id="cancelSloganButton">キャンセル</button>
-            </div>
-          </div>
+          <h2 class="next-step-title" id="nextStepTitle">今日の一歩を決めましょう</h2>
+          <p class="next-step-description" id="nextStepDescription">まずは小さな目標を1つ追加してみましょう。</p>
         </section>
 
-        <section class="reflection-card" aria-label="振り返りメモ">
-          <div class="reflection-heading">
-            <div>
-              <h2 class="section-title">振り返りメモ</h2>
-              <p class="reflection-copy">今日の気づきや、明日に活かしたいことを残せます。</p>
-            </div>
-            <span class="reflection-date" id="reflectionDate"></span>
-          </div>
-          <div class="field reflection-field">
-            <label for="reflectionNote">今日のメモ</label>
-            <textarea
-              id="reflectionNote"
-              rows="5"
-              maxlength="600"
-              placeholder="例：今日は朝に作業できた。明日は先に重要タスクから進める。"
-            ></textarea>
-          </div>
-          <div class="reflection-actions">
-            <button class="button" type="button" id="saveReflectionButton">保存する</button>
-            <span class="reflection-status" id="reflectionStatus" aria-live="polite"></span>
-          </div>
-          <div class="recent-notes">
-            <h3>最近のメモ</h3>
-            <div class="recent-notes-list" id="recentNotesList"></div>
-          </div>
-        </section>
 
         <nav class="tabs" aria-label="目標の期間">
           <button class="tab-button is-active" type="button" data-tab="year">年間</button>
@@ -3274,6 +3287,31 @@
           </section>
 
           <aside class="progress-stack" id="progress-section" aria-label="進捗">
+                  <section class="stats-grid" aria-label="進捗サマリー">
+                    <article class="stat-card stat-card-primary">
+                      <p class="stat-label">今日の達成率</p>
+                      <p class="stat-value" id="statTodayPercent">0%</p>
+                      <div class="summary-bar" aria-hidden="true">
+                        <div class="summary-bar-fill" id="statTodayBar"></div>
+                      </div>
+                      <p class="stat-note" id="statTodayNote">0 / 0 完了</p>
+                    </article>
+                    <div class="stat-summary-row" aria-label="タスク数サマリー">
+                      <article class="stat-card">
+                        <p class="stat-label">目標総数</p>
+                        <p class="stat-value" id="statTotalGoals">0個</p>
+                      </article>
+                      <article class="stat-card">
+                        <p class="stat-label">達成済み</p>
+                        <p class="stat-value" id="statDoneGoals">0個</p>
+                      </article>
+                      <article class="stat-card">
+                        <p class="stat-label">未完了</p>
+                        <p class="stat-value" id="statUndoneGoals">0個</p>
+                      </article>
+                    </div>
+                  </section>
+
             <section class="progress-card tab-progress-card">
               <div class="progress-head">
                 <p class="progress-label">全体進捗</p>
@@ -3376,6 +3414,51 @@
             </details>
           </aside>
         </div>
+
+                <section class="reflection-card" aria-label="振り返りメモ">
+                  <div class="reflection-heading">
+                    <div>
+                      <h2 class="section-title">振り返りメモ</h2>
+                      <p class="reflection-copy">今日の気づきや、明日に活かしたいことを残せます。</p>
+                    </div>
+                    <span class="reflection-date" id="reflectionDate"></span>
+                  </div>
+                  <div class="field reflection-field">
+                    <label for="reflectionNote">今日のメモ</label>
+                    <textarea
+                      id="reflectionNote"
+                      rows="5"
+                      maxlength="600"
+                      placeholder="例：今日は朝に作業できた。明日は先に重要タスクから進める。"
+                    ></textarea>
+                  </div>
+                  <div class="reflection-actions">
+                    <button class="button" type="button" id="saveReflectionButton">保存する</button>
+                    <span class="reflection-status" id="reflectionStatus" aria-live="polite"></span>
+                  </div>
+                  <div class="recent-notes">
+                    <h3>最近のメモ</h3>
+                    <div class="recent-notes-list" id="recentNotesList"></div>
+                  </div>
+                </section>
+
+                <section class="slogan-card" id="settings-section" aria-label="スローガン">
+                  <div class="slogan-display" id="sloganDisplay">
+                    <p class="slogan-text" id="sloganText">目標達成までの一歩を、今日から整える</p>
+                      <button class="button secondary" type="button" id="editSloganButton">スローガン編集</button>
+                  </div>
+        
+                  <div class="slogan-edit" id="sloganEdit">
+                    <div class="field">
+                      <label for="sloganInput">スローガン</label>
+                      <input id="sloganInput" type="text" maxlength="80" />
+                    </div>
+                    <div class="slogan-actions">
+                      <button class="button" type="button" id="saveSloganButton">保存</button>
+                      <button class="button secondary" type="button" id="cancelSloganButton">キャンセル</button>
+                    </div>
+                  </div>
+                </section>
       </section>
 
       <nav class="bottom-nav" aria-label="アプリ内ナビゲーション">
@@ -3446,6 +3529,7 @@
       const yearlyGoalMemoInput = document.getElementById("yearlyGoalMemoInput");
       const cancelYearlyGoalButton = document.getElementById("cancelYearlyGoalButton");
       const monthlyGoalPeriod = document.getElementById("monthlyGoalPeriod");
+      const monthlyGoalCount = document.getElementById("monthlyGoalCount");
       const toggleMonthlyGoalFormButton = document.getElementById("toggleMonthlyGoalFormButton");
       const monthlyGoalForm = document.getElementById("monthlyGoalForm");
       const monthlyGoalInput = document.getElementById("monthlyGoalInput");
@@ -4018,6 +4102,7 @@
         const goals = getCurrentMonthlyGoals();
 
         monthlyGoalPeriod.textContent = formatMonthLabel(currentMonth);
+        monthlyGoalCount.textContent = `${goals.length}件の目標`;
         monthlyGoalList.innerHTML = goals.length
           ? goals
               .map((goal) => {
