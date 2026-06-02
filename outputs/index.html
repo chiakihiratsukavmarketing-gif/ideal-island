@@ -1892,6 +1892,56 @@
         font-size: 0.86rem;
       }
 
+      .weekly-content {
+        display: grid;
+        gap: 12px;
+      }
+
+      .weekly-content.is-hidden,
+      .weekly-empty.is-hidden {
+        display: none;
+      }
+
+      .weekly-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .weekly-metric {
+        display: grid;
+        gap: 4px;
+        padding: 12px;
+        border: 1px solid var(--line-soft);
+        border-radius: 16px;
+        background: #fbfcf8;
+      }
+
+      .weekly-metric span {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 750;
+      }
+
+      .weekly-metric strong {
+        color: var(--ink);
+        font-size: 1.05rem;
+        line-height: 1;
+      }
+
+      .weekly-bar {
+        height: 8px;
+      }
+
+      .weekly-empty {
+        display: grid;
+        gap: 6px;
+        padding: 16px;
+        border: 1.5px dashed var(--line-soft);
+        border-radius: 18px;
+        background: #fbfcf8;
+      }
+
       .category-row {
         display: grid;
         gap: 8px;
@@ -2356,6 +2406,36 @@
               <p class="progress-note" id="overallCount">0個中0個達成</p>
             </section>
 
+            <section class="progress-card weekly-card">
+              <div class="progress-head">
+                <p class="progress-label">今週の進捗</p>
+                <span class="progress-number" id="weeklyPercent">0%</span>
+              </div>
+              <div class="weekly-empty" id="weeklyEmpty">
+                <p class="empty-title">まだ今週のタスクはありません</p>
+                <p class="empty-text">今日やることを追加すると、週間進捗が表示されます。</p>
+              </div>
+              <div class="weekly-content" id="weeklyContent">
+                <div class="weekly-metrics">
+                  <div class="weekly-metric">
+                    <span>追加</span>
+                    <strong id="weeklyAdded">0件</strong>
+                  </div>
+                  <div class="weekly-metric">
+                    <span>完了</span>
+                    <strong id="weeklyDone">0件</strong>
+                  </div>
+                  <div class="weekly-metric">
+                    <span>達成率</span>
+                    <strong id="weeklyRate">0%</strong>
+                  </div>
+                </div>
+                <div class="bar weekly-bar" aria-hidden="true">
+                  <div class="bar-fill" id="weeklyBar"></div>
+                </div>
+              </div>
+            </section>
+
             <section class="progress-card">
               <h2 class="section-title">カテゴリ別の達成状況</h2>
               <div class="category-grid" id="categoryProgress"></div>
@@ -2427,6 +2507,13 @@
       const overallPercent = document.getElementById("overallPercent");
       const overallBar = document.getElementById("overallBar");
       const overallCount = document.getElementById("overallCount");
+      const weeklyPercent = document.getElementById("weeklyPercent");
+      const weeklyAdded = document.getElementById("weeklyAdded");
+      const weeklyDone = document.getElementById("weeklyDone");
+      const weeklyRate = document.getElementById("weeklyRate");
+      const weeklyBar = document.getElementById("weeklyBar");
+      const weeklyEmpty = document.getElementById("weeklyEmpty");
+      const weeklyContent = document.getElementById("weeklyContent");
       const categoryProgress = document.getElementById("categoryProgress");
       const statTodayPercent = document.getElementById("statTodayPercent");
       const statTodayBar = document.getElementById("statTodayBar");
@@ -2545,6 +2632,7 @@
           done: Boolean(goal.done ?? goal.completed),
           dueDate: typeof goal.dueDate === "string" ? goal.dueDate : "",
           createdAt: goal.createdAt || new Date().toISOString(),
+          completedAt: typeof goal.completedAt === "string" ? goal.completedAt : "",
         }));
       }
 
@@ -2599,6 +2687,7 @@
           dueDate: goalDueDate.value,
           done: false,
           createdAt: new Date().toISOString(),
+          completedAt: "",
         };
 
         goalsByTab[activeTab].push(goal);
@@ -2612,7 +2701,9 @@
 
       function toggleGoal(goalId) {
         goalsByTab[activeTab] = goalsByTab[activeTab].map((goal) =>
-          goal.id === goalId ? { ...goal, done: !goal.done } : goal
+          goal.id === goalId
+            ? { ...goal, done: !goal.done, completedAt: !goal.done ? new Date().toISOString() : "" }
+            : goal
         );
         saveGoals();
         render();
@@ -2629,6 +2720,37 @@
         const done = goals.filter((goal) => goal.done).length;
         const percent = total === 0 ? 0 : Math.round((done / total) * 100);
         return { total, done, percent };
+      }
+
+      function getWeekRange(date = new Date()) {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        const day = start.getDay();
+        const mondayOffset = day === 0 ? -6 : 1 - day;
+        start.setDate(start.getDate() + mondayOffset);
+
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+
+        return { start, end };
+      }
+
+      function isDateInRange(value, start, end) {
+        if (!value) return false;
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return false;
+        return date >= start && date <= end;
+      }
+
+      function getWeeklyProgress() {
+        const allGoals = Object.values(goalsByTab).flat();
+        const { start, end } = getWeekRange();
+        const added = allGoals.filter((goal) => isDateInRange(goal.createdAt, start, end)).length;
+        const done = allGoals.filter((goal) => goal.done && isDateInRange(goal.completedAt, start, end)).length;
+        const percent = added === 0 ? 0 : Math.min(100, Math.round((done / added) * 100));
+
+        return { added, done, percent };
       }
 
       function getTodayKey() {
@@ -2842,6 +2964,19 @@
           </div>`;
       }
 
+      function renderWeeklyProgress() {
+        const progress = getWeeklyProgress();
+        const hasWeeklyTasks = progress.added > 0;
+
+        weeklyPercent.textContent = `${progress.percent}%`;
+        weeklyAdded.textContent = `${progress.added}件`;
+        weeklyDone.textContent = `${progress.done}件`;
+        weeklyRate.textContent = `${progress.percent}%`;
+        weeklyBar.style.width = `${progress.percent}%`;
+        weeklyEmpty.classList.toggle("is-hidden", hasWeeklyTasks);
+        weeklyContent.classList.toggle("is-hidden", !hasWeeklyTasks);
+      }
+
       function renderStats() {
         const todayProgress = getProgress(goalsByTab.today);
         const allGoals = Object.values(goalsByTab).flat();
@@ -2936,6 +3071,7 @@
         renderFilters();
         renderGoals();
         renderProgress();
+        renderWeeklyProgress();
         renderStats();
         renderStages();
         renderNextStep();
