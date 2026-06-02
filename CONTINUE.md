@@ -1,70 +1,98 @@
-# 次回再開メモ
+# MILE 次回再開メモ
 
-## 1. 現在の状態
+## 1. 現在のプロダクト
+
+- プロダクト名: MILE
+- 概要: MILEは、今日やることを整理し、目標までの進捗を見える化するシンプルな目標管理アプリ。
+- 公開URL: https://ideal-island.vercel.app/
+- VercelはGitHubの `main` ブランチと連携済み
+- 今後 `main` に `push` すると自動デプロイされる想定
+
+## 2. 現在の状態
 
 - Git初期化済み
 - GitHubバックアップ済み
-- ダークUI・近未来・クエスト風デザインへ変更済み
-- スマホ表示改善済み
-- 達成率の実データ連動済み
-- ステージカードと目標データの連動済み
-- 「次の一歩」カードを today タブの実データと連動済み
-- `README.md` 作成済み
-- `.gitignore` 作成済み
+- Vercel公開済み
+- MILEへのブランド名変更済み
+- スマホアプリ風UIへ整理済み
+- 白から薄グレー基調のミニマルデザインへ変更済み
+- クエスト感・ゲーム感を抑えた目標管理アプリUIへ調整済み
+- `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 - `localStorage` 保存処理は維持
 
-## 2. 最新コミット履歴
+## 3. 実装済み機能
 
-- `8307089` `feat: add data-driven next step card`
-- `bab2bbc` `feat: connect stage cards to goal progress`
-- `878eb26` `feat: connect progress summary to goal data`
-- `e4b3813` `fix: improve mobile layout for ideal island`
-- `f049a0c` `docs: add continuation notes`
-- `f099c89` `docs: add project readme`
-- `18d673d` `chore: ignore local work notes`
-- `8e5d5ed` `feat: redesign ideal island as goal achievement quest UI`
-
-## 3. 現在できている機能
-
-- 目標追加
-- 達成 / 未達成の切り替え
-- 目標削除
+- タスク追加
+- タスク完了 / 未完了切り替え
+- タスク削除
+- 今日の達成率表示
+- 進捗バー
+- 3STEPの進捗表示
+- 次にやることカード
+- スローガン編集
 - `localStorage` 保存
-- 達成率の自動計算
-- 目標総数 / 達成済み / 未達成 の自動表示
-- ステージカードの状態自動更新
-- 今日の未達成目標から「次の一歩」を自動表示
-- 今日の目標が全達成なら CLEAR 表示
-- 今日の目標が0件なら「今日の一歩を決めましょう」と表示
-- スマホ幅 375 / 390 / 430px 対応
+- 下部ナビゲーション
+- スマホアプリ風UI
+- 白から薄グレー基調のミニマルデザイン
+- 旧スローガンの `localStorage` 移行処理
 
-## 4. 次にやる候補
+## 4. UI方針
 
-- 0件状態の実機確認
-- 目標追加フォームのUI改善
-- 目標の編集機能
-- 目標に期限やカテゴリを追加
-- 年間 / 月間 / 今日タブの導線改善
-- 達成時の演出追加
-- GitHub Pagesで公開
-- アプリ名・文言の最終調整
+- シンプルな目標管理アプリ
+- クエスト感・ゲーム感は抑える
+- 白背景、細線、角丸、淡い影
+- アクセントはくすみライム、淡いターコイズ、マスタード
+- モバイルファースト
+- 文言は短く、説明しすぎない
 
-## 5. 注意点
+## 5. 現在の注意点
 
+- `CONTINUE.md` は作業メモとして使用
+- `README.md` はまだ旧情報が残っているため、必要になったら次回以降に更新
+- `index.html` がVercel公開用のルートファイル
+- `outputs/index.html` と `ideal-island/outputs/index.html` は保管・整理用として同期
 - `git add .` は避ける
-- 作業前後に `git status` を確認する
+- コミット前後に `git status` を確認する
 - コミット対象は必ず確認する
 - `work/` と `ideal-island/work/` はコミットしない
-- `README.md`、`.gitignore` は必要がない限り触らない
 - 既存の `localStorage` 保存処理を壊さない
-- 変更後は必ずブラウザで動作確認する
+- 変更後はブラウザで動作確認する
 - GitHubへ反映する場合は `git push` する
 
-## 6. 次回再開時の確認コマンド
+## 6. 次に改善できそうなこと
+
+- 実機スマホでの操作確認
+- タスクに期限を追加
+- 目標カテゴリ追加
+- 週間進捗の表示
+- 達成履歴の保存
+- PWA対応
+- README整備
+- 不要ファイル構成の整理
+
+## 7. 次回再開時の確認コマンド
 
 ```bash
 git status
 git log --oneline
 git remote -v
+```
+
+## 8. 次回コミット候補
+
+HTMLのMILE MVP v1調整をコミットする場合:
+
+```bash
+git add index.html outputs/index.html ideal-island/outputs/index.html
+git commit -m "style: polish MILE MVP v1 UI"
+git push
+```
+
+このメモをコミットする場合:
+
+```bash
+git add CONTINUE.md
+git commit -m "docs: update MILE continuation notes"
+git push
 ```
