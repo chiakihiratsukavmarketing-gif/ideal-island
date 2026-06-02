@@ -769,6 +769,48 @@
         align-items: center;
       }
 
+      .monthly-goal-progress {
+        display: grid;
+        gap: 7px;
+        margin-top: 2px;
+      }
+
+      .monthly-goal-progress-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 800;
+      }
+
+      .monthly-goal-progress-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.55;
+      }
+
+      .monthly-goal-progress-rate {
+        color: var(--text);
+      }
+
+      .monthly-goal-progress-bar {
+        width: 100%;
+        height: 7px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #ecefe8;
+      }
+
+      .monthly-goal-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--lime);
+      }
+
       .monthly-goal-empty {
         display: grid;
         gap: 6px;
@@ -3666,11 +3708,15 @@
         return goalPlan.monthlyGoals.find((goal) => goal.id === goalId) || null;
       }
 
-      function getLinkedTaskCount(monthlyGoalId) {
-        if (!monthlyGoalId) return 0;
-        return Object.values(goalsByTab)
+      function getMonthlyGoalProgress(monthlyGoalId) {
+        const linkedGoals = Object.values(goalsByTab)
           .flat()
-          .filter((goal) => goal.monthlyGoalId === monthlyGoalId).length;
+          .filter((goal) => goal.monthlyGoalId === monthlyGoalId);
+        const total = linkedGoals.length;
+        const done = linkedGoals.filter((goal) => goal.done).length;
+        const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+
+        return { total, done, percent };
       }
 
       function openMonthlyGoalForm() {
@@ -3725,7 +3771,7 @@
 
         saveGoalPlan();
         closeMonthlyGoalForm();
-        renderMonthlyGoals();
+        render();
       }
 
       function deleteMonthlyGoal(goalId) {
@@ -3758,15 +3804,18 @@
         monthlyGoalPeriod.textContent = formatMonthLabel(currentMonth);
         monthlyGoalList.innerHTML = goals.length
           ? goals
-              .map(
-                (goal) => `
+              .map((goal) => {
+                const progress = getMonthlyGoalProgress(goal.id);
+                const progressText =
+                  progress.total === 0 ? "まだ今日のタスクが紐づいていません" : `${progress.done} / ${progress.total} 完了`;
+
+                return `
                   <article class="monthly-goal-item">
                     <div class="monthly-goal-item-head">
                       <div>
                         <h3 class="monthly-goal-title">${escapeHtml(goal.title)}</h3>
                         <div class="monthly-goal-meta">
                           <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
-                          <span class="goal-monthly-link">紐づいたタスク数：${getLinkedTaskCount(goal.id)}件</span>
                         </div>
                       </div>
                       <button
@@ -3778,9 +3827,18 @@
                       >×</button>
                     </div>
                     ${goal.memo ? `<p class="monthly-goal-memo">${escapeHtml(goal.memo)}</p>` : ""}
+                    <div class="monthly-goal-progress" aria-label="${escapeHtml(goal.title)}の進捗">
+                      <div class="monthly-goal-progress-head">
+                        <p class="monthly-goal-progress-note">${escapeHtml(progressText)}</p>
+                        <span class="monthly-goal-progress-rate">${progress.percent}%</span>
+                      </div>
+                      <div class="monthly-goal-progress-bar" aria-hidden="true">
+                        <div class="monthly-goal-progress-fill" style="width: ${progress.percent}%"></div>
+                      </div>
+                    </div>
                   </article>
-                `
-              )
+                `;
+              })
               .join("")
           : `<div class="monthly-goal-empty">
               <p class="empty-title">今月の目標を設定しましょう</p>
