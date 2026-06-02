@@ -430,7 +430,7 @@
       }
 
       .stage-card.is-complete .state-pill::before {
-        content: "CLEAR ";
+        content: "完了 ";
       }
 
       .stage-button {
@@ -1534,53 +1534,53 @@
   <body>
     <main class="app">
       <header class="hero">
-        <div class="hero-icon" aria-hidden="true">★</div>
+        <div class="hero-icon" aria-hidden="true">✓</div>
         <h1 class="app-title">理想の自分へ</h1>
-        <p class="hero-kicker">目標達成アプリ</p>
+        <p class="hero-kicker">目標管理アプリ</p>
         <div class="hero-copy">
-          <p>目標をクエストに変えて、毎日の小さな行動を積み重ねよう。</p>
-          <p>進捗を見える化しながら、理想の未来へ一歩ずつ近づくためのアプリです。</p>
+          <p>今日やることを整理して、目標達成までの進捗を見える化します。</p>
+          <p>小さな行動を積み重ねながら、理想の状態に近づくためのアプリです。</p>
         </div>
-        <a class="cta-button" href="#goal-console">今日の目標を確認する <span aria-hidden="true">→</span></a>
+        <a class="cta-button" href="#goal-console">今日のタスクを確認する <span aria-hidden="true">→</span></a>
       </header>
 
-      <section class="quest-map" aria-label="目標マップ">
-        <h2 class="section-heading">目標マップ</h2>
+      <section class="quest-map" aria-label="進捗ステップ">
+        <h2 class="section-heading">進捗ステップ</h2>
         <article class="quest-card">
-          <div class="quest-icon" aria-hidden="true">◇</div>
+          <div class="quest-icon" aria-hidden="true">☷</div>
           <div>
-            <h3 class="quest-title">現在のゴールを確認する</h3>
-            <p class="quest-description">最終ゴールまでの道のり、今いるステージ、次にやるべき行動をひと目で確認できます。</p>
+            <h3 class="quest-title">目標達成までの流れを確認する</h3>
+            <p class="quest-description">目標設定、日々の行動、振り返りの状態をひと目で確認できます。</p>
           </div>
           <a class="quest-arrow" href="#goal-console" aria-label="現在の目標管理へ進む">›</a>
         </article>
 
-        <div class="stage-grid" aria-label="ステージ別カード">
+        <div class="stage-grid" aria-label="進捗ステップ別カード">
           <article class="stage-card" data-stage="stage1" data-tone="green">
-            <div class="stage-icon" aria-hidden="true">⚑</div>
-            <p class="stage-label">STAGE 1</p>
+            <div class="stage-icon" aria-hidden="true">○</div>
+            <p class="stage-label">STEP 1</p>
             <span class="state-pill">未着手</span>
             <h3 class="stage-title">目標を決める</h3>
-            <p class="stage-description">達成したい未来を言語化し、具体的なゴールを設定するステージです。</p>
-            <a class="stage-button" href="#goal-console">これから始める</a>
+            <p class="stage-description">達成したい状態を言語化し、具体的なゴールを設定します。</p>
+            <a class="stage-button" href="#goal-console">未着手</a>
           </article>
 
           <article class="stage-card" data-stage="stage2" data-tone="orange">
             <div class="stage-icon" aria-hidden="true">✓</div>
-            <p class="stage-label">STAGE 2</p>
+            <p class="stage-label">STEP 2</p>
             <span class="state-pill">未着手</span>
             <h3 class="stage-title">行動を積み上げる</h3>
-            <p class="stage-description">毎日のタスクや習慣を記録し、目標達成に必要な行動を継続するステージです。</p>
-            <a class="stage-button" href="#goal-console">これから始める</a>
+            <p class="stage-description">毎日のタスクや習慣を記録し、目標達成に必要な行動を継続します。</p>
+            <a class="stage-button" href="#goal-console">未着手</a>
           </article>
 
           <article class="stage-card" data-stage="stage3" data-tone="purple">
-            <div class="stage-icon" aria-hidden="true">✦</div>
-            <p class="stage-label">STAGE 3</p>
+            <div class="stage-icon" aria-hidden="true">▦</div>
+            <p class="stage-label">STEP 3</p>
             <span class="state-pill">未着手</span>
             <h3 class="stage-title">進捗を振り返る</h3>
-            <p class="stage-description">達成率や行動ログを見ながら、次に改善するポイントを見つけるステージです。</p>
-            <a class="stage-button" href="#goal-console">これから始める</a>
+            <p class="stage-description">達成率や行動ログを見ながら、次に改善するポイントを整理します。</p>
+            <a class="stage-button" href="#goal-console">未着手</a>
           </article>
         </div>
       </section>
@@ -1599,14 +1599,14 @@
           <p class="stat-value" id="statDoneGoals">0個</p>
         </article>
         <article class="stat-card">
-          <p class="stat-label">未達成</p>
+          <p class="stat-label">未完了</p>
           <p class="stat-value" id="statUndoneGoals">0個</p>
         </article>
       </section>
 
-      <section class="next-step-card is-empty" id="nextStepCard" aria-label="次の一歩">
+      <section class="next-step-card is-empty" id="nextStepCard" aria-label="次にやること">
         <div class="next-step-head">
-          <p class="next-step-label">次の一歩</p>
+          <p class="next-step-label">次にやること</p>
           <span class="next-step-status" id="nextStepStatus">未設定</span>
         </div>
         <h2 class="next-step-title" id="nextStepTitle">今日の一歩を決めましょう</h2>
@@ -1958,13 +1958,13 @@
       }
 
       function getStageButtonText(status) {
-        if (status === "complete") return "達成済み";
+        if (status === "complete") return "完了";
         if (status === "in-progress") return "続きを進める";
-        return "これから始める";
+        return "未着手";
       }
 
       function getStageLabel(status) {
-        if (status === "complete") return "達成";
+        if (status === "complete") return "完了";
         if (status === "in-progress") return "進行中";
         return "未着手";
       }
@@ -2002,9 +2002,9 @@
           description = "まずはこの目標から進めましょう。";
         } else if (todayGoals.length > 0) {
           status = "clear";
-          label = "CLEAR";
-          title = "今日の目標はすべて達成済みです";
-          description = "お疲れさま！今日はもう十分前に進んでいます。";
+          label = "完了";
+          title = "今日のタスクはすべて完了しています";
+          description = "お疲れさまです。必要な行動は完了しています。";
         }
 
         nextStepCard.classList.toggle("is-active", status === "active");
