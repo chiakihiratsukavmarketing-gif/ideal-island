@@ -1631,6 +1631,193 @@
         line-height: 1.7;
       }
 
+      .bottom-nav {
+        position: sticky;
+        bottom: 14px;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        width: min(100%, 520px);
+        margin: 28px auto 0;
+        padding: 8px;
+        border: 1.5px solid var(--line);
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 18px 48px rgba(28, 32, 25, 0.14);
+        backdrop-filter: blur(14px);
+      }
+
+      .bottom-nav-item {
+        display: grid;
+        min-height: 58px;
+        place-items: center;
+        gap: 3px;
+        border: 1px solid transparent;
+        border-radius: 22px;
+        background: transparent;
+        color: #7b8077;
+        font-size: 0.76rem;
+        font-weight: 800;
+        transition:
+          background 180ms ease,
+          border-color 180ms ease,
+          color 180ms ease,
+          transform 180ms ease;
+      }
+
+      .bottom-nav-item:hover,
+      .bottom-nav-item:active {
+        transform: translateY(-1px);
+      }
+
+      .bottom-nav-item.is-active {
+        border-color: rgba(36, 38, 34, 0.14);
+        background: var(--lime);
+        color: #1f2718;
+      }
+
+      .nav-icon {
+        display: grid;
+        width: 22px;
+        height: 22px;
+        place-items: center;
+        color: currentColor;
+        font-size: 1rem;
+        line-height: 1;
+      }
+
+      .stats-grid {
+        gap: 12px;
+      }
+
+      .stat-card {
+        display: grid;
+        gap: 8px;
+        min-height: 132px;
+        padding: 18px;
+      }
+
+      .stat-card-primary {
+        grid-column: span 2;
+        background: #fbfff0;
+      }
+
+      .stat-value {
+        font-size: clamp(1.75rem, 6vw, 2.45rem);
+        line-height: 1;
+      }
+
+      .stat-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 750;
+      }
+
+      .summary-bar,
+      .bar {
+        height: 8px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #ecefe8;
+      }
+
+      .summary-bar-fill,
+      .bar-fill {
+        width: 0;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--lime);
+        transition: width 180ms ease;
+      }
+
+      .progress-card {
+        display: grid;
+        gap: 12px;
+        padding: 20px;
+      }
+
+      .progress-number {
+        font-size: 1.55rem;
+        line-height: 1;
+      }
+
+      .progress-note {
+        margin-top: 0;
+        font-size: 0.86rem;
+      }
+
+      .category-row {
+        display: grid;
+        gap: 8px;
+        padding: 14px 0;
+      }
+
+      .stage-grid {
+        gap: 12px;
+      }
+
+      .stage-card {
+        gap: 10px;
+        padding: 18px;
+        border-top-width: 1.5px;
+      }
+
+      .stage-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 16px;
+        font-size: 1.05rem;
+      }
+
+      .stage-card.is-in-progress {
+        border-color: var(--line);
+        background: #fffdf3;
+      }
+
+      .stage-card.is-in-progress .state-pill {
+        background: var(--mustard);
+      }
+
+      .stage-card.is-complete {
+        background: #f4fbef;
+      }
+
+      .stage-card.is-complete .stage-icon {
+        background: var(--lime);
+      }
+
+      .stage-button {
+        min-height: 40px;
+        padding-inline: 14px;
+        font-size: 0.84rem;
+      }
+
+      .next-step-card {
+        display: grid;
+        gap: 10px;
+        padding: 22px;
+      }
+
+      .next-step-title {
+        font-size: clamp(1.22rem, 4vw, 1.65rem);
+        line-height: 1.35;
+      }
+
+      .next-step-card.is-active {
+        border-color: var(--line);
+        background: #fbfff0;
+      }
+
+      .next-step-card.is-clear {
+        background: #f2fbf9;
+      }
+
+      .next-step-card.is-empty {
+        background: #ffffff;
+      }
+
       .bar {
         background: #ecefe8;
       }
@@ -1698,8 +1885,25 @@
           padding: 18px;
         }
 
+        .bottom-nav {
+          bottom: 10px;
+          width: min(100%, 430px);
+          border-radius: 26px;
+        }
+
+        .bottom-nav-item {
+          min-height: 56px;
+          border-radius: 20px;
+        }
+
         .quest-arrow {
           width: 100%;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .stat-card-primary {
+          grid-column: auto;
         }
       }
     </style>
@@ -1759,9 +1963,13 @@
       </section>
 
       <section class="stats-grid" aria-label="進捗サマリー">
-        <article class="stat-card">
+        <article class="stat-card stat-card-primary">
           <p class="stat-label">今日の達成率</p>
           <p class="stat-value" id="statTodayPercent">0%</p>
+          <div class="summary-bar" aria-hidden="true">
+            <div class="summary-bar-fill" id="statTodayBar"></div>
+          </div>
+          <p class="stat-note" id="statTodayNote">0 / 0 完了</p>
         </article>
         <article class="stat-card">
           <p class="stat-label">目標総数</p>
@@ -1789,7 +1997,7 @@
       <section class="goal-console" id="goal-console" aria-label="目標管理コンソール">
         <h2 class="section-heading console-heading">目標管理</h2>
 
-        <section class="slogan-card" aria-label="スローガン">
+        <section class="slogan-card" id="settings-section" aria-label="スローガン">
           <div class="slogan-display" id="sloganDisplay">
             <p class="slogan-text" id="sloganText">理想の島を、今日の一歩からつくる</p>
             <button class="button secondary" type="button" id="editSloganButton">編集</button>
@@ -1842,7 +2050,7 @@
             <div class="goal-list" id="goalList"></div>
           </section>
 
-          <aside class="progress-stack" aria-label="進捗">
+          <aside class="progress-stack" id="progress-section" aria-label="進捗">
             <section class="progress-card">
               <div class="progress-head">
                 <p class="progress-label">全体進捗</p>
@@ -1861,6 +2069,25 @@
           </aside>
         </div>
       </section>
+
+      <nav class="bottom-nav" aria-label="アプリ内ナビゲーション">
+        <button class="bottom-nav-item is-active" type="button" data-nav="today" aria-label="今日のタスクへ移動">
+          <span class="nav-icon" aria-hidden="true">✓</span>
+          <span>今日</span>
+        </button>
+        <button class="bottom-nav-item" type="button" data-nav="goals" aria-label="目標リストへ移動">
+          <span class="nav-icon" aria-hidden="true">☰</span>
+          <span>目標</span>
+        </button>
+        <button class="bottom-nav-item" type="button" data-nav="progress" aria-label="進捗状況へ移動">
+          <span class="nav-icon" aria-hidden="true">◔</span>
+          <span>進捗</span>
+        </button>
+        <button class="bottom-nav-item" type="button" data-nav="settings" aria-label="設定へ移動">
+          <span class="nav-icon" aria-hidden="true">⚙</span>
+          <span>設定</span>
+        </button>
+      </nav>
     </main>
 
     <script>
@@ -1892,6 +2119,7 @@
       const saveSloganButton = document.getElementById("saveSloganButton");
       const cancelSloganButton = document.getElementById("cancelSloganButton");
       const tabButtons = document.querySelectorAll(".tab-button");
+      const bottomNavButtons = document.querySelectorAll(".bottom-nav-item");
       const currentTabTitle = document.getElementById("currentTabTitle");
       const goalForm = document.getElementById("goalForm");
       const goalTitle = document.getElementById("goalTitle");
@@ -1902,6 +2130,8 @@
       const overallCount = document.getElementById("overallCount");
       const categoryProgress = document.getElementById("categoryProgress");
       const statTodayPercent = document.getElementById("statTodayPercent");
+      const statTodayBar = document.getElementById("statTodayBar");
+      const statTodayNote = document.getElementById("statTodayNote");
       const statTotalGoals = document.getElementById("statTotalGoals");
       const statDoneGoals = document.getElementById("statDoneGoals");
       const statUndoneGoals = document.getElementById("statUndoneGoals");
@@ -1920,6 +2150,34 @@
         button.addEventListener("click", () => {
           activeTab = button.dataset.tab;
           render();
+        });
+      });
+
+      bottomNavButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const nav = button.dataset.nav;
+          bottomNavButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+
+          if (nav === "today") {
+            activeTab = "today";
+            render();
+            scrollToSection("goal-console");
+            return;
+          }
+
+          if (nav === "goals") {
+            scrollToSection("goal-console");
+            return;
+          }
+
+          if (nav === "progress") {
+            scrollToSection("progress-section");
+            return;
+          }
+
+          if (nav === "settings") {
+            scrollToSection("settings-section");
+          }
         });
       });
 
@@ -1962,6 +2220,12 @@
 
       function saveGoals() {
         localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goalsByTab));
+      }
+
+      function scrollToSection(id) {
+        const section = document.getElementById(id);
+        if (!section) return;
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
       function startSloganEdit() {
@@ -2122,6 +2386,8 @@
         const undone = allProgress.total - allProgress.done;
 
         statTodayPercent.textContent = `${todayProgress.percent}%`;
+        statTodayBar.style.width = `${todayProgress.percent}%`;
+        statTodayNote.textContent = `${todayProgress.done} / ${todayProgress.total} 完了`;
         statTotalGoals.textContent = `${allProgress.total}個`;
         statDoneGoals.textContent = `${allProgress.done}個`;
         statUndoneGoals.textContent = `${undone}個`;
@@ -2188,7 +2454,7 @@
           status = "clear";
           label = "完了";
           title = "今日のタスクはすべて完了しています";
-          description = "お疲れさまです。必要な行動は完了しています。";
+          description = "おつかれさまでした。明日の一歩も整えていきましょう。";
         }
 
         nextStepCard.classList.toggle("is-active", status === "active");
