@@ -1898,6 +1898,58 @@
         padding: 14px 0;
       }
 
+      .category-row {
+        padding: 14px;
+        border: 1px solid var(--line-soft);
+        border-radius: 18px;
+        background: #fbfcf8;
+      }
+
+      .category-row-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .category-row.is-work .bar-fill {
+        background: #9adbd6;
+      }
+
+      .category-row.is-study .bar-fill {
+        background: #b8d96a;
+      }
+
+      .category-row.is-health .bar-fill {
+        background: #a9d7a7;
+      }
+
+      .category-row.is-family .bar-fill {
+        background: #e2c46d;
+      }
+
+      .category-row.is-money .bar-fill {
+        background: #c9c0ae;
+      }
+
+      .category-row.is-other .bar-fill {
+        background: #cfd3ca;
+      }
+
+      .category-bar {
+        height: 7px;
+      }
+
+      .category-empty {
+        display: grid;
+        justify-items: start;
+        gap: 6px;
+        padding: 18px;
+        border: 1.5px dashed var(--line-soft);
+        border-radius: 20px;
+        background: #fbfcf8;
+      }
+
       .stage-grid {
         gap: 12px;
       }
@@ -2305,7 +2357,7 @@
             </section>
 
             <section class="progress-card">
-              <h2 class="section-title">カテゴリー別</h2>
+              <h2 class="section-title">カテゴリ別の達成状況</h2>
               <div class="category-grid" id="categoryProgress"></div>
             </section>
           </aside>
@@ -2763,23 +2815,31 @@
         overallBar.style.width = `${progress.percent}%`;
         overallCount.textContent = `${progress.total}個中${progress.done}個達成`;
 
-        categoryProgress.innerHTML = CATEGORIES.map((category) => {
+        const categoryRows = CATEGORIES.map((category) => {
           const categoryGoals = goals.filter((goal) => goal.category === category);
           const categoryResult = getProgress(categoryGoals);
+          if (categoryResult.total === 0) return "";
 
           return `
-            <div class="category-row">
-              <div class="progress-head">
+            <div class="category-row is-${getCategoryTone(category)}">
+              <div class="category-row-head">
                 <p class="progress-label">${category}</p>
                 <span class="small-number">${categoryResult.percent}%</span>
               </div>
-              <div class="bar" aria-hidden="true">
+              <p class="progress-note">${categoryResult.done} / ${categoryResult.total} 完了</p>
+              <div class="bar category-bar" aria-hidden="true">
                 <div class="bar-fill" style="width: ${categoryResult.percent}%"></div>
               </div>
-              <p class="progress-note">${categoryResult.total}個中${categoryResult.done}個達成</p>
             </div>
           `;
         }).join("");
+
+        categoryProgress.innerHTML =
+          categoryRows ||
+          `<div class="category-empty">
+            <p class="empty-title">まだカテゴリ別の進捗はありません</p>
+            <p class="empty-text">タスクを追加すると、カテゴリごとの達成状況が表示されます。</p>
+          </div>`;
       }
 
       function renderStats() {
