@@ -2014,6 +2014,53 @@
         font-weight: 800;
       }
 
+      .streak-card {
+        gap: 14px;
+      }
+
+      .streak-message {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+
+      .streak-dots {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid var(--line-soft);
+        border-radius: 18px;
+        background: #fbfcf8;
+      }
+
+      .streak-day {
+        display: grid;
+        min-width: 0;
+        justify-items: center;
+        gap: 7px;
+      }
+
+      .streak-dot {
+        width: 13px;
+        height: 13px;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        background: #e7ebe4;
+      }
+
+      .streak-day.is-done .streak-dot {
+        border-color: rgba(184, 217, 106, 0.75);
+        background: var(--lime);
+      }
+
+      .streak-label {
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
       .category-row {
         display: grid;
         gap: 8px;
@@ -2536,6 +2583,15 @@
               </div>
             </section>
 
+            <section class="progress-card streak-card">
+              <div class="progress-head">
+                <p class="progress-label">連続達成日数</p>
+                <span class="progress-number" id="streakCount">0日</span>
+              </div>
+              <p class="streak-message" id="streakMessage">タスクを完了すると、連続記録が始まります</p>
+              <div class="streak-dots" id="streakDots" aria-label="直近7日間の達成状態"></div>
+            </section>
+
             <section class="progress-card">
               <h2 class="section-title">カテゴリ別の達成状況</h2>
               <div class="category-grid" id="categoryProgress"></div>
@@ -2621,6 +2677,9 @@
       const achievementEmpty = document.getElementById("achievementEmpty");
       const achievementContent = document.getElementById("achievementContent");
       const achievementBars = document.getElementById("achievementBars");
+      const streakCount = document.getElementById("streakCount");
+      const streakMessage = document.getElementById("streakMessage");
+      const streakDots = document.getElementById("streakDots");
       const categoryProgress = document.getElementById("categoryProgress");
       const statTodayPercent = document.getElementById("statTodayPercent");
       const statTodayBar = document.getElementById("statTodayBar");
@@ -2900,6 +2959,54 @@
         return { today, yesterday, recent, days, max };
       }
 
+      function getCompletedDateSet() {
+        const allGoals = Object.values(goalsByTab).flat();
+        const completedDates = new Set();
+
+        allGoals.forEach((goal) => {
+          const completedKey = getDateKeyFromValue(goal.completedAt);
+          if (completedKey) completedDates.add(completedKey);
+        });
+
+        return completedDates;
+      }
+
+      function getStreakMessage(days) {
+        if (days === 0) return "タスクを完了すると、連続記録が始まります";
+        if (days === 1) return "今日の一歩を記録しました";
+        if (days < 7) return "少しずつ積み上がっています";
+        return "継続のリズムができています";
+      }
+
+      function getStreakProgress() {
+        const todayKey = getTodayKey();
+        const yesterdayKey = addDays(todayKey, -1);
+        const completedDates = getCompletedDateSet();
+        const startKey = completedDates.has(todayKey)
+          ? todayKey
+          : completedDates.has(yesterdayKey)
+            ? yesterdayKey
+            : "";
+        let count = 0;
+
+        if (startKey) {
+          let currentKey = startKey;
+          while (completedDates.has(currentKey)) {
+            count += 1;
+            currentKey = addDays(currentKey, -1);
+          }
+        }
+
+        const days = Array.from({ length: 7 }, (_, index) => {
+          const dateKey = addDays(todayKey, index - 6);
+          const date = new Date(`${dateKey}T00:00:00`);
+          const weekday = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
+          return { dateKey, weekday, done: completedDates.has(dateKey) };
+        });
+
+        return { count, message: getStreakMessage(count), days };
+      }
+
       function getTodayKey() {
         const now = new Date();
         const year = now.getFullYear();
@@ -3150,6 +3257,23 @@
           .join("");
       }
 
+      function renderStreakProgress() {
+        const streak = getStreakProgress();
+
+        streakCount.textContent = streak.count === 0 ? "0日" : `${streak.count}日連続`;
+        streakMessage.textContent = streak.message;
+        streakDots.innerHTML = streak.days
+          .map(
+            (day) => `
+              <div class="streak-day ${day.done ? "is-done" : ""}">
+                <span class="streak-dot" aria-hidden="true"></span>
+                <span class="streak-label">${escapeHtml(day.weekday)}</span>
+              </div>
+            `
+          )
+          .join("");
+      }
+
       function renderStats() {
         const todayProgress = getProgress(goalsByTab.today);
         const allGoals = Object.values(goalsByTab).flat();
@@ -3246,6 +3370,7 @@
         renderProgress();
         renderWeeklyProgress();
         renderAchievementHistory();
+        renderStreakProgress();
         renderStats();
         renderStages();
         renderNextStep();
