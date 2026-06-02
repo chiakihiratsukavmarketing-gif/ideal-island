@@ -1994,8 +1994,8 @@
         <h1 class="app-title">MILE</h1>
         <p class="hero-kicker">目標管理アプリ</p>
         <div class="hero-copy">
-          <p>今日やることを整理して、目標達成までの進捗を見える化します。</p>
-          <p>小さな行動を積み重ねながら、理想の状態に近づくためのアプリです。</p>
+          <p>今日やることを整理し、目標までの進捗を見える化します。</p>
+          <p>小さな行動を積み重ねて、理想の状態に近づきます。</p>
         </div>
         <a class="cta-button" href="#goal-console">今日のタスクを確認する <span aria-hidden="true">→</span></a>
       </header>
@@ -2005,8 +2005,8 @@
         <article class="quest-card">
           <div class="quest-icon" aria-hidden="true">☷</div>
           <div>
-            <h3 class="quest-title">目標達成までの流れを確認する</h3>
-            <p class="quest-description">目標設定、日々の行動、振り返りの状態をひと目で確認できます。</p>
+            <h3 class="quest-title">目標までの流れ</h3>
+            <p class="quest-description">設定、行動、振り返りをひと目で確認。</p>
           </div>
           <a class="quest-arrow" href="#goal-console" aria-label="現在の目標管理へ進む">›</a>
         </article>
@@ -2017,7 +2017,7 @@
             <p class="stage-label">STEP 1</p>
             <span class="state-pill">未着手</span>
             <h3 class="stage-title">目標を決める</h3>
-            <p class="stage-description">達成したい状態を言語化し、具体的なゴールを設定します。</p>
+            <p class="stage-description">達成したい状態を決める。</p>
             <a class="stage-button" href="#goal-console">未着手</a>
           </article>
 
@@ -2026,7 +2026,7 @@
             <p class="stage-label">STEP 2</p>
             <span class="state-pill">未着手</span>
             <h3 class="stage-title">行動を積み上げる</h3>
-            <p class="stage-description">毎日のタスクや習慣を記録し、目標達成に必要な行動を継続します。</p>
+            <p class="stage-description">毎日のタスクを記録する。</p>
             <a class="stage-button" href="#goal-console">未着手</a>
           </article>
 
@@ -2035,7 +2035,7 @@
             <p class="stage-label">STEP 3</p>
             <span class="state-pill">未着手</span>
             <h3 class="stage-title">進捗を振り返る</h3>
-            <p class="stage-description">達成率や行動ログを見ながら、次に改善するポイントを整理します。</p>
+            <p class="stage-description">達成率を見て行動を整える。</p>
             <a class="stage-button" href="#goal-console">未着手</a>
           </article>
         </div>
@@ -2079,7 +2079,7 @@
         <section class="slogan-card" id="settings-section" aria-label="スローガン">
           <div class="slogan-display" id="sloganDisplay">
             <p class="slogan-text" id="sloganText">目標達成までの一歩を、今日から整える</p>
-            <button class="button secondary" type="button" id="editSloganButton">編集</button>
+              <button class="button secondary" type="button" id="editSloganButton">スローガン編集</button>
           </div>
 
           <div class="slogan-edit" id="sloganEdit">
@@ -2397,7 +2397,7 @@
             <div class="empty">
               <span class="empty-icon" aria-hidden="true">☑</span>
               <p class="empty-title">まだタスクがありません</p>
-              <p class="empty-text">今日やることを追加して、最初の一歩を始めましょう。</p>
+              <p class="empty-text">今日やることを追加してください。</p>
             </div>
           `;
           return;
@@ -2521,14 +2521,14 @@
         const nextGoal = todayGoals.find((goal) => !goal.done);
         let status = "empty";
         let label = "未設定";
-        let title = "今日の一歩を決めましょう";
-        let description = "まずは小さな目標を1つ追加してみましょう。";
+        let title = "今日やることを追加";
+        let description = "最初のタスクを入力してください。";
 
         if (nextGoal) {
           status = "active";
           label = "進行中";
           title = nextGoal.title;
-          description = "まずはこの目標から進めましょう。";
+          description = "このタスクから進める。";
         } else if (todayGoals.length > 0) {
           status = "clear";
           label = "完了";
