@@ -2278,7 +2278,10 @@
 
       function loadSlogan() {
         const savedSlogan = localStorage.getItem(SLOGAN_STORAGE_KEY);
-        return savedSlogan && savedSlogan.trim() ? savedSlogan : DEFAULT_SLOGAN;
+        if (!savedSlogan || !savedSlogan.trim()) return DEFAULT_SLOGAN;
+        const oldBrandName = `理想の${String.fromCharCode(23798)}`;
+        if (savedSlogan.includes(oldBrandName)) return DEFAULT_SLOGAN;
+        return savedSlogan;
       }
 
       function loadGoals() {
