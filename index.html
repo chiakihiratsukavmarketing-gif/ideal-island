@@ -2432,12 +2432,12 @@
 
       .progress-card {
         display: grid;
-        gap: 12px;
-        padding: 20px;
+        gap: 10px;
+        padding: 16px;
       }
 
       .progress-number {
-        font-size: 1.55rem;
+        font-size: 1.38rem;
         line-height: 1;
       }
 
@@ -2446,9 +2446,67 @@
         font-size: 0.86rem;
       }
 
+      .tab-progress-card {
+        display: none;
+      }
+
+      .progress-details {
+        display: grid;
+        order: 2;
+        gap: 10px;
+      }
+
+      .progress-details-summary {
+        display: flex;
+        min-height: 48px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        background: #ffffff;
+        color: var(--text);
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        font-weight: 850;
+        cursor: pointer;
+        box-shadow: var(--shadow-soft);
+        list-style: none;
+      }
+
+      .progress-details-summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .summary-close {
+        display: none;
+      }
+
+      .progress-details[open] .summary-open {
+        display: none;
+      }
+
+      .progress-details[open] .summary-close {
+        display: inline;
+      }
+
+      .progress-details[open] .progress-details-summary span:last-child {
+        transform: rotate(45deg);
+      }
+
+      .progress-details-content {
+        display: grid;
+        gap: 10px;
+        padding-top: 10px;
+      }
+
+      .progress-details-content .streak-card {
+        display: none;
+      }
+
       .weekly-content {
         display: grid;
-        gap: 12px;
+        gap: 10px;
       }
 
       .weekly-content.is-hidden,
@@ -2569,21 +2627,22 @@
       }
 
       .streak-card {
-        gap: 14px;
+        order: 1;
+        gap: 10px;
       }
 
       .streak-message {
         margin: 0;
         color: var(--muted);
-        font-size: 0.9rem;
-        line-height: 1.7;
+        font-size: 0.86rem;
+        line-height: 1.55;
       }
 
       .streak-dots {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 8px;
-        padding: 12px;
+        gap: 6px;
+        padding: 10px;
         border: 1px solid var(--line-soft);
         border-radius: 18px;
         background: #fbfcf8;
@@ -2593,7 +2652,7 @@
         display: grid;
         min-width: 0;
         justify-items: center;
-        gap: 7px;
+        gap: 5px;
       }
 
       .streak-dot {
@@ -3215,7 +3274,7 @@
           </section>
 
           <aside class="progress-stack" id="progress-section" aria-label="進捗">
-            <section class="progress-card">
+            <section class="progress-card tab-progress-card">
               <div class="progress-head">
                 <p class="progress-label">全体進捗</p>
                 <span class="progress-number" id="overallPercent">0%</span>
@@ -3226,6 +3285,22 @@
               <p class="progress-note" id="overallCount">0個中0個達成</p>
             </section>
 
+            <section class="progress-card streak-card">
+              <div class="progress-head">
+                <p class="progress-label">連続達成日数</p>
+                <span class="progress-number" id="streakCount">0日</span>
+              </div>
+              <p class="streak-message" id="streakMessage">タスクを完了すると、連続記録が始まります</p>
+              <div class="streak-dots" id="streakDots" aria-label="直近7日間の達成状態"></div>
+            </section>
+
+            <details class="progress-details">
+              <summary class="progress-details-summary">
+                <span class="summary-open">詳しい進捗を見る</span>
+                <span class="summary-close">進捗詳細を閉じる</span>
+                <span aria-hidden="true">+</span>
+              </summary>
+              <div class="progress-details-content">
             <section class="progress-card weekly-card">
               <div class="progress-head">
                 <p class="progress-label">今週の進捗</p>
@@ -3287,16 +3362,18 @@
             <section class="progress-card streak-card">
               <div class="progress-head">
                 <p class="progress-label">連続達成日数</p>
-                <span class="progress-number" id="streakCount">0日</span>
+                <span class="progress-number">0日</span>
               </div>
-              <p class="streak-message" id="streakMessage">タスクを完了すると、連続記録が始まります</p>
-              <div class="streak-dots" id="streakDots" aria-label="直近7日間の達成状態"></div>
+              <p class="streak-message">タスクを完了すると、連続記録が始まります</p>
+              <div class="streak-dots" aria-label="直近7日間の達成状態"></div>
             </section>
 
             <section class="progress-card">
               <h2 class="section-title">カテゴリ別の達成状況</h2>
               <div class="category-grid" id="categoryProgress"></div>
             </section>
+              </div>
+            </details>
           </aside>
         </div>
       </section>
