@@ -565,6 +565,7 @@
         gap: 16px;
         margin-bottom: 18px;
         padding: 20px;
+        background: #ffffff;
       }
 
       .reflection-heading {
@@ -607,7 +608,7 @@
         resize: vertical;
         border: 1.5px solid var(--line);
         border-radius: 20px;
-        background: #fbfcf8;
+        background: #ffffff;
         color: var(--text);
         padding: 14px 15px;
         font: inherit;
@@ -667,7 +668,7 @@
         padding: 12px 14px;
         border: 1px solid var(--line-soft);
         border-radius: 18px;
-        background: #fbfcf8;
+        background: #ffffff;
       }
 
       .recent-note-date {
@@ -1610,6 +1611,31 @@
         background: #ffffff;
       }
 
+      .goal-form.is-collapsed {
+        display: none;
+      }
+
+      .form-toggle-button {
+        display: inline-flex;
+        width: 100%;
+        min-height: 52px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 14px 0 12px;
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        background: var(--lime);
+        color: #1f2718;
+        font-weight: 900;
+      }
+
+      .form-toggle-button:hover,
+      .form-toggle-button:active {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(143, 179, 63, 0.14);
+      }
+
       .form-heading {
         display: grid;
         gap: 2px;
@@ -1655,6 +1681,8 @@
 
       .form-actions {
         display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
       }
 
       .add-button {
@@ -1751,14 +1779,20 @@
         color: var(--text);
         font-size: 0.98rem;
         line-height: 1.45;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
 
       .goal-meta {
         margin-top: 6px;
+        max-width: 100%;
         border-color: var(--line-soft);
         background: #f4f6ef;
         color: var(--muted);
         font-size: 0.74rem;
+        line-height: 1.35;
+        white-space: normal;
       }
 
       .goal-meta.is-work {
@@ -1803,6 +1837,8 @@
         gap: 6px;
         align-items: center;
         margin-top: 6px;
+        min-width: 0;
+        max-width: 100%;
       }
 
       .goal-meta-row .goal-meta {
@@ -1811,7 +1847,8 @@
 
       .due-badge {
         display: inline-flex;
-        width: fit-content;
+        width: auto;
+        max-width: 100%;
         align-items: center;
         min-height: 24px;
         border: 1px solid var(--line-soft);
@@ -1820,6 +1857,9 @@
         color: var(--muted);
         font-size: 0.74rem;
         font-weight: 800;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+        white-space: normal;
       }
 
       .due-badge.is-today {
@@ -2450,6 +2490,10 @@
           padding: 18px;
         }
 
+        .form-actions {
+          grid-template-columns: 1fr;
+        }
+
         .bottom-nav {
           bottom: 10px;
           width: min(100%, 430px);
@@ -2500,53 +2544,8 @@
         <div class="hero-icon" aria-hidden="true">✓</div>
         <h1 class="app-title">MILE</h1>
         <p class="hero-kicker">目標管理アプリ</p>
-        <div class="hero-copy">
-          <p>今日やることを整理し、目標までの進捗を見える化します。</p>
-          <p>小さな行動を積み重ねて、理想の状態に近づきます。</p>
-        </div>
         <a class="cta-button" href="#goal-console">今日のタスクを確認する <span aria-hidden="true">→</span></a>
       </header>
-
-      <section class="quest-map" aria-label="進捗ステップ">
-        <h2 class="section-heading">進捗ステップ</h2>
-        <article class="quest-card">
-          <div class="quest-icon" aria-hidden="true">☷</div>
-          <div>
-            <h3 class="quest-title">目標までの流れ</h3>
-            <p class="quest-description">設定、行動、振り返りをひと目で確認。</p>
-          </div>
-          <a class="quest-arrow" href="#goal-console" aria-label="現在の目標管理へ進む">›</a>
-        </article>
-
-        <div class="stage-grid" aria-label="進捗ステップ別カード">
-          <article class="stage-card" data-stage="stage1" data-tone="green">
-            <div class="stage-icon" aria-hidden="true">○</div>
-            <p class="stage-label">STEP 1</p>
-            <span class="state-pill">未着手</span>
-            <h3 class="stage-title">目標を決める</h3>
-            <p class="stage-description">達成したい状態を決める。</p>
-            <a class="stage-button" href="#goal-console">未着手</a>
-          </article>
-
-          <article class="stage-card" data-stage="stage2" data-tone="orange">
-            <div class="stage-icon" aria-hidden="true">✓</div>
-            <p class="stage-label">STEP 2</p>
-            <span class="state-pill">未着手</span>
-            <h3 class="stage-title">行動を積み上げる</h3>
-            <p class="stage-description">毎日のタスクを記録する。</p>
-            <a class="stage-button" href="#goal-console">未着手</a>
-          </article>
-
-          <article class="stage-card" data-stage="stage3" data-tone="purple">
-            <div class="stage-icon" aria-hidden="true">▦</div>
-            <p class="stage-label">STEP 3</p>
-            <span class="state-pill">未着手</span>
-            <h3 class="stage-title">進捗を振り返る</h3>
-            <p class="stage-description">達成率を見て行動を整える。</p>
-            <a class="stage-button" href="#goal-console">未着手</a>
-          </article>
-        </div>
-      </section>
 
       <section class="stats-grid" aria-label="進捗サマリー">
         <article class="stat-card stat-card-primary">
@@ -2638,7 +2637,12 @@
           <section class="panel" aria-label="目標管理">
             <h2 class="section-title" id="currentTabTitle">年間の目標</h2>
 
-            <form class="goal-form" id="goalForm">
+            <button class="form-toggle-button" type="button" id="toggleGoalFormButton" aria-expanded="false">
+              <span aria-hidden="true">＋</span>
+              今日やることを追加
+            </button>
+
+            <form class="goal-form is-collapsed" id="goalForm">
               <div class="form-heading">
                 <p class="form-eyebrow">タスク入力</p>
                 <h3>今日やることを追加</h3>
@@ -2664,6 +2668,7 @@
               </div>
               <div class="form-actions">
                 <button class="button add-button" type="submit">追加する</button>
+                <button class="button secondary" type="button" id="closeGoalFormButton">閉じる</button>
               </div>
             </form>
 
@@ -2813,6 +2818,7 @@
       let activeTab = "year";
       let activeFilter = "all";
       let activeCategoryFilter = "all";
+      let isGoalFormOpen = false;
       let slogan = loadSlogan();
       let goalsByTab = loadGoals();
       let reflectionNotes = loadReflectionNotes();
@@ -2836,6 +2842,8 @@
       const categoryFilterButtons = document.querySelectorAll(".category-filter-button");
       const currentTabTitle = document.getElementById("currentTabTitle");
       const goalForm = document.getElementById("goalForm");
+      const toggleGoalFormButton = document.getElementById("toggleGoalFormButton");
+      const closeGoalFormButton = document.getElementById("closeGoalFormButton");
       const goalTitle = document.getElementById("goalTitle");
       const goalCategory = document.getElementById("goalCategory");
       const goalDueDate = document.getElementById("goalDueDate");
@@ -2877,6 +2885,8 @@
       saveSloganButton.addEventListener("click", saveSlogan);
       cancelSloganButton.addEventListener("click", cancelSloganEdit);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
+      toggleGoalFormButton.addEventListener("click", toggleGoalForm);
+      closeGoalFormButton.addEventListener("click", closeGoalForm);
       goalForm.addEventListener("submit", addGoal);
 
       tabButtons.forEach((button) => {
@@ -3102,6 +3112,34 @@
             </div>`;
       }
 
+      function renderGoalFormState() {
+        goalForm.classList.toggle("is-collapsed", !isGoalFormOpen);
+        toggleGoalFormButton.setAttribute("aria-expanded", String(isGoalFormOpen));
+        toggleGoalFormButton.textContent = isGoalFormOpen ? "入力フォームを閉じる" : "＋ 今日やることを追加";
+      }
+
+      function openGoalForm() {
+        isGoalFormOpen = true;
+        renderGoalFormState();
+        goalTitle.focus();
+      }
+
+      function closeGoalForm() {
+        isGoalFormOpen = false;
+        goalForm.reset();
+        goalCategory.value = "その他";
+        goalDueDate.value = "";
+        renderGoalFormState();
+      }
+
+      function toggleGoalForm() {
+        if (isGoalFormOpen) {
+          closeGoalForm();
+        } else {
+          openGoalForm();
+        }
+      }
+
       function addGoal(event) {
         event.preventDefault();
 
@@ -3126,7 +3164,11 @@
         goalForm.reset();
         goalCategory.value = "その他";
         goalDueDate.value = "";
-        goalTitle.focus();
+        if (window.innerWidth <= 760) {
+          closeGoalForm();
+        } else {
+          goalTitle.focus();
+        }
         render();
       }
 
