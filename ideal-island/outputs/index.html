@@ -239,6 +239,7 @@
       .quest-card,
       .stage-card,
       .yearly-goal-card,
+      .monthly-goal-card,
       .slogan-card,
       .reflection-card,
       .panel,
@@ -656,6 +657,137 @@
         display: grid;
         grid-template-columns: 1fr auto;
         gap: 10px;
+      }
+
+      .monthly-goal-card {
+        display: grid;
+        width: min(100%, 720px);
+        gap: 16px;
+        margin: 16px auto 0;
+        padding: 20px;
+        background: #ffffff;
+      }
+
+      .monthly-goal-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .monthly-goal-form {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid var(--line-soft);
+        border-radius: 20px;
+        background: #ffffff;
+      }
+
+      .monthly-goal-form.is-collapsed {
+        display: none;
+      }
+
+      .monthly-goal-form input,
+      .monthly-goal-form select,
+      .monthly-goal-form textarea {
+        width: 100%;
+        border: 1.5px solid var(--line);
+        border-radius: 20px;
+        background: #ffffff;
+        color: var(--text);
+        padding: 13px 15px;
+        font: inherit;
+        line-height: 1.7;
+        outline: none;
+      }
+
+      .monthly-goal-form input,
+      .monthly-goal-form select {
+        min-height: 52px;
+      }
+
+      .monthly-goal-form textarea {
+        min-height: 104px;
+        resize: vertical;
+      }
+
+      .monthly-goal-form input:focus,
+      .monthly-goal-form select:focus,
+      .monthly-goal-form textarea:focus {
+        box-shadow: 0 0 0 4px rgba(184, 217, 106, 0.28);
+      }
+
+      .monthly-goal-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+      }
+
+      .monthly-goal-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .monthly-goal-item {
+        display: grid;
+        gap: 8px;
+        padding: 14px;
+        border: 1px solid var(--line-soft);
+        border-radius: 20px;
+        background: #fbfcf8;
+      }
+
+      .monthly-goal-item-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .monthly-goal-title {
+        margin: 0;
+        color: var(--text);
+        font-size: 1rem;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+
+      .monthly-goal-memo {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.65;
+        overflow-wrap: anywhere;
+      }
+
+      .monthly-goal-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .monthly-goal-empty {
+        display: grid;
+        gap: 6px;
+        padding: 16px;
+        border: 1.5px dashed var(--line-soft);
+        border-radius: 20px;
+        background: #fbfcf8;
+      }
+
+      .monthly-goal-delete {
+        flex: 0 0 auto;
+        width: 34px;
+        min-width: 34px;
+        height: 34px;
+        min-height: 34px;
+        padding: 0;
+        border-color: rgba(217, 107, 95, 0.28);
+        background: #fff7f6;
+        color: var(--danger);
       }
 
       .slogan-card {
@@ -2579,18 +2711,22 @@
 
         .reflection-heading,
         .yearly-goal-head,
+        .monthly-goal-head,
         .reflection-actions {
           display: grid;
         }
 
         .yearly-goal-head .button,
+        .monthly-goal-head .button,
         .yearly-goal-actions,
+        .monthly-goal-actions,
         .reflection-date,
         .reflection-actions .button {
           width: 100%;
         }
 
-        .yearly-goal-actions {
+        .yearly-goal-actions,
+        .monthly-goal-actions {
           grid-template-columns: 1fr;
         }
 
@@ -2702,6 +2838,56 @@
             <button class="button secondary" type="button" id="cancelYearlyGoalButton">キャンセル</button>
           </div>
         </form>
+      </section>
+
+      <section class="monthly-goal-card" id="monthly-goal-section" aria-label="今月の目標">
+        <div class="monthly-goal-head">
+          <div>
+            <p class="form-eyebrow" id="monthlyGoalPeriod">今月の目標</p>
+            <h2 class="section-title">今月取り組むこと</h2>
+          </div>
+          <button class="button secondary" type="button" id="toggleMonthlyGoalFormButton" aria-expanded="false">
+            今月の目標を追加
+          </button>
+        </div>
+
+        <form class="monthly-goal-form is-collapsed" id="monthlyGoalForm">
+          <div class="field">
+            <label for="monthlyGoalInput">今月の目標タイトル</label>
+            <input
+              id="monthlyGoalInput"
+              type="text"
+              maxlength="100"
+              placeholder="例：新規商談を5件作る"
+            />
+          </div>
+          <div class="field">
+            <label for="monthlyGoalCategory">カテゴリ</label>
+            <select id="monthlyGoalCategory">
+              <option value="仕事">仕事</option>
+              <option value="学習">学習</option>
+              <option value="健康">健康</option>
+              <option value="家族">家族</option>
+              <option value="お金">お金</option>
+              <option value="その他" selected>その他</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="monthlyGoalMemoInput">メモ</label>
+            <textarea
+              id="monthlyGoalMemoInput"
+              rows="4"
+              maxlength="400"
+              placeholder="例：月末までに商談候補をリスト化し、週ごとに連絡する。"
+            ></textarea>
+          </div>
+          <div class="monthly-goal-actions">
+            <button class="button" type="submit">保存する</button>
+            <button class="button secondary" type="button" id="cancelMonthlyGoalButton">キャンセル</button>
+          </div>
+        </form>
+
+        <div class="monthly-goal-list" id="monthlyGoalList"></div>
       </section>
 
       <section class="stats-grid" aria-label="進捗サマリー">
@@ -2998,6 +3184,14 @@
       const yearlyGoalInput = document.getElementById("yearlyGoalInput");
       const yearlyGoalMemoInput = document.getElementById("yearlyGoalMemoInput");
       const cancelYearlyGoalButton = document.getElementById("cancelYearlyGoalButton");
+      const monthlyGoalPeriod = document.getElementById("monthlyGoalPeriod");
+      const toggleMonthlyGoalFormButton = document.getElementById("toggleMonthlyGoalFormButton");
+      const monthlyGoalForm = document.getElementById("monthlyGoalForm");
+      const monthlyGoalInput = document.getElementById("monthlyGoalInput");
+      const monthlyGoalCategory = document.getElementById("monthlyGoalCategory");
+      const monthlyGoalMemoInput = document.getElementById("monthlyGoalMemoInput");
+      const cancelMonthlyGoalButton = document.getElementById("cancelMonthlyGoalButton");
+      const monthlyGoalList = document.getElementById("monthlyGoalList");
       const reflectionDate = document.getElementById("reflectionDate");
       const reflectionNote = document.getElementById("reflectionNote");
       const saveReflectionButton = document.getElementById("saveReflectionButton");
@@ -3054,6 +3248,9 @@
       editYearlyGoalButton.addEventListener("click", startYearlyGoalEdit);
       yearlyGoalForm.addEventListener("submit", saveYearlyGoal);
       cancelYearlyGoalButton.addEventListener("click", cancelYearlyGoalEdit);
+      toggleMonthlyGoalFormButton.addEventListener("click", toggleMonthlyGoalForm);
+      monthlyGoalForm.addEventListener("submit", addMonthlyGoal);
+      cancelMonthlyGoalButton.addEventListener("click", closeMonthlyGoalForm);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
       toggleGoalFormButton.addEventListener("click", toggleGoalForm);
       closeGoalFormButton.addEventListener("click", closeGoalForm);
@@ -3123,6 +3320,15 @@
 
         if (action === "delete") {
           deleteGoal(goalId);
+        }
+      });
+
+      monthlyGoalList.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-monthly-action]");
+        if (!button) return;
+
+        if (button.dataset.monthlyAction === "delete") {
+          deleteMonthlyGoal(button.dataset.id);
         }
       });
 
@@ -3232,8 +3438,26 @@
             createdAt: typeof yearlyGoal.createdAt === "string" ? yearlyGoal.createdAt : "",
             updatedAt: typeof yearlyGoal.updatedAt === "string" ? yearlyGoal.updatedAt : "",
           },
-          monthlyGoals: Array.isArray(plan.monthlyGoals) ? plan.monthlyGoals : [],
+          monthlyGoals: Array.isArray(plan.monthlyGoals)
+            ? plan.monthlyGoals
+                .filter((goal) => goal && typeof goal === "object" && !Array.isArray(goal))
+                .map(normalizeMonthlyGoal)
+            : [],
           dailyTasks: Array.isArray(plan.dailyTasks) ? plan.dailyTasks : [],
+        };
+      }
+
+      function normalizeMonthlyGoal(goal) {
+        const currentMonth = getCurrentMonthKey();
+        return {
+          id: typeof goal.id === "string" && goal.id ? goal.id : `month-${currentMonth}-${Date.now()}`,
+          yearGoalId: typeof goal.yearGoalId === "string" ? goal.yearGoalId : "",
+          title: typeof goal.title === "string" ? goal.title : "",
+          month: typeof goal.month === "string" && goal.month ? goal.month : currentMonth,
+          category: CATEGORIES.includes(goal.category) ? goal.category : "その他",
+          memo: typeof goal.memo === "string" ? goal.memo : "",
+          createdAt: typeof goal.createdAt === "string" ? goal.createdAt : "",
+          updatedAt: typeof goal.updatedAt === "string" ? goal.updatedAt : "",
         };
       }
 
@@ -3350,6 +3574,19 @@
         return `${date.getMonth() + 1}/${date.getDate()}`;
       }
 
+      function getCurrentMonthKey() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        return `${year}-${month}`;
+      }
+
+      function formatMonthLabel(monthKey) {
+        const [year, month] = monthKey.split("-");
+        if (!year || !month) return "今月の目標";
+        return `${year}年${Number(month)}月の目標`;
+      }
+
       function getRecentReflectionNotes() {
         return Object.entries(reflectionNotes)
           .filter(([, note]) => note.trim())
@@ -3391,6 +3628,118 @@
           ? memo || "メモはまだありません。"
           : "年間で達成したいことを1つ決めると、今月・今日の行動に落とし込みやすくなります。";
         editYearlyGoalButton.textContent = hasGoal ? "編集" : "年間目標を設定";
+      }
+
+      function getCurrentMonthlyGoals() {
+        const currentMonth = getCurrentMonthKey();
+        return goalPlan.monthlyGoals.filter((goal) => goal.month === currentMonth);
+      }
+
+      function openMonthlyGoalForm() {
+        monthlyGoalForm.classList.remove("is-collapsed");
+        toggleMonthlyGoalFormButton.setAttribute("aria-expanded", "true");
+        toggleMonthlyGoalFormButton.textContent = "入力フォームを閉じる";
+        monthlyGoalInput.focus();
+      }
+
+      function closeMonthlyGoalForm() {
+        monthlyGoalForm.classList.add("is-collapsed");
+        toggleMonthlyGoalFormButton.setAttribute("aria-expanded", "false");
+        toggleMonthlyGoalFormButton.textContent = "今月の目標を追加";
+        monthlyGoalForm.reset();
+        monthlyGoalCategory.value = "その他";
+      }
+
+      function toggleMonthlyGoalForm() {
+        if (monthlyGoalForm.classList.contains("is-collapsed")) {
+          openMonthlyGoalForm();
+        } else {
+          closeMonthlyGoalForm();
+        }
+      }
+
+      function addMonthlyGoal(event) {
+        event.preventDefault();
+
+        const title = monthlyGoalInput.value.trim();
+        if (!title) {
+          monthlyGoalInput.focus();
+          return;
+        }
+
+        const now = new Date().toISOString();
+        const month = getCurrentMonthKey();
+        const goal = {
+          id: `month-${month}-${crypto.randomUUID ? crypto.randomUUID() : Date.now()}`,
+          yearGoalId: goalPlan.yearlyGoal.id,
+          title,
+          month,
+          category: monthlyGoalCategory.value,
+          memo: monthlyGoalMemoInput.value.trim(),
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        goalPlan = {
+          ...goalPlan,
+          monthlyGoals: [...goalPlan.monthlyGoals, goal],
+        };
+
+        saveGoalPlan();
+        closeMonthlyGoalForm();
+        renderMonthlyGoals();
+      }
+
+      function deleteMonthlyGoal(goalId) {
+        const goal = goalPlan.monthlyGoals.find((item) => item.id === goalId);
+        if (!goal) return;
+
+        const shouldDelete = window.confirm ? window.confirm("この今月の目標を削除しますか？") : true;
+        if (!shouldDelete) return;
+
+        goalPlan = {
+          ...goalPlan,
+          monthlyGoals: goalPlan.monthlyGoals.filter((item) => item.id !== goalId),
+        };
+
+        saveGoalPlan();
+        renderMonthlyGoals();
+      }
+
+      function renderMonthlyGoals() {
+        const currentMonth = getCurrentMonthKey();
+        const goals = getCurrentMonthlyGoals();
+
+        monthlyGoalPeriod.textContent = formatMonthLabel(currentMonth);
+        monthlyGoalList.innerHTML = goals.length
+          ? goals
+              .map(
+                (goal) => `
+                  <article class="monthly-goal-item">
+                    <div class="monthly-goal-item-head">
+                      <div>
+                        <h3 class="monthly-goal-title">${escapeHtml(goal.title)}</h3>
+                        <div class="monthly-goal-meta">
+                          <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+                        </div>
+                      </div>
+                      <button
+                        class="button danger monthly-goal-delete"
+                        type="button"
+                        data-monthly-action="delete"
+                        data-id="${escapeHtml(goal.id)}"
+                        aria-label="${escapeHtml(goal.title)}を削除"
+                      >×</button>
+                    </div>
+                    ${goal.memo ? `<p class="monthly-goal-memo">${escapeHtml(goal.memo)}</p>` : ""}
+                  </article>
+                `
+              )
+              .join("")
+          : `<div class="monthly-goal-empty">
+              <p class="empty-title">今月の目標を設定しましょう</p>
+              <p class="empty-text">年間目標から逆算して、今月取り組むことを決めます。</p>
+            </div>`;
       }
 
       function renderGoalFormState() {
@@ -3952,6 +4301,7 @@
 
       function render() {
         renderYearlyGoal();
+        renderMonthlyGoals();
         renderSlogan();
         renderTabs();
         renderFilters();
