@@ -2099,6 +2099,24 @@
         white-space: normal;
       }
 
+      .goal-monthly-link {
+        display: inline-flex;
+        width: auto;
+        max-width: 100%;
+        align-items: center;
+        min-height: 24px;
+        border: 1px solid rgba(107, 178, 171, 0.28);
+        border-radius: 999px;
+        background: #f1faf8;
+        color: #567d79;
+        padding: 2px 9px;
+        font-size: 0.74rem;
+        font-weight: 800;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+        white-space: normal;
+      }
+
       .due-badge.is-today {
         border-color: rgba(226, 181, 72, 0.42);
         background: #fff7df;
@@ -3009,6 +3027,12 @@
                 <label for="goalDueDate">期限</label>
                 <input id="goalDueDate" type="date" />
               </div>
+              <div class="field">
+                <label for="goalMonthlyGoal">今月の目標</label>
+                <select id="goalMonthlyGoal">
+                  <option value="">紐づけなし</option>
+                </select>
+              </div>
               <div class="form-actions">
                 <button class="button add-button" type="submit">追加する</button>
                 <button class="button secondary" type="button" id="closeGoalFormButton">閉じる</button>
@@ -3208,6 +3232,7 @@
       const goalTitle = document.getElementById("goalTitle");
       const goalCategory = document.getElementById("goalCategory");
       const goalDueDate = document.getElementById("goalDueDate");
+      const goalMonthlyGoal = document.getElementById("goalMonthlyGoal");
       const goalList = document.getElementById("goalList");
       const overallPercent = document.getElementById("overallPercent");
       const overallBar = document.getElementById("overallBar");
@@ -3364,6 +3389,7 @@
           category: CATEGORIES.includes(goal.category) ? goal.category : "その他",
           done: Boolean(goal.done ?? goal.completed),
           dueDate: typeof goal.dueDate === "string" ? goal.dueDate : "",
+          monthlyGoalId: typeof goal.monthlyGoalId === "string" ? goal.monthlyGoalId : "",
           createdAt: goal.createdAt || new Date().toISOString(),
           completedAt: typeof goal.completedAt === "string" ? goal.completedAt : "",
         }));
@@ -3635,6 +3661,18 @@
         return goalPlan.monthlyGoals.filter((goal) => goal.month === currentMonth);
       }
 
+      function findMonthlyGoal(goalId) {
+        if (!goalId) return null;
+        return goalPlan.monthlyGoals.find((goal) => goal.id === goalId) || null;
+      }
+
+      function getLinkedTaskCount(monthlyGoalId) {
+        if (!monthlyGoalId) return 0;
+        return Object.values(goalsByTab)
+          .flat()
+          .filter((goal) => goal.monthlyGoalId === monthlyGoalId).length;
+      }
+
       function openMonthlyGoalForm() {
         monthlyGoalForm.classList.remove("is-collapsed");
         toggleMonthlyGoalFormButton.setAttribute("aria-expanded", "true");
@@ -3701,9 +3739,16 @@
           ...goalPlan,
           monthlyGoals: goalPlan.monthlyGoals.filter((item) => item.id !== goalId),
         };
+        goalsByTab = Object.fromEntries(
+          Object.entries(goalsByTab).map(([tab, goals]) => [
+            tab,
+            goals.map((item) => (item.monthlyGoalId === goalId ? { ...item, monthlyGoalId: "" } : item)),
+          ])
+        );
 
         saveGoalPlan();
-        renderMonthlyGoals();
+        saveGoals();
+        render();
       }
 
       function renderMonthlyGoals() {
@@ -3721,6 +3766,7 @@
                         <h3 class="monthly-goal-title">${escapeHtml(goal.title)}</h3>
                         <div class="monthly-goal-meta">
                           <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+                          <span class="goal-monthly-link">紐づいたタスク数：${getLinkedTaskCount(goal.id)}件</span>
                         </div>
                       </div>
                       <button
@@ -3742,6 +3788,19 @@
             </div>`;
       }
 
+      function renderGoalMonthlyOptions() {
+        const currentGoals = getCurrentMonthlyGoals();
+        const selectedValue = goalMonthlyGoal.value || "";
+
+        goalMonthlyGoal.innerHTML = `
+          <option value="">紐づけなし</option>
+          ${currentGoals
+            .map((goal) => `<option value="${escapeHtml(goal.id)}">${escapeHtml(goal.title)}</option>`)
+            .join("")}
+        `;
+        goalMonthlyGoal.value = currentGoals.some((goal) => goal.id === selectedValue) ? selectedValue : "";
+      }
+
       function renderGoalFormState() {
         goalForm.classList.toggle("is-collapsed", !isGoalFormOpen);
         toggleGoalFormButton.setAttribute("aria-expanded", String(isGoalFormOpen));
@@ -3759,6 +3818,7 @@
         goalForm.reset();
         goalCategory.value = "その他";
         goalDueDate.value = "";
+        goalMonthlyGoal.value = "";
         renderGoalFormState();
       }
 
@@ -3784,6 +3844,7 @@
           title,
           category: goalCategory.value,
           dueDate: goalDueDate.value,
+          monthlyGoalId: goalMonthlyGoal.value,
           done: false,
           createdAt: new Date().toISOString(),
           completedAt: "",
@@ -3794,6 +3855,7 @@
         goalForm.reset();
         goalCategory.value = "その他";
         goalDueDate.value = "";
+        goalMonthlyGoal.value = "";
         if (window.innerWidth <= 760) {
           closeGoalForm();
         } else {
@@ -4089,6 +4151,10 @@
               const dueBadge = dueMeta
                 ? `<span class="due-badge is-${dueMeta.tone}">${escapeHtml(dueMeta.label)}</span>`
                 : "";
+              const linkedMonthlyGoal = findMonthlyGoal(goal.monthlyGoalId);
+              const monthlyGoalBadge = linkedMonthlyGoal
+                ? `<span class="goal-monthly-link">今月の目標：${escapeHtml(linkedMonthlyGoal.title)}</span>`
+                : "";
 
               return `
               <article class="goal-item ${goal.done ? "is-done" : ""}">
@@ -4104,6 +4170,7 @@
                   <div class="goal-meta-row">
                     <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
                     ${dueBadge}
+                    ${monthlyGoalBadge}
                   </div>
                 </div>
                 <button
@@ -4279,10 +4346,16 @@
         let description = "最初のタスクを入力してください。";
 
         if (nextGoal) {
+          const linkedMonthlyGoal = findMonthlyGoal(nextGoal.monthlyGoalId);
+          const nextDescriptions = [
+            linkedMonthlyGoal ? `今月の目標：${linkedMonthlyGoal.title}` : "",
+            nextDueMeta ? nextDueMeta.label : "",
+          ].filter(Boolean);
+
           status = "active";
           label = "進行中";
           title = nextGoal.title;
-          description = nextDueMeta ? nextDueMeta.label : "このタスクから進める。";
+          description = nextDescriptions.length ? nextDescriptions.join(" / ") : "このタスクから進める。";
         } else if (todayGoals.length > 0) {
           status = "clear";
           label = "完了";
@@ -4302,6 +4375,7 @@
       function render() {
         renderYearlyGoal();
         renderMonthlyGoals();
+        renderGoalMonthlyOptions();
         renderSlogan();
         renderTabs();
         renderFilters();
