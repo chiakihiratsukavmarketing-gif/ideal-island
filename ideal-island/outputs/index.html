@@ -238,6 +238,7 @@
 
       .quest-card,
       .stage-card,
+      .yearly-goal-card,
       .slogan-card,
       .reflection-card,
       .panel,
@@ -551,6 +552,110 @@
 
       .console-heading {
         margin-top: 38px;
+      }
+
+      .yearly-goal-card {
+        display: grid;
+        width: min(100%, 720px);
+        gap: 16px;
+        margin: 22px auto 0;
+        padding: 20px;
+        background: #ffffff;
+      }
+
+      .yearly-goal-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .yearly-goal-display {
+        display: grid;
+        gap: 8px;
+        padding: 16px;
+        border: 1px solid var(--line-soft);
+        border-radius: 20px;
+        background: #fbfcf8;
+      }
+
+      .yearly-goal-title {
+        margin: 0;
+        color: var(--text);
+        font-size: 1.08rem;
+        line-height: 1.55;
+        overflow-wrap: anywhere;
+      }
+
+      .yearly-goal-memo,
+      .yearly-goal-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+      }
+
+      .yearly-goal-note {
+        width: fit-content;
+        max-width: 100%;
+        margin-top: 2px;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        background: #f4f9e8;
+        padding: 4px 10px;
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .yearly-goal-form {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid var(--line-soft);
+        border-radius: 20px;
+        background: #ffffff;
+      }
+
+      .yearly-goal-form.is-collapsed {
+        display: none;
+      }
+
+      .yearly-goal-display.is-hidden {
+        display: none;
+      }
+
+      .yearly-goal-form input,
+      .yearly-goal-form textarea {
+        width: 100%;
+        border: 1.5px solid var(--line);
+        border-radius: 20px;
+        background: #ffffff;
+        color: var(--text);
+        padding: 13px 15px;
+        font: inherit;
+        line-height: 1.7;
+        outline: none;
+      }
+
+      .yearly-goal-form input {
+        min-height: 52px;
+      }
+
+      .yearly-goal-form textarea {
+        min-height: 116px;
+        resize: vertical;
+      }
+
+      .yearly-goal-form input:focus,
+      .yearly-goal-form textarea:focus {
+        box-shadow: 0 0 0 4px rgba(184, 217, 106, 0.28);
+      }
+
+      .yearly-goal-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
       }
 
       .slogan-card {
@@ -2473,13 +2578,20 @@
         }
 
         .reflection-heading,
+        .yearly-goal-head,
         .reflection-actions {
           display: grid;
         }
 
+        .yearly-goal-head .button,
+        .yearly-goal-actions,
         .reflection-date,
         .reflection-actions .button {
           width: 100%;
+        }
+
+        .yearly-goal-actions {
+          grid-template-columns: 1fr;
         }
 
         .goal-item {
@@ -2546,6 +2658,51 @@
         <p class="hero-kicker">目標管理アプリ</p>
         <a class="cta-button" href="#goal-console">今日のタスクを確認する <span aria-hidden="true">→</span></a>
       </header>
+
+      <section class="yearly-goal-card" id="yearly-goal-section" aria-label="年間目標">
+        <div class="yearly-goal-head">
+          <div>
+            <p class="form-eyebrow">年間目標</p>
+            <h2 class="section-title">今年の目標</h2>
+          </div>
+          <button class="button secondary" type="button" id="editYearlyGoalButton" aria-expanded="false">
+            年間目標を設定
+          </button>
+        </div>
+
+        <div class="yearly-goal-display" id="yearlyGoalDisplay">
+          <h3 class="yearly-goal-title" id="yearlyGoalTitle">今年の目標を設定しましょう</h3>
+          <p class="yearly-goal-memo" id="yearlyGoalMemo">
+            年間で達成したいことを1つ決めると、今月・今日の行動に落とし込みやすくなります。
+          </p>
+          <p class="yearly-goal-note">今月の目標を設定すると進捗が表示されます。</p>
+        </div>
+
+        <form class="yearly-goal-form is-collapsed" id="yearlyGoalForm">
+          <div class="field">
+            <label for="yearlyGoalInput">年間目標タイトル</label>
+            <input
+              id="yearlyGoalInput"
+              type="text"
+              maxlength="100"
+              placeholder="例：SNS運用代行で年間売上600万円を達成する"
+            />
+          </div>
+          <div class="field">
+            <label for="yearlyGoalMemoInput">メモ</label>
+            <textarea
+              id="yearlyGoalMemoInput"
+              rows="4"
+              maxlength="400"
+              placeholder="例：月50万円の売上を安定させる。既存顧客の継続と新規商談を増やす。"
+            ></textarea>
+          </div>
+          <div class="yearly-goal-actions">
+            <button class="button" type="submit">保存する</button>
+            <button class="button secondary" type="button" id="cancelYearlyGoalButton">キャンセル</button>
+          </div>
+        </form>
+      </section>
 
       <section class="stats-grid" aria-label="進捗サマリー">
         <article class="stat-card stat-card-primary">
@@ -2802,6 +2959,7 @@
       const SLOGAN_STORAGE_KEY = "idealIslandSlogan";
       const GOALS_STORAGE_KEY = "idealIslandGoals";
       const REFLECTION_STORAGE_KEY = "mileReflectionNotes";
+      const GOAL_PLAN_STORAGE_KEY = "mileGoalPlan";
       const TAB_LABELS = {
         year: "年間",
         month: "今月",
@@ -2822,6 +2980,7 @@
       let slogan = loadSlogan();
       let goalsByTab = loadGoals();
       let reflectionNotes = loadReflectionNotes();
+      let goalPlan = loadGoalPlan();
       let reflectionStatusTimer = 0;
 
       const sloganText = document.getElementById("sloganText");
@@ -2831,6 +2990,14 @@
       const editSloganButton = document.getElementById("editSloganButton");
       const saveSloganButton = document.getElementById("saveSloganButton");
       const cancelSloganButton = document.getElementById("cancelSloganButton");
+      const editYearlyGoalButton = document.getElementById("editYearlyGoalButton");
+      const yearlyGoalForm = document.getElementById("yearlyGoalForm");
+      const yearlyGoalDisplay = document.getElementById("yearlyGoalDisplay");
+      const yearlyGoalTitle = document.getElementById("yearlyGoalTitle");
+      const yearlyGoalMemo = document.getElementById("yearlyGoalMemo");
+      const yearlyGoalInput = document.getElementById("yearlyGoalInput");
+      const yearlyGoalMemoInput = document.getElementById("yearlyGoalMemoInput");
+      const cancelYearlyGoalButton = document.getElementById("cancelYearlyGoalButton");
       const reflectionDate = document.getElementById("reflectionDate");
       const reflectionNote = document.getElementById("reflectionNote");
       const saveReflectionButton = document.getElementById("saveReflectionButton");
@@ -2884,6 +3051,9 @@
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
       cancelSloganButton.addEventListener("click", cancelSloganEdit);
+      editYearlyGoalButton.addEventListener("click", startYearlyGoalEdit);
+      yearlyGoalForm.addEventListener("submit", saveYearlyGoal);
+      cancelYearlyGoalButton.addEventListener("click", cancelYearlyGoalEdit);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
       toggleGoalFormButton.addEventListener("click", toggleGoalForm);
       closeGoalFormButton.addEventListener("click", closeGoalForm);
@@ -2909,7 +3079,7 @@
           }
 
           if (nav === "goals") {
-            scrollToSection("goal-console");
+            scrollToSection("yearly-goal-section");
             return;
           }
 
@@ -3019,6 +3189,58 @@
         localStorage.setItem(REFLECTION_STORAGE_KEY, JSON.stringify(reflectionNotes));
       }
 
+      function createEmptyGoalPlan() {
+        const year = new Date().getFullYear();
+        return {
+          yearlyGoal: {
+            id: `year-${year}`,
+            title: "",
+            memo: "",
+            createdAt: "",
+            updatedAt: "",
+          },
+          monthlyGoals: [],
+          dailyTasks: [],
+        };
+      }
+
+      function loadGoalPlan() {
+        const savedPlan = localStorage.getItem(GOAL_PLAN_STORAGE_KEY);
+        if (!savedPlan) return createEmptyGoalPlan();
+
+        try {
+          return normalizeGoalPlan(JSON.parse(savedPlan));
+        } catch {
+          return createEmptyGoalPlan();
+        }
+      }
+
+      function normalizeGoalPlan(plan) {
+        const fallbackPlan = createEmptyGoalPlan();
+        if (!plan || typeof plan !== "object" || Array.isArray(plan)) return fallbackPlan;
+
+        const yearlyGoal =
+          plan.yearlyGoal && typeof plan.yearlyGoal === "object" && !Array.isArray(plan.yearlyGoal)
+            ? plan.yearlyGoal
+            : {};
+
+        return {
+          yearlyGoal: {
+            id: typeof yearlyGoal.id === "string" && yearlyGoal.id ? yearlyGoal.id : fallbackPlan.yearlyGoal.id,
+            title: typeof yearlyGoal.title === "string" ? yearlyGoal.title : "",
+            memo: typeof yearlyGoal.memo === "string" ? yearlyGoal.memo : "",
+            createdAt: typeof yearlyGoal.createdAt === "string" ? yearlyGoal.createdAt : "",
+            updatedAt: typeof yearlyGoal.updatedAt === "string" ? yearlyGoal.updatedAt : "",
+          },
+          monthlyGoals: Array.isArray(plan.monthlyGoals) ? plan.monthlyGoals : [],
+          dailyTasks: Array.isArray(plan.dailyTasks) ? plan.dailyTasks : [],
+        };
+      }
+
+      function saveGoalPlan() {
+        localStorage.setItem(GOAL_PLAN_STORAGE_KEY, JSON.stringify(goalPlan));
+      }
+
       function scrollToSection(id) {
         const section = document.getElementById(id);
         if (!section) return;
@@ -3048,6 +3270,53 @@
       function closeSloganEdit() {
         sloganDisplay.classList.remove("is-hidden");
         sloganEdit.classList.remove("is-active");
+      }
+
+      function startYearlyGoalEdit() {
+        yearlyGoalInput.value = goalPlan.yearlyGoal.title;
+        yearlyGoalMemoInput.value = goalPlan.yearlyGoal.memo;
+        yearlyGoalForm.classList.remove("is-collapsed");
+        yearlyGoalDisplay.classList.add("is-hidden");
+        editYearlyGoalButton.setAttribute("aria-expanded", "true");
+        editYearlyGoalButton.textContent = "編集中";
+        yearlyGoalInput.focus();
+      }
+
+      function saveYearlyGoal(event) {
+        event.preventDefault();
+
+        const now = new Date().toISOString();
+        const title = yearlyGoalInput.value.trim();
+        const memo = yearlyGoalMemoInput.value.trim();
+        const previousGoal = goalPlan.yearlyGoal;
+
+        goalPlan = {
+          ...goalPlan,
+          yearlyGoal: {
+            ...previousGoal,
+            title,
+            memo,
+            createdAt: previousGoal.createdAt || now,
+            updatedAt: now,
+          },
+        };
+
+        saveGoalPlan();
+        closeYearlyGoalEdit();
+        renderYearlyGoal();
+      }
+
+      function cancelYearlyGoalEdit() {
+        closeYearlyGoalEdit();
+      }
+
+      function closeYearlyGoalEdit() {
+        yearlyGoalForm.classList.add("is-collapsed");
+        yearlyGoalDisplay.classList.remove("is-hidden");
+        editYearlyGoalButton.setAttribute("aria-expanded", "false");
+        yearlyGoalInput.value = "";
+        yearlyGoalMemoInput.value = "";
+        renderYearlyGoal();
       }
 
       function saveReflectionNote() {
@@ -3110,6 +3379,18 @@
               <p class="empty-title">まだ振り返りメモはありません</p>
               <p class="empty-text">今日の気づきをひとこと残してみましょう。</p>
             </div>`;
+      }
+
+      function renderYearlyGoal() {
+        const title = goalPlan.yearlyGoal.title.trim();
+        const memo = goalPlan.yearlyGoal.memo.trim();
+        const hasGoal = Boolean(title);
+
+        yearlyGoalTitle.textContent = hasGoal ? title : "今年の目標を設定しましょう";
+        yearlyGoalMemo.textContent = hasGoal
+          ? memo || "メモはまだありません。"
+          : "年間で達成したいことを1つ決めると、今月・今日の行動に落とし込みやすくなります。";
+        editYearlyGoalButton.textContent = hasGoal ? "編集" : "年間目標を設定";
       }
 
       function renderGoalFormState() {
@@ -3670,6 +3951,7 @@
       }
 
       function render() {
+        renderYearlyGoal();
         renderSlogan();
         renderTabs();
         renderFilters();
