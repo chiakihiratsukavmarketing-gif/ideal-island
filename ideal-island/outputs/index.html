@@ -609,6 +609,57 @@
         font-weight: 800;
       }
 
+      .yearly-goal-progress {
+        display: grid;
+        gap: 8px;
+        margin-top: 6px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line-soft);
+      }
+
+      .yearly-goal-progress-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .yearly-goal-progress-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 850;
+      }
+
+      .yearly-goal-progress-rate {
+        color: var(--text);
+        font-size: 1.28rem;
+        font-weight: 900;
+        letter-spacing: 0;
+      }
+
+      .yearly-goal-progress-bar {
+        width: 100%;
+        height: 7px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #ecefe8;
+      }
+
+      .yearly-goal-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--lime);
+      }
+
+      .yearly-goal-progress-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+
       .yearly-goal-form {
         display: grid;
         gap: 12px;
@@ -2872,6 +2923,18 @@
             年間で達成したいことを1つ決めると、今月・今日の行動に落とし込みやすくなります。
           </p>
           <p class="yearly-goal-note">今月の目標を設定すると進捗が表示されます。</p>
+          <div class="yearly-goal-progress" aria-label="年間進捗">
+            <div class="yearly-goal-progress-head">
+              <p class="yearly-goal-progress-label">年間進捗</p>
+              <span class="yearly-goal-progress-rate" id="yearlyProgressRate">0%</span>
+            </div>
+            <div class="yearly-goal-progress-bar" aria-hidden="true">
+              <div class="yearly-goal-progress-fill" id="yearlyProgressBar"></div>
+            </div>
+            <p class="yearly-goal-progress-note" id="yearlyProgressNote">
+              今月の目標を設定すると、年間進捗が表示されます
+            </p>
+          </div>
         </div>
 
         <form class="yearly-goal-form is-collapsed" id="yearlyGoalForm">
@@ -3247,6 +3310,9 @@
       const yearlyGoalDisplay = document.getElementById("yearlyGoalDisplay");
       const yearlyGoalTitle = document.getElementById("yearlyGoalTitle");
       const yearlyGoalMemo = document.getElementById("yearlyGoalMemo");
+      const yearlyProgressRate = document.getElementById("yearlyProgressRate");
+      const yearlyProgressBar = document.getElementById("yearlyProgressBar");
+      const yearlyProgressNote = document.getElementById("yearlyProgressNote");
       const yearlyGoalInput = document.getElementById("yearlyGoalInput");
       const yearlyGoalMemoInput = document.getElementById("yearlyGoalMemoInput");
       const cancelYearlyGoalButton = document.getElementById("cancelYearlyGoalButton");
@@ -3690,12 +3756,19 @@
         const title = goalPlan.yearlyGoal.title.trim();
         const memo = goalPlan.yearlyGoal.memo.trim();
         const hasGoal = Boolean(title);
+        const yearlyProgress = getYearlyGoalProgress();
 
         yearlyGoalTitle.textContent = hasGoal ? title : "今年の目標を設定しましょう";
         yearlyGoalMemo.textContent = hasGoal
           ? memo || "メモはまだありません。"
           : "年間で達成したいことを1つ決めると、今月・今日の行動に落とし込みやすくなります。";
         editYearlyGoalButton.textContent = hasGoal ? "編集" : "年間目標を設定";
+        yearlyProgressRate.textContent = `${yearlyProgress.percent}%`;
+        yearlyProgressBar.style.width = `${yearlyProgress.percent}%`;
+        yearlyProgressNote.textContent =
+          yearlyProgress.total === 0
+            ? "今月の目標を設定すると、年間進捗が表示されます"
+            : "今月の目標の進み具合から算出しています";
       }
 
       function getCurrentMonthlyGoals() {
@@ -3717,6 +3790,20 @@
         const percent = total === 0 ? 0 : Math.round((done / total) * 100);
 
         return { total, done, percent };
+      }
+
+      function getYearlyGoalProgress() {
+        const yearlyGoalId = goalPlan.yearlyGoal.id;
+        const yearlyMonthlyGoals = goalPlan.monthlyGoals.filter((goal) => goal.yearGoalId === yearlyGoalId);
+        const total = yearlyMonthlyGoals.length;
+        const percent =
+          total === 0
+            ? 0
+            : Math.round(
+                yearlyMonthlyGoals.reduce((sum, goal) => sum + getMonthlyGoalProgress(goal.id).percent, 0) / total
+              );
+
+        return { total, percent };
       }
 
       function openMonthlyGoalForm() {
