@@ -239,6 +239,7 @@
       .quest-card,
       .stage-card,
       .slogan-card,
+      .reflection-card,
       .panel,
       .goal-form,
       .goal-list,
@@ -557,6 +558,140 @@
         gap: 16px;
         margin-bottom: 18px;
         padding: 20px;
+      }
+
+      .reflection-card {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 18px;
+        padding: 20px;
+      }
+
+      .reflection-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .reflection-copy {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+
+      .reflection-date {
+        flex: 0 0 auto;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        background: #fbfcf8;
+        color: var(--muted);
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .reflection-field {
+        gap: 8px;
+      }
+
+      .reflection-field label {
+        color: var(--text);
+        font-size: 0.88rem;
+      }
+
+      .reflection-field textarea {
+        min-height: 132px;
+        width: 100%;
+        resize: vertical;
+        border: 1.5px solid var(--line);
+        border-radius: 20px;
+        background: #fbfcf8;
+        color: var(--text);
+        padding: 14px 15px;
+        font: inherit;
+        line-height: 1.7;
+        outline: none;
+      }
+
+      .reflection-field textarea:focus {
+        box-shadow: 0 0 0 4px rgba(184, 217, 106, 0.28);
+      }
+
+      .reflection-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .reflection-actions .button {
+        min-height: 48px;
+        padding-inline: 22px;
+      }
+
+      .reflection-status {
+        min-height: 1.2em;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 750;
+        opacity: 0;
+        transition: opacity 180ms ease;
+      }
+
+      .reflection-status.is-visible {
+        opacity: 1;
+      }
+
+      .recent-notes {
+        display: grid;
+        gap: 10px;
+        padding-top: 2px;
+      }
+
+      .recent-notes h3 {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+
+      .recent-notes-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .recent-note {
+        display: grid;
+        gap: 5px;
+        padding: 12px 14px;
+        border: 1px solid var(--line-soft);
+        border-radius: 18px;
+        background: #fbfcf8;
+      }
+
+      .recent-note-date {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .recent-note-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin: 0;
+        color: var(--text);
+        font-size: 0.9rem;
+        line-height: 1.65;
+      }
+
+      .recent-notes-empty {
+        padding: 14px;
+        border: 1.5px dashed var(--line-soft);
+        border-radius: 18px;
+        background: #fbfcf8;
       }
 
       .slogan-display {
@@ -2297,6 +2432,16 @@
           grid-template-columns: 1fr;
         }
 
+        .reflection-heading,
+        .reflection-actions {
+          display: grid;
+        }
+
+        .reflection-date,
+        .reflection-actions .button {
+          width: 100%;
+        }
+
         .goal-item {
           grid-template-columns: 34px minmax(0, 1fr) 36px;
         }
@@ -2453,6 +2598,33 @@
               <button class="button" type="button" id="saveSloganButton">保存</button>
               <button class="button secondary" type="button" id="cancelSloganButton">キャンセル</button>
             </div>
+          </div>
+        </section>
+
+        <section class="reflection-card" aria-label="振り返りメモ">
+          <div class="reflection-heading">
+            <div>
+              <h2 class="section-title">振り返りメモ</h2>
+              <p class="reflection-copy">今日の気づきや、明日に活かしたいことを残せます。</p>
+            </div>
+            <span class="reflection-date" id="reflectionDate"></span>
+          </div>
+          <div class="field reflection-field">
+            <label for="reflectionNote">今日のメモ</label>
+            <textarea
+              id="reflectionNote"
+              rows="5"
+              maxlength="600"
+              placeholder="例：今日は朝に作業できた。明日は先に重要タスクから進める。"
+            ></textarea>
+          </div>
+          <div class="reflection-actions">
+            <button class="button" type="button" id="saveReflectionButton">保存する</button>
+            <span class="reflection-status" id="reflectionStatus" aria-live="polite"></span>
+          </div>
+          <div class="recent-notes">
+            <h3>最近のメモ</h3>
+            <div class="recent-notes-list" id="recentNotesList"></div>
           </div>
         </section>
 
@@ -2624,6 +2796,7 @@
       const DEFAULT_SLOGAN = "目標達成までの一歩を、今日から整える";
       const SLOGAN_STORAGE_KEY = "idealIslandSlogan";
       const GOALS_STORAGE_KEY = "idealIslandGoals";
+      const REFLECTION_STORAGE_KEY = "mileReflectionNotes";
       const TAB_LABELS = {
         year: "年間",
         month: "今月",
@@ -2642,6 +2815,8 @@
       let activeCategoryFilter = "all";
       let slogan = loadSlogan();
       let goalsByTab = loadGoals();
+      let reflectionNotes = loadReflectionNotes();
+      let reflectionStatusTimer = 0;
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -2650,6 +2825,11 @@
       const editSloganButton = document.getElementById("editSloganButton");
       const saveSloganButton = document.getElementById("saveSloganButton");
       const cancelSloganButton = document.getElementById("cancelSloganButton");
+      const reflectionDate = document.getElementById("reflectionDate");
+      const reflectionNote = document.getElementById("reflectionNote");
+      const saveReflectionButton = document.getElementById("saveReflectionButton");
+      const reflectionStatus = document.getElementById("reflectionStatus");
+      const recentNotesList = document.getElementById("recentNotesList");
       const tabButtons = document.querySelectorAll(".tab-button");
       const bottomNavButtons = document.querySelectorAll(".bottom-nav-item");
       const taskFilterButtons = document.querySelectorAll(".task-filter-button");
@@ -2696,6 +2876,7 @@
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
       cancelSloganButton.addEventListener("click", cancelSloganEdit);
+      saveReflectionButton.addEventListener("click", saveReflectionNote);
       goalForm.addEventListener("submit", addGoal);
 
       tabButtons.forEach((button) => {
@@ -2806,6 +2987,28 @@
         localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goalsByTab));
       }
 
+      function loadReflectionNotes() {
+        const savedNotes = localStorage.getItem(REFLECTION_STORAGE_KEY);
+        if (!savedNotes) return {};
+
+        try {
+          const parsedNotes = JSON.parse(savedNotes);
+          if (!parsedNotes || typeof parsedNotes !== "object" || Array.isArray(parsedNotes)) return {};
+
+          return Object.fromEntries(
+            Object.entries(parsedNotes)
+              .filter(([dateKey, note]) => typeof dateKey === "string" && typeof note === "string")
+              .map(([dateKey, note]) => [dateKey, note])
+          );
+        } catch {
+          return {};
+        }
+      }
+
+      function saveReflectionNotes() {
+        localStorage.setItem(REFLECTION_STORAGE_KEY, JSON.stringify(reflectionNotes));
+      }
+
       function scrollToSection(id) {
         const section = document.getElementById(id);
         if (!section) return;
@@ -2835,6 +3038,68 @@
       function closeSloganEdit() {
         sloganDisplay.classList.remove("is-hidden");
         sloganEdit.classList.remove("is-active");
+      }
+
+      function saveReflectionNote() {
+        const todayKey = getTodayKey();
+        const note = reflectionNote.value.trim();
+
+        if (note) {
+          reflectionNotes[todayKey] = note;
+        } else {
+          delete reflectionNotes[todayKey];
+        }
+
+        saveReflectionNotes();
+        renderReflectionNotes();
+        showReflectionStatus();
+      }
+
+      function showReflectionStatus() {
+        window.clearTimeout(reflectionStatusTimer);
+        reflectionStatus.textContent = "保存しました";
+        reflectionStatus.classList.add("is-visible");
+        reflectionStatusTimer = window.setTimeout(() => {
+          reflectionStatus.classList.remove("is-visible");
+          reflectionStatus.textContent = "";
+        }, 2200);
+      }
+
+      function formatShortDate(dateKey) {
+        const date = new Date(`${dateKey}T00:00:00`);
+        if (Number.isNaN(date.getTime())) return dateKey;
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      }
+
+      function getRecentReflectionNotes() {
+        return Object.entries(reflectionNotes)
+          .filter(([, note]) => note.trim())
+          .sort(([dateA], [dateB]) => dateB.localeCompare(dateA))
+          .slice(0, 3);
+      }
+
+      function renderReflectionNotes() {
+        const todayKey = getTodayKey();
+        const todayNote = reflectionNotes[todayKey] || "";
+        const recentNotes = getRecentReflectionNotes();
+
+        reflectionDate.textContent = formatShortDate(todayKey);
+        reflectionNote.value = todayNote;
+        recentNotesList.innerHTML = recentNotes.length
+          ? recentNotes
+              .map(
+                ([dateKey, note]) => `
+                  <article class="recent-note">
+                    <span class="recent-note-date">${escapeHtml(formatShortDate(dateKey))}</span>
+                    <p class="recent-note-text">${escapeHtml(note)}</p>
+                  </article>
+                `
+              )
+              .join("")
+          : `<div class="recent-notes-empty">
+              <p class="empty-title">まだ振り返りメモはありません</p>
+              <p class="empty-text">今日の気づきをひとこと残してみましょう。</p>
+            </div>`;
       }
 
       function addGoal(event) {
@@ -3386,6 +3651,7 @@
       }
 
       render();
+      renderReflectionNotes();
     </script>
   </body>
 </html>
