@@ -1570,6 +1570,49 @@
         font-size: 0.74rem;
       }
 
+      .goal-meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        margin-top: 6px;
+      }
+
+      .goal-meta-row .goal-meta {
+        margin-top: 0;
+      }
+
+      .due-badge {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        min-height: 24px;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        padding: 2px 9px;
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
+      .due-badge.is-today {
+        border-color: rgba(226, 181, 72, 0.42);
+        background: #fff7df;
+        color: #866a1e;
+      }
+
+      .due-badge.is-overdue {
+        border-color: rgba(217, 107, 95, 0.32);
+        background: #fff3f1;
+        color: #a45c54;
+      }
+
+      .due-badge.is-upcoming {
+        border-color: rgba(107, 178, 171, 0.32);
+        background: #eef9f7;
+        color: #4c7f79;
+      }
+
       .goal-item .button.danger {
         width: 34px;
         min-width: 34px;
@@ -1595,6 +1638,12 @@
       }
 
       .goal-item.is-done .goal-title {
+        color: #8b9086;
+      }
+
+      .goal-item.is-done .due-badge,
+      .goal-item.is-done .goal-meta {
+        background: #eef0eb;
         color: #8b9086;
       }
 
@@ -2121,6 +2170,10 @@
                   <option value="プライベート">プライベート</option>
                 </select>
               </div>
+              <div class="field">
+                <label for="goalDueDate">期限</label>
+                <input id="goalDueDate" type="date" />
+              </div>
               <div class="form-actions">
                 <button class="button add-button" type="submit">追加する</button>
               </div>
@@ -2203,6 +2256,7 @@
       const goalForm = document.getElementById("goalForm");
       const goalTitle = document.getElementById("goalTitle");
       const goalCategory = document.getElementById("goalCategory");
+      const goalDueDate = document.getElementById("goalDueDate");
       const goalList = document.getElementById("goalList");
       const overallPercent = document.getElementById("overallPercent");
       const overallBar = document.getElementById("overallBar");
@@ -2291,13 +2345,25 @@
         try {
           const parsedGoals = JSON.parse(savedGoals);
           return {
-            year: Array.isArray(parsedGoals.year) ? parsedGoals.year : [],
-            month: Array.isArray(parsedGoals.month) ? parsedGoals.month : [],
-            today: Array.isArray(parsedGoals.today) ? parsedGoals.today : [],
+            year: normalizeGoals(parsedGoals.year),
+            month: normalizeGoals(parsedGoals.month),
+            today: normalizeGoals(parsedGoals.today),
           };
         } catch {
           return { ...initialGoals };
         }
+      }
+
+      function normalizeGoals(goals) {
+        if (!Array.isArray(goals)) return [];
+        return goals.map((goal) => ({
+          ...goal,
+          title: goal.title || goal.text || "",
+          category: goal.category || "仕事",
+          done: Boolean(goal.done ?? goal.completed),
+          dueDate: typeof goal.dueDate === "string" ? goal.dueDate : "",
+          createdAt: goal.createdAt || new Date().toISOString(),
+        }));
       }
 
       function saveGoals() {
@@ -2348,6 +2414,7 @@
           id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
           title,
           category: goalCategory.value,
+          dueDate: goalDueDate.value,
           done: false,
           createdAt: new Date().toISOString(),
         };
@@ -2356,6 +2423,7 @@
         saveGoals();
         goalForm.reset();
         goalCategory.value = "仕事";
+        goalDueDate.value = "";
         goalTitle.focus();
         render();
       }
@@ -2379,6 +2447,51 @@
         const done = goals.filter((goal) => goal.done).length;
         const percent = total === 0 ? 0 : Math.round((done / total) * 100);
         return { total, done, percent };
+      }
+
+      function getTodayKey() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function getDueMeta(goal) {
+        const dueDate = goal.dueDate || "";
+        if (!dueDate) return null;
+
+        const today = getTodayKey();
+        const date = new Date(`${dueDate}T00:00:00`);
+        const labelDate = Number.isNaN(date.getTime())
+          ? dueDate
+          : `${date.getMonth() + 1}/${date.getDate()}`;
+
+        if (!goal.done && dueDate < today) {
+          return { label: "期限切れ", tone: "overdue", rank: 0 };
+        }
+
+        if (dueDate === today) {
+          return { label: "今日まで", tone: "today", rank: 1 };
+        }
+
+        return { label: `期限：${labelDate}`, tone: "upcoming", rank: 2 };
+      }
+
+      function getDueRank(goal) {
+        if (goal.done) return Number.MAX_SAFE_INTEGER;
+        const dueMeta = getDueMeta(goal);
+        if (!dueMeta) return 9000000000000;
+        return dueMeta.rank * 10000000000 + Number(goal.dueDate.replaceAll("-", ""));
+      }
+
+      function sortGoals(goals) {
+        return [...goals].sort((a, b) => {
+          if (a.done !== b.done) return a.done ? 1 : -1;
+          const dueDiff = getDueRank(a) - getDueRank(b);
+          if (dueDiff !== 0) return dueDiff;
+          return String(a.createdAt || "").localeCompare(String(b.createdAt || ""));
+        });
       }
 
       function renderSlogan() {
@@ -2406,9 +2519,15 @@
           return;
         }
 
-        goalList.innerHTML = goals
+        goalList.innerHTML = sortGoals(goals)
           .map(
-            (goal) => `
+            (goal) => {
+              const dueMeta = getDueMeta(goal);
+              const dueBadge = dueMeta
+                ? `<span class="due-badge is-${dueMeta.tone}">${escapeHtml(dueMeta.label)}</span>`
+                : "";
+
+              return `
               <article class="goal-item ${goal.done ? "is-done" : ""}">
                 <button
                   class="goal-check"
@@ -2419,7 +2538,10 @@
                 >${goal.done ? "✓" : ""}</button>
                 <div class="goal-content">
                   <p class="goal-title">${escapeHtml(goal.title)}</p>
-                  <span class="goal-meta">${escapeHtml(goal.category)}</span>
+                  <div class="goal-meta-row">
+                    <span class="goal-meta">${escapeHtml(goal.category)}</span>
+                    ${dueBadge}
+                  </div>
                 </div>
                 <button
                   class="button danger"
@@ -2429,7 +2551,8 @@
                   aria-label="${escapeHtml(goal.title)}を削除"
                 >×</button>
               </article>
-            `
+            `;
+            }
           )
           .join("");
       }
@@ -2521,7 +2644,8 @@
 
       function renderNextStep() {
         const todayGoals = goalsByTab.today;
-        const nextGoal = todayGoals.find((goal) => !goal.done);
+        const nextGoal = sortGoals(todayGoals).find((goal) => !goal.done);
+        const nextDueMeta = nextGoal ? getDueMeta(nextGoal) : null;
         let status = "empty";
         let label = "未設定";
         let title = "今日やることを追加";
@@ -2531,7 +2655,7 @@
           status = "active";
           label = "進行中";
           title = nextGoal.title;
-          description = "このタスクから進める。";
+          description = nextDueMeta ? nextDueMeta.label : "このタスクから進める。";
         } else if (todayGoals.length > 0) {
           status = "clear";
           label = "完了";
