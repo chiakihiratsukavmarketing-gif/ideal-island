@@ -2039,16 +2039,52 @@
 
       .goal-edit-button,
       .goal-delete-button {
-        min-height: 34px;
-        padding: 0 10px;
-        border-radius: 999px;
-        font-size: 0.75rem;
+        display: inline-grid;
+        width: 36px;
+        min-width: 36px;
+        height: 36px;
+        min-height: 36px;
+        place-items: center;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 14px;
+        padding: 0;
+        color: var(--muted);
+        font-size: 0;
       }
 
       .goal-edit-button {
         border-color: var(--line-soft);
         background: #ffffff;
         color: var(--muted);
+      }
+
+      .goal-delete-button {
+        border-color: rgba(154, 116, 111, 0.2);
+        background: #fbf7f6;
+        color: #9a746f;
+      }
+
+      .goal-icon {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+
+      .goal-edit-button:hover,
+      .goal-edit-button:focus-visible {
+        border-color: var(--line);
+        color: var(--text);
+      }
+
+      .goal-delete-button:hover,
+      .goal-delete-button:focus-visible {
+        border-color: rgba(154, 116, 111, 0.38);
+        background: #fff3f1;
+        color: #8b5f5a;
       }
 
       .goal-edit-form {
@@ -2447,13 +2483,13 @@
       }
 
       .goal-item .goal-delete-button {
-        width: auto;
-        min-width: auto;
-        height: auto;
-        min-height: 34px;
-        padding: 0 10px;
-        font-size: 0.75rem;
-        line-height: 1.2;
+        width: 36px;
+        min-width: 36px;
+        height: 36px;
+        min-height: 36px;
+        padding: 0;
+        font-size: 0;
+        line-height: 1;
       }
 
       .goal-item.is-done {
@@ -2724,6 +2760,110 @@
 
       .progress-details-content .streak-card {
         display: none;
+      }
+
+      .yearly-goal-card,
+      .monthly-goal-card,
+      .goal-console,
+      .reflection-card,
+      .slogan-card {
+        width: min(100%, 720px);
+        margin-inline: auto;
+      }
+
+      .yearly-goal-card {
+        gap: 8px;
+        margin-top: 10px;
+        padding: 12px;
+        border-radius: 22px;
+      }
+
+      .yearly-goal-head {
+        align-items: center;
+        gap: 8px;
+      }
+
+      .yearly-goal-head .section-title {
+        margin-bottom: 0;
+      }
+
+      .yearly-goal-head .button {
+        min-height: 34px;
+        padding: 6px 10px;
+        font-size: 0.76rem;
+      }
+
+      .yearly-goal-display {
+        gap: 5px;
+        padding: 10px;
+        border-radius: 18px;
+      }
+
+      .yearly-goal-title {
+        font-size: 0.96rem;
+        line-height: 1.38;
+      }
+
+      .yearly-goal-memo {
+        font-size: 0.78rem;
+        line-height: 1.42;
+        -webkit-line-clamp: 2;
+      }
+
+      .yearly-goal-note,
+      .yearly-goal-progress-note {
+        display: none;
+      }
+
+      .yearly-goal-progress {
+        gap: 5px;
+        margin-top: 2px;
+        padding-top: 7px;
+      }
+
+      .yearly-goal-progress-label {
+        font-size: 0.78rem;
+      }
+
+      .yearly-goal-progress-rate {
+        font-size: 1rem;
+      }
+
+      .yearly-goal-progress-bar {
+        height: 6px;
+      }
+
+      .tabs {
+        display: none !important;
+      }
+
+      .goal-console {
+        margin-top: 14px;
+      }
+
+      .console-heading,
+      .panel .section-title {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .layout {
+        width: 100%;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .panel,
+      .progress-stack,
+      .goal-list,
+      .goal-form,
+      .next-step-card,
+      .progress-card,
+      .stat-summary-row,
+      .streak-card {
+        width: 100%;
+        max-width: 100%;
+        margin-inline: 0;
       }
 
       .weekly-content {
@@ -3271,6 +3411,64 @@
           grid-column: 1 / -1;
         }
       }
+
+      .app {
+        width: min(100%, 760px);
+      }
+
+      .goal-console,
+      .yearly-goal-card,
+      .monthly-goal-card,
+      .reflection-card,
+      .slogan-card {
+        width: min(100%, 720px);
+        margin-inline: auto;
+      }
+
+      @media (min-width: 900px) {
+        .goal-console {
+          width: min(100%, 720px);
+        }
+      }
+
+      @media (max-width: 760px) {
+        .yearly-goal-card {
+          gap: 7px;
+          padding: 11px;
+          border-radius: 20px;
+        }
+
+        .yearly-goal-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+
+        .yearly-goal-head .button {
+          width: auto;
+          min-height: 34px;
+          padding: 6px 10px;
+        }
+
+        .yearly-goal-display {
+          padding: 9px;
+        }
+
+        .yearly-goal-progress {
+          padding-top: 6px;
+        }
+
+        .goal-edit-button,
+        .goal-delete-button,
+        .goal-item .goal-delete-button {
+          width: 36px;
+          min-width: 36px;
+          height: 36px;
+          min-height: 36px;
+          padding: 0;
+        }
+      }
     </style>
   </head>
   <body>
@@ -3298,9 +3496,8 @@
         <div class="yearly-goal-display" id="yearlyGoalDisplay">
           <h3 class="yearly-goal-title" id="yearlyGoalTitle">今年の目標を設定しましょう</h3>
           <p class="yearly-goal-memo" id="yearlyGoalMemo">
-            年間で達成したいことを1つ決めると、今月・今日の行動に落とし込みやすくなります。
+            今年達成したいことを設定しましょう。
           </p>
-          <p class="yearly-goal-note">今月の目標を設定すると進捗が表示されます。</p>
           <div class="yearly-goal-progress" aria-label="年間進捗">
             <div class="yearly-goal-progress-head">
               <p class="yearly-goal-progress-label">年間進捗</p>
@@ -3309,9 +3506,6 @@
             <div class="yearly-goal-progress-bar" aria-hidden="true">
               <div class="yearly-goal-progress-fill" id="yearlyProgressBar"></div>
             </div>
-            <p class="yearly-goal-progress-note" id="yearlyProgressNote">
-              今月の目標を設定すると、年間進捗が表示されます
-            </p>
           </div>
         </div>
 
@@ -3688,7 +3882,7 @@
         today: [],
       };
 
-      let activeTab = "year";
+      let activeTab = "today";
       let activeFilter = "all";
       let activeCategoryFilter = "all";
       let isGoalFormOpen = false;
@@ -3715,7 +3909,6 @@
       const yearlyGoalMemo = document.getElementById("yearlyGoalMemo");
       const yearlyProgressRate = document.getElementById("yearlyProgressRate");
       const yearlyProgressBar = document.getElementById("yearlyProgressBar");
-      const yearlyProgressNote = document.getElementById("yearlyProgressNote");
       const yearlyGoalInput = document.getElementById("yearlyGoalInput");
       const yearlyGoalMemoInput = document.getElementById("yearlyGoalMemoInput");
       const cancelYearlyGoalButton = document.getElementById("cancelYearlyGoalButton");
@@ -4190,14 +4383,10 @@
         yearlyGoalTitle.textContent = hasGoal ? title : "今年の目標を設定しましょう";
         yearlyGoalMemo.textContent = hasGoal
           ? memo || "メモはまだありません。"
-          : "年間で達成したいことを1つ決めると、今月・今日の行動に落とし込みやすくなります。";
+          : "今年達成したいことを設定しましょう。";
         editYearlyGoalButton.textContent = hasGoal ? "編集" : "年間目標を設定";
         yearlyProgressRate.textContent = `${yearlyProgress.percent}%`;
         yearlyProgressBar.style.width = `${yearlyProgress.percent}%`;
-        yearlyProgressNote.textContent =
-          yearlyProgress.total === 0
-            ? "今月の目標を設定すると、年間進捗が表示されます"
-            : "今月の目標の進み具合から算出しています";
       }
 
       function getCurrentMonthlyGoals() {
@@ -4942,14 +5131,30 @@
                 type="button"
                 data-action="edit"
                 data-id="${escapeHtml(goal.id)}"
-              >編集</button>
+                aria-label="タスクを編集"
+                title="編集"
+              >
+                <svg class="goal-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 20h4l11-11a2.8 2.8 0 0 0-4-4L4 16v4Z"></path>
+                  <path d="M13.5 6.5l4 4"></path>
+                </svg>
+              </button>
               <button
                 class="button danger goal-delete-button"
                 type="button"
                 data-action="delete"
                 data-id="${escapeHtml(goal.id)}"
-                aria-label="${escapeHtml(goal.title)}を削除"
-              >削除</button>
+                aria-label="タスクを削除"
+                title="削除"
+              >
+                <svg class="goal-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h16"></path>
+                  <path d="M10 11v6"></path>
+                  <path d="M14 11v6"></path>
+                  <path d="M6 7l1 14h10l1-14"></path>
+                  <path d="M9 7V4h6v3"></path>
+                </svg>
+              </button>
             </div>
             ${
               isEditing
