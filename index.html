@@ -1942,6 +1942,78 @@
         background: #fbfcf8;
       }
 
+      .achievement-content {
+        display: grid;
+        gap: 14px;
+      }
+
+      .achievement-content.is-hidden,
+      .achievement-empty.is-hidden {
+        display: none;
+      }
+
+      .achievement-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .achievement-empty {
+        display: grid;
+        gap: 6px;
+        padding: 16px;
+        border: 1.5px dashed var(--line-soft);
+        border-radius: 18px;
+        background: #fbfcf8;
+      }
+
+      .achievement-bars {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        align-items: end;
+        gap: 7px;
+        padding-top: 2px;
+      }
+
+      .achievement-day {
+        display: grid;
+        min-width: 0;
+        justify-items: center;
+        gap: 6px;
+      }
+
+      .achievement-count {
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 750;
+      }
+
+      .achievement-bar-track {
+        display: flex;
+        align-items: flex-end;
+        width: 100%;
+        max-width: 28px;
+        height: 58px;
+        overflow: hidden;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        background: #eef2ec;
+      }
+
+      .achievement-bar-fill {
+        width: 100%;
+        min-height: 4px;
+        border-radius: inherit;
+        background: var(--lime);
+        transition: height 180ms ease;
+      }
+
+      .achievement-label {
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
       .category-row {
         display: grid;
         gap: 8px;
@@ -2436,6 +2508,34 @@
               </div>
             </section>
 
+            <section class="progress-card achievement-card">
+              <div class="progress-head">
+                <p class="progress-label">達成履歴</p>
+                <span class="progress-number" id="historyTotal">0件</span>
+              </div>
+              <div class="achievement-empty" id="achievementEmpty">
+                <p class="empty-title">まだ達成履歴はありません</p>
+                <p class="empty-text">タスクを完了すると、日々の積み上げが表示されます。</p>
+              </div>
+              <div class="achievement-content" id="achievementContent">
+                <div class="achievement-metrics">
+                  <div class="weekly-metric">
+                    <span>今日</span>
+                    <strong id="historyToday">0件</strong>
+                  </div>
+                  <div class="weekly-metric">
+                    <span>昨日</span>
+                    <strong id="historyYesterday">0件</strong>
+                  </div>
+                  <div class="weekly-metric">
+                    <span>直近7日</span>
+                    <strong id="historyRecent">0件</strong>
+                  </div>
+                </div>
+                <div class="achievement-bars" id="achievementBars" aria-label="直近7日間の完了数"></div>
+              </div>
+            </section>
+
             <section class="progress-card">
               <h2 class="section-title">カテゴリ別の達成状況</h2>
               <div class="category-grid" id="categoryProgress"></div>
@@ -2514,6 +2614,13 @@
       const weeklyBar = document.getElementById("weeklyBar");
       const weeklyEmpty = document.getElementById("weeklyEmpty");
       const weeklyContent = document.getElementById("weeklyContent");
+      const historyTotal = document.getElementById("historyTotal");
+      const historyToday = document.getElementById("historyToday");
+      const historyYesterday = document.getElementById("historyYesterday");
+      const historyRecent = document.getElementById("historyRecent");
+      const achievementEmpty = document.getElementById("achievementEmpty");
+      const achievementContent = document.getElementById("achievementContent");
+      const achievementBars = document.getElementById("achievementBars");
       const categoryProgress = document.getElementById("categoryProgress");
       const statTodayPercent = document.getElementById("statTodayPercent");
       const statTodayBar = document.getElementById("statTodayBar");
@@ -2753,6 +2860,46 @@
         return { added, done, percent };
       }
 
+      function formatDateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function getDateKeyFromValue(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        return formatDateKey(date);
+      }
+
+      function getAchievementHistory() {
+        const todayKey = getTodayKey();
+        const yesterdayKey = addDays(todayKey, -1);
+        const days = Array.from({ length: 7 }, (_, index) => {
+          const dateKey = addDays(todayKey, index - 6);
+          const date = new Date(`${dateKey}T00:00:00`);
+          const weekday = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
+          return { dateKey, weekday, count: 0 };
+        });
+        const dayMap = new Map(days.map((day) => [day.dateKey, day]));
+        const allGoals = Object.values(goalsByTab).flat();
+
+        allGoals.forEach((goal) => {
+          const completedKey = getDateKeyFromValue(goal.completedAt);
+          if (!completedKey || !dayMap.has(completedKey)) return;
+          dayMap.get(completedKey).count += 1;
+        });
+
+        const today = dayMap.get(todayKey)?.count || 0;
+        const yesterday = dayMap.get(yesterdayKey)?.count || 0;
+        const recent = days.reduce((sum, day) => sum + day.count, 0);
+        const max = Math.max(1, ...days.map((day) => day.count));
+
+        return { today, yesterday, recent, days, max };
+      }
+
       function getTodayKey() {
         const now = new Date();
         const year = now.getFullYear();
@@ -2977,6 +3124,32 @@
         weeklyContent.classList.toggle("is-hidden", !hasWeeklyTasks);
       }
 
+      function renderAchievementHistory() {
+        const history = getAchievementHistory();
+        const hasHistory = history.recent > 0;
+
+        historyTotal.textContent = `${history.recent}件`;
+        historyToday.textContent = `${history.today}件`;
+        historyYesterday.textContent = `${history.yesterday}件`;
+        historyRecent.textContent = `${history.recent}件`;
+        achievementEmpty.classList.toggle("is-hidden", hasHistory);
+        achievementContent.classList.toggle("is-hidden", !hasHistory);
+        achievementBars.innerHTML = history.days
+          .map((day) => {
+            const height = day.count === 0 ? 4 : Math.max(12, Math.round((day.count / history.max) * 58));
+            return `
+              <div class="achievement-day">
+                <span class="achievement-count">${day.count}</span>
+                <div class="achievement-bar-track" aria-hidden="true">
+                  <div class="achievement-bar-fill" style="height: ${height}px"></div>
+                </div>
+                <span class="achievement-label">${escapeHtml(day.weekday)}</span>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
       function renderStats() {
         const todayProgress = getProgress(goalsByTab.today);
         const allGoals = Object.values(goalsByTab).flat();
@@ -3072,6 +3245,7 @@
         renderGoals();
         renderProgress();
         renderWeeklyProgress();
+        renderAchievementHistory();
         renderStats();
         renderStages();
         renderNextStep();
