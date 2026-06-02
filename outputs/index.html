@@ -820,11 +820,19 @@
         background: #fbfcf8;
       }
 
+      .monthly-goal-item.is-editing {
+        background: #ffffff;
+      }
+
       .monthly-goal-item-head {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         gap: 12px;
+        min-width: 0;
+      }
+
+      .monthly-goal-item-body {
         min-width: 0;
       }
 
@@ -853,6 +861,74 @@
         flex-wrap: wrap;
         gap: 6px;
         align-items: center;
+      }
+
+      .monthly-goal-controls {
+        display: flex;
+        flex: 0 0 auto;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+
+      .monthly-goal-edit,
+      .monthly-goal-delete {
+        min-height: 34px;
+        padding: 0 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+      }
+
+      .monthly-goal-edit {
+        border-color: var(--line-soft);
+        background: #ffffff;
+        color: var(--muted);
+      }
+
+      .monthly-goal-edit:hover,
+      .monthly-goal-edit:focus-visible {
+        border-color: var(--line);
+        color: var(--text);
+      }
+
+      .monthly-goal-edit-form {
+        display: grid;
+        gap: 10px;
+        margin-top: 4px;
+        padding: 12px;
+        border: 1px solid var(--line-soft);
+        border-radius: 18px;
+        background: #ffffff;
+      }
+
+      .monthly-goal-edit-form input,
+      .monthly-goal-edit-form select,
+      .monthly-goal-edit-form textarea {
+        width: 100%;
+        border: 1.5px solid var(--line);
+        border-radius: 18px;
+        background: #ffffff;
+        color: var(--text);
+        padding: 12px 14px;
+        font: inherit;
+        line-height: 1.6;
+        outline: none;
+      }
+
+      .monthly-goal-edit-form input,
+      .monthly-goal-edit-form select {
+        min-height: 48px;
+      }
+
+      .monthly-goal-edit-form textarea {
+        min-height: 92px;
+        resize: vertical;
+      }
+
+      .monthly-goal-edit-form input:focus,
+      .monthly-goal-edit-form select:focus,
+      .monthly-goal-edit-form textarea:focus {
+        box-shadow: 0 0 0 4px rgba(184, 217, 106, 0.22);
       }
 
       .monthly-goal-progress {
@@ -908,11 +984,6 @@
 
       .monthly-goal-delete {
         flex: 0 0 auto;
-        width: 34px;
-        min-width: 34px;
-        height: 34px;
-        min-height: 34px;
-        padding: 0;
         border-color: rgba(217, 107, 95, 0.28);
         background: #fff7f6;
         color: var(--danger);
@@ -3022,11 +3093,10 @@
           border-radius: 18px;
         }
 
+        .monthly-goal-edit,
         .monthly-goal-delete {
-          width: 30px;
-          min-width: 30px;
-          height: 30px;
-          min-height: 30px;
+          min-height: 32px;
+          padding: 0 9px;
         }
 
         .goal-item {
@@ -3509,6 +3579,7 @@
       let reflectionNotes = loadReflectionNotes();
       let goalPlan = loadGoalPlan();
       let reflectionStatusTimer = 0;
+      let editingMonthlyGoalId = "";
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -3597,6 +3668,7 @@
       toggleMonthlyGoalFormButton.addEventListener("click", toggleMonthlyGoalForm);
       monthlyGoalForm.addEventListener("submit", addMonthlyGoal);
       cancelMonthlyGoalButton.addEventListener("click", closeMonthlyGoalForm);
+      monthlyGoalList.addEventListener("submit", saveMonthlyGoalEdit);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
       toggleGoalFormButton.addEventListener("click", toggleGoalForm);
       closeGoalFormButton.addEventListener("click", closeGoalForm);
@@ -3672,6 +3744,14 @@
       monthlyGoalList.addEventListener("click", (event) => {
         const button = event.target.closest("button[data-monthly-action]");
         if (!button) return;
+
+        if (button.dataset.monthlyAction === "edit") {
+          startMonthlyGoalEdit(button.dataset.id);
+        }
+
+        if (button.dataset.monthlyAction === "cancel-edit") {
+          cancelMonthlyGoalEdit();
+        }
 
         if (button.dataset.monthlyAction === "delete") {
           deleteMonthlyGoal(button.dataset.id);
@@ -4020,6 +4100,7 @@
       }
 
       function openMonthlyGoalForm() {
+        editingMonthlyGoalId = "";
         monthlyGoalForm.classList.remove("is-collapsed");
         toggleMonthlyGoalFormButton.setAttribute("aria-expanded", "true");
         toggleMonthlyGoalFormButton.textContent = "入力フォームを閉じる";
@@ -4081,6 +4162,10 @@
         const shouldDelete = window.confirm ? window.confirm("この今月の目標を削除しますか？") : true;
         if (!shouldDelete) return;
 
+        if (editingMonthlyGoalId === goalId) {
+          editingMonthlyGoalId = "";
+        }
+
         goalPlan = {
           ...goalPlan,
           monthlyGoals: goalPlan.monthlyGoals.filter((item) => item.id !== goalId),
@@ -4097,6 +4182,75 @@
         render();
       }
 
+      function startMonthlyGoalEdit(goalId) {
+        const goal = goalPlan.monthlyGoals.find((item) => item.id === goalId);
+        if (!goal) return;
+
+        editingMonthlyGoalId = goalId;
+        closeMonthlyGoalForm();
+        render();
+
+        window.requestAnimationFrame(() => {
+          const input = [...document.querySelectorAll("[data-monthly-edit-title]")].find(
+            (item) => item.dataset.monthlyEditTitle === goalId
+          );
+          if (input) input.focus();
+        });
+      }
+
+      function cancelMonthlyGoalEdit() {
+        editingMonthlyGoalId = "";
+        render();
+      }
+
+      function saveMonthlyGoalEdit(event) {
+        const form = event.target.closest(".monthly-goal-edit-form");
+        if (!form) return;
+
+        event.preventDefault();
+
+        const goalId = form.dataset.id;
+        const titleInput = form.querySelector("[data-monthly-edit-title]");
+        const categoryInput = form.querySelector("[data-monthly-edit-category]");
+        const memoInput = form.querySelector("[data-monthly-edit-memo]");
+        const title = titleInput.value.trim();
+
+        if (!title) {
+          titleInput.focus();
+          return;
+        }
+
+        const now = new Date().toISOString();
+
+        goalPlan = {
+          ...goalPlan,
+          monthlyGoals: goalPlan.monthlyGoals.map((goal) =>
+            goal.id === goalId
+              ? {
+                  ...goal,
+                  title,
+                  category: categoryInput.value,
+                  memo: memoInput.value.trim(),
+                  updatedAt: now,
+                }
+              : goal
+          ),
+        };
+
+        editingMonthlyGoalId = "";
+        saveGoalPlan();
+        render();
+      }
+
+      function renderCategoryOptions(selectedCategory) {
+        return CATEGORIES.map(
+          (category) =>
+            `<option value="${escapeHtml(category)}"${category === selectedCategory ? " selected" : ""}>${escapeHtml(
+              category
+            )}</option>`
+        ).join("");
+      }
+
       function renderMonthlyGoals() {
         const currentMonth = getCurrentMonthKey();
         const goals = getCurrentMonthlyGoals();
@@ -4109,25 +4263,72 @@
                 const progress = getMonthlyGoalProgress(goal.id);
                 const progressText =
                   progress.total === 0 ? "まだ今日のタスクが紐づいていません" : `${progress.done} / ${progress.total} 完了`;
+                const isEditing = goal.id === editingMonthlyGoalId;
 
                 return `
-                  <article class="monthly-goal-item">
+                  <article class="monthly-goal-item${isEditing ? " is-editing" : ""}">
                     <div class="monthly-goal-item-head">
-                      <div>
+                      <div class="monthly-goal-item-body">
                         <h3 class="monthly-goal-title">${escapeHtml(goal.title)}</h3>
                         <div class="monthly-goal-meta">
                           <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
                         </div>
                       </div>
-                      <button
-                        class="button danger monthly-goal-delete"
-                        type="button"
-                        data-monthly-action="delete"
-                        data-id="${escapeHtml(goal.id)}"
-                        aria-label="${escapeHtml(goal.title)}を削除"
-                      >×</button>
+                      <div class="monthly-goal-controls">
+                        <button
+                          class="button secondary monthly-goal-edit"
+                          type="button"
+                          data-monthly-action="edit"
+                          data-id="${escapeHtml(goal.id)}"
+                        >編集</button>
+                        <button
+                          class="button danger monthly-goal-delete"
+                          type="button"
+                          data-monthly-action="delete"
+                          data-id="${escapeHtml(goal.id)}"
+                          aria-label="${escapeHtml(goal.title)}を削除"
+                        >削除</button>
+                      </div>
                     </div>
                     ${goal.memo ? `<p class="monthly-goal-memo">${escapeHtml(goal.memo)}</p>` : ""}
+                    ${
+                      isEditing
+                        ? `<form class="monthly-goal-edit-form" data-id="${escapeHtml(goal.id)}">
+                            <div class="field">
+                              <label for="monthly-edit-title-${escapeHtml(goal.id)}">今月の目標タイトル</label>
+                              <input
+                                id="monthly-edit-title-${escapeHtml(goal.id)}"
+                                type="text"
+                                maxlength="100"
+                                value="${escapeHtml(goal.title)}"
+                                data-monthly-edit-title="${escapeHtml(goal.id)}"
+                              />
+                            </div>
+                            <div class="field">
+                              <label for="monthly-edit-category-${escapeHtml(goal.id)}">カテゴリ</label>
+                              <select
+                                id="monthly-edit-category-${escapeHtml(goal.id)}"
+                                data-monthly-edit-category="${escapeHtml(goal.id)}"
+                              >
+                                ${renderCategoryOptions(goal.category)}
+                              </select>
+                            </div>
+                            <div class="field">
+                              <label for="monthly-edit-memo-${escapeHtml(goal.id)}">メモ</label>
+                              <textarea
+                                id="monthly-edit-memo-${escapeHtml(goal.id)}"
+                                rows="3"
+                                maxlength="400"
+                                data-monthly-edit-memo="${escapeHtml(goal.id)}"
+                              >${escapeHtml(goal.memo || "")}</textarea>
+                            </div>
+                            <div class="monthly-goal-actions">
+                              <button class="button" type="submit">保存する</button>
+                              <button class="button secondary" type="button" data-monthly-action="cancel-edit">キャンセル</button>
+                            </div>
+                          </form>`
+                        : ""
+                    }
                     <div class="monthly-goal-progress" aria-label="${escapeHtml(goal.title)}の進捗">
                       <div class="monthly-goal-progress-head">
                         <p class="monthly-goal-progress-note">${escapeHtml(progressText)}</p>
