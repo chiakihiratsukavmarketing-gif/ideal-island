@@ -1528,6 +1528,46 @@
         font-size: 0.98rem;
       }
 
+      .task-filter {
+        display: flex;
+        gap: 8px;
+        margin: 14px 0 4px;
+        padding: 2px 0 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .task-filter::-webkit-scrollbar {
+        display: none;
+      }
+
+      .task-filter-button {
+        flex: 0 0 auto;
+        min-height: 38px;
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        background: #ffffff;
+        color: var(--text);
+        padding: 7px 14px;
+        font-size: 0.84rem;
+        font-weight: 800;
+        transition:
+          background 180ms ease,
+          border-color 180ms ease,
+          transform 180ms ease;
+      }
+
+      .task-filter-button:hover,
+      .task-filter-button:active {
+        transform: translateY(-1px);
+      }
+
+      .task-filter-button.is-active {
+        border-color: rgba(36, 38, 34, 0.16);
+        background: var(--lime);
+        color: #1f2718;
+      }
+
       .goal-list {
         gap: 10px;
         padding: 8px 0 0;
@@ -2179,6 +2219,12 @@
               </div>
             </form>
 
+            <nav class="task-filter" aria-label="タスク表示フィルター">
+              <button class="task-filter-button is-active" type="button" data-filter="all">すべて</button>
+              <button class="task-filter-button" type="button" data-filter="today">今日</button>
+              <button class="task-filter-button" type="button" data-filter="week">今週</button>
+              <button class="task-filter-button" type="button" data-filter="noDue">期限なし</button>
+            </nav>
             <div class="goal-list" id="goalList"></div>
           </section>
 
@@ -2240,6 +2286,7 @@
       };
 
       let activeTab = "year";
+      let activeFilter = "all";
       let slogan = loadSlogan();
       let goalsByTab = loadGoals();
 
@@ -2252,6 +2299,7 @@
       const cancelSloganButton = document.getElementById("cancelSloganButton");
       const tabButtons = document.querySelectorAll(".tab-button");
       const bottomNavButtons = document.querySelectorAll(".bottom-nav-item");
+      const taskFilterButtons = document.querySelectorAll(".task-filter-button");
       const currentTabTitle = document.getElementById("currentTabTitle");
       const goalForm = document.getElementById("goalForm");
       const goalTitle = document.getElementById("goalTitle");
@@ -2311,6 +2359,14 @@
           if (nav === "settings") {
             scrollToSection("settings-section");
           }
+        });
+      });
+
+      taskFilterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeFilter = button.dataset.filter;
+          renderGoals();
+          renderFilters();
         });
       });
 
@@ -2457,6 +2513,15 @@
         return `${year}-${month}-${day}`;
       }
 
+      function addDays(dateKey, days) {
+        const date = new Date(`${dateKey}T00:00:00`);
+        date.setDate(date.getDate() + days);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
       function getDueMeta(goal) {
         const dueDate = goal.dueDate || "";
         if (!dueDate) return null;
@@ -2494,6 +2559,32 @@
         });
       }
 
+      function filterGoals(goals) {
+        const today = getTodayKey();
+        const weekEnd = addDays(today, 6);
+
+        if (activeFilter === "today") {
+          return goals.filter((goal) => goal.dueDate === today);
+        }
+
+        if (activeFilter === "week") {
+          return goals.filter((goal) => goal.dueDate && goal.dueDate >= today && goal.dueDate <= weekEnd);
+        }
+
+        if (activeFilter === "noDue") {
+          return goals.filter((goal) => !goal.dueDate);
+        }
+
+        return goals;
+      }
+
+      function getEmptyMessage() {
+        if (activeFilter === "today") return "今日が期限のタスクはありません";
+        if (activeFilter === "week") return "今週が期限のタスクはありません";
+        if (activeFilter === "noDue") return "期限なしのタスクはありません";
+        return "まだタスクがありません";
+      }
+
       function renderSlogan() {
         sloganText.textContent = slogan;
       }
@@ -2505,21 +2596,28 @@
         currentTabTitle.textContent = `${TAB_LABELS[activeTab]}の目標`;
       }
 
+      function renderFilters() {
+        taskFilterButtons.forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.filter === activeFilter);
+        });
+      }
+
       function renderGoals() {
         const goals = goalsByTab[activeTab];
+        const visibleGoals = filterGoals(goals);
 
-        if (goals.length === 0) {
+        if (visibleGoals.length === 0) {
           goalList.innerHTML = `
             <div class="empty">
               <span class="empty-icon" aria-hidden="true">☑</span>
-              <p class="empty-title">まだタスクがありません</p>
+              <p class="empty-title">${getEmptyMessage()}</p>
               <p class="empty-text">今日やることを追加してください。</p>
             </div>
           `;
           return;
         }
 
-        goalList.innerHTML = sortGoals(goals)
+        goalList.innerHTML = sortGoals(visibleGoals)
           .map(
             (goal) => {
               const dueMeta = getDueMeta(goal);
@@ -2675,6 +2773,7 @@
       function render() {
         renderSlogan();
         renderTabs();
+        renderFilters();
         renderGoals();
         renderProgress();
         renderStats();
