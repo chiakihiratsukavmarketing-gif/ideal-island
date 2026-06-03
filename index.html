@@ -11,6 +11,7 @@
     <meta name="apple-mobile-web-app-title" content="MILE" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>MILE | 目標管理アプリ</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       :root {
         color-scheme: dark;
@@ -252,6 +253,7 @@
       .stage-card,
       .yearly-goal-card,
       .monthly-goal-card,
+      .cloud-card,
       .slogan-card,
       .reflection-card,
       .panel,
@@ -1144,6 +1146,97 @@
 
       .reflection-status.is-visible {
         opacity: 1;
+      }
+
+      .cloud-card {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 18px;
+        padding: 20px;
+        background: #ffffff;
+      }
+
+      .cloud-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .cloud-copy {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.65;
+      }
+
+      .cloud-badge {
+        flex: 0 0 auto;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        background: #fbfcf8;
+        color: var(--muted);
+        padding: 5px 10px;
+        font-size: 0.74rem;
+        font-weight: 850;
+      }
+
+      .cloud-card[data-state="signed-in"] .cloud-badge {
+        border-color: rgba(184, 217, 106, 0.5);
+        background: rgba(184, 217, 106, 0.18);
+        color: #50621f;
+      }
+
+      .cloud-panel {
+        display: grid;
+        gap: 10px;
+      }
+
+      .cloud-panel[hidden] {
+        display: none;
+      }
+
+      .cloud-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .cloud-actions .button {
+        min-height: 44px;
+      }
+
+      .cloud-status {
+        min-height: 1.2em;
+        color: var(--muted);
+        font-size: 0.84rem;
+        font-weight: 750;
+      }
+
+      .cloud-status.is-error {
+        color: var(--danger);
+      }
+
+      .cloud-user {
+        display: grid;
+        gap: 4px;
+        padding: 12px 14px;
+        border: 1px solid var(--line-soft);
+        border-radius: 18px;
+        background: #fbfcf8;
+      }
+
+      .cloud-user span {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .cloud-user strong {
+        min-width: 0;
+        color: var(--text);
+        overflow-wrap: anywhere;
+        font-size: 0.94rem;
       }
 
       .recent-notes {
@@ -2995,6 +3088,7 @@
       .monthly-goal-card,
       .goal-console,
       .reflection-card,
+      .cloud-card,
       .slogan-card {
         width: min(100%, 720px);
         margin-inline: auto;
@@ -4792,7 +4886,41 @@
                   </div>
                 </section>
 
-                <section class="slogan-card" id="settings-section" aria-label="スローガン">
+                <section class="cloud-card" id="settings-section" aria-label="クラウド保存" data-state="signed-out">
+                  <div class="cloud-heading">
+                    <div>
+                      <h2 class="section-title">クラウド保存</h2>
+                      <p class="cloud-copy" id="cloudDescription">現在はこの端末だけに保存されています。</p>
+                    </div>
+                    <span class="cloud-badge" id="cloudStatusBadge">未ログイン</span>
+                  </div>
+
+                  <div class="cloud-panel" id="cloudSignedOutPanel">
+                    <p class="cloud-copy">メールアドレスを入力してログインリンクを送信できます。</p>
+                    <div class="field">
+                      <label for="cloudEmailInput">メールアドレス</label>
+                      <input id="cloudEmailInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+                    </div>
+                    <div class="cloud-actions">
+                      <button class="button" type="button" id="sendLoginLinkButton">ログインリンクを送る</button>
+                    </div>
+                  </div>
+
+                  <div class="cloud-panel" id="cloudSignedInPanel" hidden>
+                    <div class="cloud-user">
+                      <span>ログイン中</span>
+                      <strong id="cloudUserEmail">user@example.com</strong>
+                    </div>
+                    <p class="cloud-copy">次のフェーズでクラウド保存を有効化します。</p>
+                    <div class="cloud-actions">
+                      <button class="button secondary" type="button" id="cloudLogoutButton">ログアウト</button>
+                    </div>
+                  </div>
+
+                  <p class="cloud-status" id="cloudAuthStatus" aria-live="polite"></p>
+                </section>
+
+                <section class="slogan-card" id="slogan-section" aria-label="スローガン">
                   <div class="slogan-display" id="sloganDisplay">
                     <p class="slogan-text" id="sloganText">目標達成までの一歩を、今日から整える</p>
                       <button class="button secondary" type="button" id="editSloganButton">スローガン編集</button>
@@ -4835,6 +4963,8 @@
       const GOALS_STORAGE_KEY = "idealIslandGoals";
       const REFLECTION_STORAGE_KEY = "mileReflectionNotes";
       const GOAL_PLAN_STORAGE_KEY = "mileGoalPlan";
+      const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWVkcmtwdnJ3a3N6YmthaGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODYwMDMsImV4cCI6MjA5NjA2MjAwM30.ZTaJhkZPzd0CAqiCfMYTAib3iNSWXtT70285m5mxbOI";
       const TAB_LABELS = {
         year: "年間",
         month: "今月",
@@ -4870,6 +5000,8 @@
       let editingMonthlyGoalId = "";
       let editingGoalId = "";
       let isCompletedTasksOpen = false;
+      let supabaseClient = createSupabaseClient();
+      let cloudSession = null;
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -4904,6 +5036,16 @@
       const saveReflectionButton = document.getElementById("saveReflectionButton");
       const reflectionStatus = document.getElementById("reflectionStatus");
       const recentNotesList = document.getElementById("recentNotesList");
+      const cloudCard = document.getElementById("settings-section");
+      const cloudDescription = document.getElementById("cloudDescription");
+      const cloudStatusBadge = document.getElementById("cloudStatusBadge");
+      const cloudSignedOutPanel = document.getElementById("cloudSignedOutPanel");
+      const cloudSignedInPanel = document.getElementById("cloudSignedInPanel");
+      const cloudEmailInput = document.getElementById("cloudEmailInput");
+      const sendLoginLinkButton = document.getElementById("sendLoginLinkButton");
+      const cloudLogoutButton = document.getElementById("cloudLogoutButton");
+      const cloudUserEmail = document.getElementById("cloudUserEmail");
+      const cloudAuthStatus = document.getElementById("cloudAuthStatus");
       const tabButtons = document.querySelectorAll(".tab-button");
       const bottomNavButtons = document.querySelectorAll(".bottom-nav-item");
       const taskFilterButtons = document.querySelectorAll(".task-filter-button");
@@ -4990,6 +5132,8 @@
       });
       monthlyGoalList.addEventListener("submit", saveMonthlyGoalEdit);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
+      sendLoginLinkButton.addEventListener("click", sendCloudLoginLink);
+      cloudLogoutButton.addEventListener("click", signOutCloud);
       toggleGoalFormButton.addEventListener("click", toggleGoalForm);
       closeGoalFormButton.addEventListener("click", closeGoalForm);
       goalForm.addEventListener("submit", addGoal);
@@ -5045,6 +5189,133 @@
           renderFilters();
         });
       });
+
+      function isSupabaseConfigured() {
+        return (
+          SUPABASE_URL &&
+          SUPABASE_ANON_KEY &&
+          SUPABASE_URL !== "YOUR_SUPABASE_URL" &&
+          SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY"
+        );
+      }
+
+      function createSupabaseClient() {
+        if (!isSupabaseConfigured() || !window.supabase) return null;
+        try {
+          return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) {
+          console.warn("Supabase client initialization failed.", error);
+          return null;
+        }
+      }
+
+      function getCloudRedirectUrl() {
+        return window.location.origin + window.location.pathname;
+      }
+
+      function setCloudAuthStatus(message, type = "") {
+        cloudAuthStatus.textContent = message;
+        cloudAuthStatus.classList.toggle("is-error", type === "error");
+      }
+
+      function renderCloudAuth() {
+        const isConfigured = isSupabaseConfigured();
+        const userEmail = cloudSession?.user?.email || "";
+
+        cloudCard.dataset.state = userEmail ? "signed-in" : "signed-out";
+        cloudSignedOutPanel.hidden = Boolean(userEmail);
+        cloudSignedInPanel.hidden = !userEmail;
+        cloudUserEmail.textContent = userEmail || "";
+
+        if (userEmail) {
+          cloudDescription.textContent = "ログイン状態を確認できています。";
+          cloudStatusBadge.textContent = "ログイン中";
+          return;
+        }
+
+        cloudDescription.textContent = "現在はこの端末だけに保存されています。";
+        cloudStatusBadge.textContent = isConfigured ? "未ログイン" : "未設定";
+
+        if (!isConfigured) {
+          setCloudAuthStatus("SUPABASE_URL と SUPABASE_ANON_KEY を差し替えるとログイン確認を使えます。");
+        }
+      }
+
+      async function initializeSupabaseAuth() {
+        renderCloudAuth();
+        if (!supabaseClient) return;
+
+        try {
+          const { data, error } = await supabaseClient.auth.getSession();
+          if (error) throw error;
+          cloudSession = data?.session || null;
+          renderCloudAuth();
+
+          supabaseClient.auth.onAuthStateChange((_event, session) => {
+            cloudSession = session;
+            renderCloudAuth();
+          });
+        } catch (error) {
+          setCloudAuthStatus("ログイン状態を確認できませんでした。時間を置いて再度お試しください。", "error");
+        }
+      }
+
+      async function sendCloudLoginLink() {
+        const email = cloudEmailInput.value.trim();
+
+        if (!supabaseClient) {
+          setCloudAuthStatus("Supabase接続情報を差し替えてからログインリンクを送信してください。", "error");
+          return;
+        }
+
+        if (!email) {
+          setCloudAuthStatus("メールアドレスを入力してください。", "error");
+          cloudEmailInput.focus();
+          return;
+        }
+
+        sendLoginLinkButton.disabled = true;
+        setCloudAuthStatus("ログインリンクを送信しています...");
+
+        try {
+          const { error } = await supabaseClient.auth.signInWithOtp({
+            email,
+            options: {
+              emailRedirectTo: getCloudRedirectUrl(),
+            },
+          });
+
+          if (error) throw error;
+          setCloudAuthStatus("ログインリンクを送信しました。メールをご確認ください。");
+        } catch (error) {
+          setCloudAuthStatus("ログインリンクを送信できませんでした。設定とメールアドレスを確認してください。", "error");
+        } finally {
+          sendLoginLinkButton.disabled = false;
+        }
+      }
+
+      async function signOutCloud() {
+        if (!supabaseClient) {
+          cloudSession = null;
+          renderCloudAuth();
+          return;
+        }
+
+        cloudLogoutButton.disabled = true;
+        setCloudAuthStatus("ログアウトしています...");
+
+        try {
+          const { error } = await supabaseClient.auth.signOut();
+          if (error) throw error;
+          cloudSession = null;
+          renderCloudAuth();
+          setCloudAuthStatus("ログアウトしました。");
+        } catch (error) {
+          setCloudAuthStatus("ログアウトできませんでした。時間を置いて再度お試しください。", "error");
+        } finally {
+          cloudLogoutButton.disabled = false;
+        }
+      }
 
       goalList.addEventListener("click", (event) => {
         const button = event.target.closest("button[data-action]");
@@ -6931,6 +7202,7 @@
 
       render();
       renderReflectionNotes();
+      initializeSupabaseAuth();
     </script>
   </body>
 </html>
