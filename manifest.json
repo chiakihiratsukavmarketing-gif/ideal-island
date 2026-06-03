@@ -1,0 +1,24 @@
+{
+  "name": "MILE",
+  "short_name": "MILE",
+  "description": "今日やることを整理し、目標までの進捗を見える化する目標管理アプリ",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F6F7F2",
+  "theme_color": "#F6F7F2",
+  "icons": [
+    {
+      "src": "/assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
