@@ -4911,8 +4911,10 @@
                       <span>ログイン中</span>
                       <strong id="cloudUserEmail">user@example.com</strong>
                     </div>
-                    <p class="cloud-copy">次のフェーズでクラウド保存を有効化します。</p>
+                    <p class="cloud-copy">手動でこの端末のデータをクラウドへ保存できます。読み込み前には確認が表示されます。</p>
                     <div class="cloud-actions">
+                      <button class="button" type="button" id="cloudSaveButton">クラウドに保存</button>
+                      <button class="button secondary" type="button" id="cloudLoadButton">クラウドから読み込み</button>
                       <button class="button secondary" type="button" id="cloudLogoutButton">ログアウト</button>
                     </div>
                   </div>
@@ -5043,6 +5045,8 @@
       const cloudSignedInPanel = document.getElementById("cloudSignedInPanel");
       const cloudEmailInput = document.getElementById("cloudEmailInput");
       const sendLoginLinkButton = document.getElementById("sendLoginLinkButton");
+      const cloudSaveButton = document.getElementById("cloudSaveButton");
+      const cloudLoadButton = document.getElementById("cloudLoadButton");
       const cloudLogoutButton = document.getElementById("cloudLogoutButton");
       const cloudUserEmail = document.getElementById("cloudUserEmail");
       const cloudAuthStatus = document.getElementById("cloudAuthStatus");
@@ -5133,6 +5137,8 @@
       monthlyGoalList.addEventListener("submit", saveMonthlyGoalEdit);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
       sendLoginLinkButton.addEventListener("click", sendCloudLoginLink);
+      cloudSaveButton.addEventListener("click", saveAppDataToCloud);
+      cloudLoadButton.addEventListener("click", loadAppDataFromCloud);
       cloudLogoutButton.addEventListener("click", signOutCloud);
       toggleGoalFormButton.addEventListener("click", toggleGoalForm);
       closeGoalFormButton.addEventListener("click", closeGoalForm);
@@ -5213,9 +5219,174 @@
         return window.location.origin + window.location.pathname;
       }
 
-      function setCloudAuthStatus(message, type = "") {
+      function setCloudStatusMessage(message, type = "") {
         cloudAuthStatus.textContent = message;
         cloudAuthStatus.classList.toggle("is-error", type === "error");
+      }
+
+      function setCloudAuthStatus(message, type = "") {
+        setCloudStatusMessage(message, type);
+      }
+
+      function getCloudUser() {
+        return cloudSession?.user || null;
+      }
+
+      function setCloudActionButtonsDisabled(isDisabled) {
+        cloudSaveButton.disabled = isDisabled;
+        cloudLoadButton.disabled = isDisabled;
+        cloudLogoutButton.disabled = isDisabled;
+      }
+
+      function readStoredJson(key, fallback) {
+        try {
+          const rawValue = localStorage.getItem(key);
+          return rawValue ? JSON.parse(rawValue) : fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function collectLocalAppData() {
+        return {
+          version: 1,
+          appName: "MILE",
+          savedAt: new Date().toISOString(),
+          data: {
+            goalsByTab: readStoredJson(GOALS_STORAGE_KEY, goalsByTab),
+            goalPlan: readStoredJson(GOAL_PLAN_STORAGE_KEY, goalPlan),
+            reflectionNotes: readStoredJson(REFLECTION_STORAGE_KEY, reflectionNotes),
+            slogan: localStorage.getItem(SLOGAN_STORAGE_KEY) || slogan || DEFAULT_SLOGAN,
+          },
+        };
+      }
+
+      function backupLocalAppData() {
+        const backup = {
+          createdAt: new Date().toISOString(),
+          data: {
+            [GOALS_STORAGE_KEY]: localStorage.getItem(GOALS_STORAGE_KEY),
+            [GOAL_PLAN_STORAGE_KEY]: localStorage.getItem(GOAL_PLAN_STORAGE_KEY),
+            [REFLECTION_STORAGE_KEY]: localStorage.getItem(REFLECTION_STORAGE_KEY),
+            [SLOGAN_STORAGE_KEY]: localStorage.getItem(SLOGAN_STORAGE_KEY),
+          },
+        };
+
+        localStorage.setItem("mileCloudLoadBackup", JSON.stringify(backup));
+        return backup;
+      }
+
+      function applyCloudAppDataToLocal(appData) {
+        const nextData = appData?.data;
+        if (!nextData || typeof nextData !== "object" || Array.isArray(nextData)) {
+          throw new Error("Invalid cloud app data.");
+        }
+
+        if ("goalsByTab" in nextData) {
+          localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(nextData.goalsByTab || initialGoals));
+        }
+
+        if ("goalPlan" in nextData) {
+          localStorage.setItem(GOAL_PLAN_STORAGE_KEY, JSON.stringify(nextData.goalPlan || createEmptyGoalPlan()));
+        }
+
+        if ("reflectionNotes" in nextData) {
+          localStorage.setItem(REFLECTION_STORAGE_KEY, JSON.stringify(nextData.reflectionNotes || {}));
+        }
+
+        if ("slogan" in nextData) {
+          localStorage.setItem(SLOGAN_STORAGE_KEY, String(nextData.slogan || DEFAULT_SLOGAN));
+        }
+
+        goalsByTab = loadGoals();
+        goalPlan = loadGoalPlan();
+        reflectionNotes = loadReflectionNotes();
+        slogan = loadSlogan();
+        editingYearlyGoalId = "";
+        editingMonthlyGoalId = "";
+        editingGoalId = "";
+        isGoalFormOpen = false;
+        render();
+        renderReflectionNotes();
+      }
+
+      async function saveAppDataToCloud() {
+        const user = getCloudUser();
+
+        if (!supabaseClient || !user) {
+          setCloudStatusMessage("ログイン後にクラウド保存を使えます。", "error");
+          return;
+        }
+
+        setCloudActionButtonsDisabled(true);
+        setCloudStatusMessage("クラウドに保存しています...");
+
+        try {
+          const appData = collectLocalAppData();
+          const { error } = await supabaseClient
+            .from("user_app_data")
+            .upsert(
+              {
+                user_id: user.id,
+                app_data: appData,
+              },
+              { onConflict: "user_id" }
+            );
+
+          if (error) throw error;
+          setCloudStatusMessage("クラウドに保存しました。");
+        } catch (error) {
+          console.warn("Cloud save failed.", error);
+          setCloudStatusMessage("クラウドに保存できませんでした。時間を置いて再度お試しください。", "error");
+        } finally {
+          setCloudActionButtonsDisabled(false);
+        }
+      }
+
+      async function loadAppDataFromCloud() {
+        const user = getCloudUser();
+
+        if (!supabaseClient || !user) {
+          setCloudStatusMessage("ログイン後にクラウド読み込みを使えます。", "error");
+          return;
+        }
+
+        setCloudActionButtonsDisabled(true);
+        setCloudStatusMessage("クラウドデータを確認しています...");
+
+        try {
+          const { data, error } = await supabaseClient
+            .from("user_app_data")
+            .select("app_data, updated_at")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (error) throw error;
+
+          if (!data?.app_data) {
+            setCloudStatusMessage("クラウドデータはまだありません。");
+            return;
+          }
+
+          const confirmed = window.confirm(
+            "クラウドのデータをこの端末に読み込みます。現在の端末データは上書きされます。続けますか？"
+          );
+
+          if (!confirmed) {
+            setCloudStatusMessage("クラウド読み込みをキャンセルしました。");
+            return;
+          }
+
+          backupLocalAppData();
+          applyCloudAppDataToLocal(data.app_data);
+          const updatedAt = data.updated_at ? `（更新: ${formatDateTime(data.updated_at)}）` : "";
+          setCloudStatusMessage(`クラウドから読み込みました。${updatedAt}`);
+        } catch (error) {
+          console.warn("Cloud load failed.", error);
+          setCloudStatusMessage("クラウドから読み込めませんでした。端末内のデータは変更していません。", "error");
+        } finally {
+          setCloudActionButtonsDisabled(false);
+        }
       }
 
       function renderCloudAuth() {
@@ -5729,6 +5900,16 @@
         const date = new Date(`${dateKey}T00:00:00`);
         if (Number.isNaN(date.getTime())) return dateKey;
         return `${date.getMonth() + 1}/${date.getDate()}`;
+      }
+
+      function formatDateTime(value) {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const hour = String(date.getHours()).padStart(2, "0");
+        const minute = String(date.getMinutes()).padStart(2, "0");
+        return `${month}/${day} ${hour}:${minute}`;
       }
 
       function getCurrentMonthKey() {
@@ -7206,4 +7387,3 @@
     </script>
   </body>
 </html>
-
