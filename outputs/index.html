@@ -2144,8 +2144,26 @@
       input,
       select,
       textarea {
+        width: 100%;
         max-width: 100%;
         box-sizing: border-box;
+        min-width: 0;
+      }
+
+      input[type="date"] {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        min-width: 0;
+      }
+
+      .field,
+      .form-row,
+      .form-row > *,
+      .compact-form-row,
+      .compact-form-row > * {
+        min-width: 0;
+        max-width: 100%;
       }
 
       .yearly-goal-list,
@@ -5856,17 +5874,14 @@
       }
 
       function renderStats() {
-        const todayKey = getTodayKey();
-        const todayDueGoals = Object.values(goalsByTab).flat().filter((goal) => goal.dueDate === todayKey);
-        const todayProgress = getProgress(todayDueGoals);
+        const todayProgress = getProgress(goalsByTab.today);
         const allGoals = Object.values(goalsByTab).flat();
         const allProgress = getProgress(allGoals);
         const undone = allProgress.total - allProgress.done;
 
         statTodayPercent.textContent = `${todayProgress.percent}%`;
         statTodayBar.style.width = `${todayProgress.percent}%`;
-        statTodayNote.textContent =
-          todayProgress.total === 0 ? "今日期限のタスクはありません" : `${todayProgress.done} / ${todayProgress.total} 完了`;
+        statTodayNote.textContent = `${todayProgress.done} / ${todayProgress.total} 完了`;
         statTotalGoals.textContent = `${allProgress.total}個`;
         statDoneGoals.textContent = `${allProgress.done}個`;
         statUndoneGoals.textContent = `${undone}個`;
