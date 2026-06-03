@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
@@ -26,6 +26,11 @@
       }
 
       * {
+        box-sizing: border-box;
+      }
+
+      *::before,
+      *::after {
         box-sizing: border-box;
       }
 
@@ -832,7 +837,60 @@
         min-width: 0;
       }
 
+      .monthly-goal-icon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--line-soft);
+        border-radius: 14px;
+        background: #f5f6f2;
+        font-size: 1.12rem;
+        line-height: 1;
+      }
+
+      .monthly-goal-icon.is-active {
+        border-color: rgba(176, 199, 97, 0.44);
+        background: #f3f8dd;
+      }
+
+      .monthly-goal-icon.is-complete {
+        border-color: rgba(176, 199, 97, 0.64);
+        background: #e7f3b8;
+      }
+
+      .progress-state-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 22px;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        background: #f3f4f1;
+        color: var(--muted);
+        padding: 2px 8px;
+        font-size: 0.68rem;
+        font-weight: 850;
+        line-height: 1.25;
+        white-space: nowrap;
+      }
+
+      .progress-state-pill.is-active {
+        border-color: rgba(176, 199, 97, 0.44);
+        background: #f3f8dd;
+        color: #6f8733;
+      }
+
+      .progress-state-pill.is-complete {
+        border-color: rgba(176, 199, 97, 0.64);
+        background: #e7f3b8;
+        color: #536d1f;
+      }
+
       .monthly-goal-item-body {
+        flex: 1 1 auto;
         min-width: 0;
       }
 
@@ -2582,6 +2640,7 @@
         width: auto;
         max-width: 100%;
         align-items: center;
+        gap: 4px;
         min-height: 24px;
         border: 1px solid rgba(107, 178, 171, 0.28);
         border-radius: 999px;
@@ -2593,6 +2652,19 @@
         line-height: 1.35;
         overflow-wrap: anywhere;
         white-space: normal;
+      }
+
+      .goal-monthly-icon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: #ffffff;
+        font-size: 0.78rem;
+        line-height: 1;
       }
 
       .due-badge.is-today {
@@ -3649,6 +3721,632 @@
           min-width: 0;
         }
       }
+
+      .goal-form,
+      .goal-form * {
+        box-sizing: border-box;
+      }
+
+      .goal-form,
+      .goal-form .field {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      .goal-form input,
+      .goal-form select,
+      .goal-form textarea,
+      .goal-form input[type="date"],
+      #goalDueDate {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+
+      .goal-form input[type="date"],
+      #goalDueDate {
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      #goalDueDate::-webkit-date-and-time-value {
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .goal-form .due-date-field {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        inline-size: 100%;
+        max-inline-size: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      .goal-form .due-date-field input,
+      .goal-form .due-date-field input[type="date"],
+      .goal-form #goalDueDate {
+        display: block;
+        width: 100%;
+        max-width: calc(100% - 0px);
+        min-width: 0;
+        inline-size: 100%;
+        max-inline-size: 100%;
+        box-sizing: border-box;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      .goal-form #goalDueDate::-webkit-date-and-time-value,
+      .goal-form #goalDueDate::-webkit-datetime-edit,
+      .goal-form #goalDueDate::-webkit-datetime-edit-fields-wrapper {
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      @media (max-width: 480px) {
+        .goal-form {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          padding: 16px;
+        }
+
+        .goal-form .field,
+        .goal-form .form-actions {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+        }
+
+        .goal-form .due-date-field,
+        .goal-form .due-date-field input,
+        .goal-form #goalDueDate {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          inline-size: 100%;
+          max-inline-size: 100%;
+        }
+      }
+
+      .panel,
+      .goal-console,
+      .layout,
+      .goal-form {
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      .goal-form {
+        width: 100%;
+        inline-size: 100%;
+        max-inline-size: 100%;
+        overflow-x: hidden;
+      }
+
+      .goal-form .field {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: stretch;
+      }
+
+      .goal-form input,
+      .goal-form select,
+      .goal-form textarea {
+        inline-size: 100%;
+        max-inline-size: 100%;
+        min-inline-size: 0;
+      }
+
+      .goal-form .due-date-field {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: stretch;
+        contain: layout;
+      }
+
+      .goal-form .due-date-field > label,
+      .goal-form .due-date-field > input,
+      .goal-form .due-date-field > #goalDueDate {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        inline-size: 100%;
+        max-inline-size: 100%;
+        min-inline-size: 0;
+      }
+
+      .goal-form .due-date-field > #goalDueDate {
+        flex: 0 1 auto;
+        margin: 0;
+        border-inline-width: 1.5px;
+        padding-inline: 12px;
+        overflow: hidden;
+      }
+
+      @supports (-webkit-touch-callout: none) {
+        .goal-form .due-date-field > #goalDueDate {
+          inline-size: -webkit-fill-available;
+          max-inline-size: -webkit-fill-available;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .panel {
+          overflow-x: hidden;
+        }
+
+        .goal-form {
+          width: 100%;
+          max-width: 100%;
+          inline-size: 100%;
+          max-inline-size: 100%;
+        }
+
+        .goal-form .due-date-field {
+          width: 100%;
+          max-width: 100%;
+          overflow: hidden;
+        }
+      }
+      .dashboard-card {
+        display: grid;
+        gap: 12px;
+        width: min(100%, 720px);
+        max-width: 100%;
+        min-width: 0;
+        margin: 12px auto 0;
+        padding: 16px;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 26px;
+        background: #ffffff;
+        box-shadow: var(--shadow-soft);
+        box-sizing: border-box;
+      }
+
+      .dashboard-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .dashboard-main {
+        display: grid;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .dashboard-primary,
+      .dashboard-next {
+        display: grid;
+        gap: 9px;
+        min-width: 0;
+        padding: 12px;
+        border: 1px solid var(--line-soft);
+        border-radius: 20px;
+        background: #fbfcf7;
+        box-sizing: border-box;
+      }
+
+      .dashboard-primary-head,
+      .dashboard-next-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .dashboard-label,
+      .dashboard-note,
+      .dashboard-next-meta {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.55;
+      }
+
+      .dashboard-number {
+        color: var(--text);
+        font-size: clamp(1.9rem, 8vw, 2.7rem);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      .dashboard-bar {
+        width: 100%;
+        height: 8px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #edf0e7;
+      }
+
+      .dashboard-bar-fill {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--lime);
+        transition: width 180ms ease;
+      }
+
+      .dashboard-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .dashboard-metric {
+        display: grid;
+        gap: 5px;
+        min-width: 0;
+        min-height: 72px;
+        padding: 10px 8px;
+        border: 1px solid var(--line-soft);
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 10px 22px rgba(24, 31, 20, 0.05);
+        box-sizing: border-box;
+      }
+
+      .dashboard-metric span {
+        overflow: hidden;
+        color: var(--muted);
+        font-size: 0.72rem;
+        line-height: 1.25;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .dashboard-metric strong {
+        color: var(--text);
+        font-size: 1.08rem;
+        line-height: 1.1;
+      }
+
+      .mini-progress-bar {
+        width: 100%;
+        height: 5px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #edf0e7;
+      }
+
+      .mini-progress-fill {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--lime);
+        transition: width 180ms ease;
+      }
+
+      .dashboard-metric.is-complete .mini-progress-fill,
+      .monthly-goal-progress.is-complete .monthly-goal-progress-fill {
+        background: #a8cb4f;
+      }
+
+      .dashboard-next {
+        background: #ffffff;
+      }
+
+      .dashboard-next-head span {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .dashboard-next-head strong {
+        flex: 0 0 auto;
+        padding: 4px 9px;
+        border: 1px solid rgba(176, 199, 97, 0.7);
+        border-radius: 999px;
+        background: rgba(218, 232, 151, 0.36);
+        color: var(--text);
+        font-size: 0.72rem;
+      }
+
+      .dashboard-next-title {
+        min-width: 0;
+        margin: 0;
+        color: var(--text);
+        font-size: 0.98rem;
+        font-weight: 700;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+      }
+
+      .dashboard-next[data-status="clear"] {
+        background: #f7fbec;
+      }
+
+      .dashboard-next[data-status="empty"] {
+        background: #fafafa;
+      }
+
+      .goal-console > .next-step-card {
+        display: none;
+      }
+
+      @media (max-width: 480px) {
+        .dashboard-card {
+          gap: 10px;
+          padding: 14px;
+          border-radius: 22px;
+        }
+
+        .dashboard-primary,
+        .dashboard-next {
+          padding: 11px;
+          border-radius: 18px;
+        }
+
+        .dashboard-metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 7px;
+        }
+
+        .dashboard-metric {
+          min-height: 66px;
+          padding: 9px 8px;
+        }
+      }
+
+      .dashboard-card {
+        gap: 9px;
+        padding: 13px;
+      }
+
+      .dashboard-head {
+        gap: 6px;
+      }
+
+      .dashboard-head .form-eyebrow {
+        margin-bottom: 2px;
+      }
+
+      .dashboard-head .section-title {
+        font-size: 1.05rem;
+      }
+
+      .dashboard-main {
+        gap: 8px;
+      }
+
+      .dashboard-primary,
+      .dashboard-next {
+        gap: 7px;
+        padding: 10px;
+        border-radius: 18px;
+      }
+
+      .dashboard-number {
+        font-size: clamp(1.65rem, 7vw, 2.15rem);
+      }
+
+      .dashboard-bar {
+        height: 7px;
+      }
+
+      .dashboard-metrics {
+        gap: 7px;
+      }
+
+      .dashboard-metric {
+        min-height: 58px;
+        padding: 8px 7px;
+        border-radius: 16px;
+      }
+
+      .dashboard-metric span {
+        font-size: 0.68rem;
+      }
+
+      .dashboard-metric strong {
+        font-size: 1rem;
+      }
+
+      .dashboard-next-title {
+        font-size: 0.92rem;
+        line-height: 1.35;
+      }
+
+      .dashboard-label,
+      .dashboard-note,
+      .dashboard-next-meta,
+      .dashboard-next-head span {
+        font-size: 0.74rem;
+        line-height: 1.4;
+      }
+
+      .goal-console > .tabs,
+      .progress-stack > .stats-grid,
+      .progress-stack > .tab-progress-card {
+        display: none;
+      }
+
+      @media (max-width: 480px) {
+        .dashboard-card {
+          gap: 7px;
+          padding: 11px;
+        }
+
+        .dashboard-primary,
+        .dashboard-next {
+          gap: 6px;
+          padding: 8px;
+        }
+
+        .dashboard-metrics {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 5px;
+        }
+
+        .dashboard-metric {
+          min-height: 48px;
+          padding: 7px 4px;
+          border-radius: 14px;
+        }
+
+        .dashboard-metric span {
+          font-size: 0.62rem;
+        }
+
+        .dashboard-metric strong {
+          font-size: 0.9rem;
+        }
+
+        .dashboard-number {
+          font-size: clamp(1.5rem, 6vw, 1.9rem);
+        }
+
+        .dashboard-next-title {
+          font-size: 0.88rem;
+        }
+      }
+
+      .monthly-goal-card,
+      .yearly-goal-card {
+        gap: 9px;
+        padding: 12px;
+        border-radius: 22px;
+      }
+
+      .monthly-goal-head,
+      .yearly-goal-head {
+        align-items: center;
+        gap: 9px;
+      }
+
+      .monthly-goal-head .form-eyebrow,
+      .yearly-goal-head .form-eyebrow {
+        margin-bottom: 2px;
+      }
+
+      .monthly-goal-head .section-title,
+      .yearly-goal-head .section-title {
+        font-size: 1rem;
+        line-height: 1.25;
+      }
+
+      .monthly-goal-count {
+        margin-top: 2px;
+        font-size: 0.74rem;
+      }
+
+      .monthly-goal-head .button {
+        min-height: 36px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+
+      .monthly-goal-empty,
+      .yearly-goal-empty {
+        display: grid;
+        gap: 3px;
+        padding: 10px;
+        border: 1px solid var(--line-soft);
+        border-radius: 16px;
+        background: #fbfcf8;
+      }
+
+      .monthly-goal-empty .empty-title,
+      .yearly-goal-empty .empty-title,
+      .monthly-goal-empty .empty-text,
+      .yearly-goal-empty .empty-text {
+        margin: 0;
+      }
+
+      .monthly-goal-empty .empty-title,
+      .yearly-goal-empty .empty-title {
+        font-size: 0.9rem;
+        line-height: 1.35;
+      }
+
+      .monthly-goal-empty .empty-text,
+      .yearly-goal-empty .empty-text {
+        font-size: 0.76rem;
+        line-height: 1.35;
+      }
+
+      .monthly-goal-list,
+      .yearly-goal-list {
+        gap: 6px;
+      }
+
+      .monthly-goal-item,
+      .yearly-goal-item {
+        gap: 5px;
+        padding: 9px;
+        border-radius: 17px;
+      }
+
+      .monthly-goal-item-head,
+      .yearly-goal-item-head {
+        gap: 8px;
+      }
+
+      .monthly-goal-title,
+      .yearly-goal-title {
+        font-size: 0.9rem;
+        line-height: 1.32;
+      }
+
+      .monthly-goal-memo,
+      .yearly-goal-memo {
+        font-size: 0.74rem;
+        line-height: 1.35;
+        -webkit-line-clamp: 1;
+      }
+
+      .monthly-goal-progress,
+      .yearly-goal-progress {
+        gap: 4px;
+        margin-top: 1px;
+        padding-top: 6px;
+      }
+
+      .monthly-goal-progress-note,
+      .yearly-goal-progress-label {
+        font-size: 0.72rem;
+      }
+
+      .monthly-goal-progress-rate,
+      .yearly-goal-progress-rate {
+        font-size: 0.98rem;
+      }
+
+      .monthly-goal-progress-bar,
+      .yearly-goal-progress-bar {
+        height: 6px;
+      }
+
+      .goal-number-progress-text {
+        margin: 0;
+        font-size: 0.7rem;
+        line-height: 1.3;
+      }
+
+      @media (max-width: 480px) {
+        .monthly-goal-card,
+        .yearly-goal-card {
+          gap: 8px;
+          padding: 11px;
+        }
+
+        .monthly-goal-head .button {
+          min-height: 34px;
+          padding: 6px 8px;
+          font-size: 0.72rem;
+        }
+      }
     </style>
   </head>
   <body>
@@ -3661,6 +4359,221 @@
       </header>
 
       <p class="goal-flow-hint">年間目標から、今月の目標と今日の行動を整理します。</p>
+
+      <section class="dashboard-card" id="dashboard-section" aria-label="ダッシュボード">
+        <div class="dashboard-head">
+          <div>
+            <p class="form-eyebrow">Dashboard</p>
+            <h2 class="section-title">今日の状況</h2>
+          </div>
+        </div>
+
+        <div class="dashboard-main">
+          <div class="dashboard-primary">
+            <div class="dashboard-primary-head">
+              <p class="dashboard-label">今日の達成率</p>
+              <span class="dashboard-number" id="dashboardTodayPercent">0%</span>
+            </div>
+            <div class="dashboard-bar" aria-hidden="true">
+              <div class="dashboard-bar-fill" id="dashboardTodayBar"></div>
+            </div>
+            <p class="dashboard-note" id="dashboardTodayNote">0 / 0 完了</p>
+          </div>
+
+          <div class="dashboard-metrics" aria-label="進捗サマリー">
+            <article class="dashboard-metric">
+              <span>残り</span>
+              <strong id="dashboardRemainingCount">0件</strong>
+            </article>
+            <article class="dashboard-metric">
+              <span>完了</span>
+              <strong id="dashboardCompletedCount">0件</strong>
+            </article>
+            <article class="dashboard-metric">
+              <span>今月</span>
+              <strong id="dashboardMonthPercent">0%</strong>
+              <div class="mini-progress-bar" aria-hidden="true">
+                <div class="mini-progress-fill" id="dashboardMonthMiniBar"></div>
+              </div>
+            </article>
+            <article class="dashboard-metric">
+              <span>年間</span>
+              <strong id="dashboardYearPercent">0%</strong>
+              <div class="mini-progress-bar" aria-hidden="true">
+                <div class="mini-progress-fill" id="dashboardYearMiniBar"></div>
+              </div>
+            </article>
+          </div>
+
+          <article class="dashboard-next" id="dashboardNextCard">
+            <div class="dashboard-next-head">
+              <span>次にやること</span>
+              <strong id="dashboardNextStatus">未設定</strong>
+            </div>
+            <p class="dashboard-next-title" id="dashboardNextTitle">今日やることを追加</p>
+            <p class="dashboard-next-meta" id="dashboardNextMeta">最初のタスクを入力してください。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="goal-console" id="goal-console" aria-label="目標管理コンソール">
+        <h2 class="section-heading console-heading">今日やること</h2>
+
+        <section class="next-step-card is-empty" id="nextStepCard" aria-label="次にやること">
+          <div class="next-step-head">
+            <p class="next-step-label">次にやること</p>
+            <span class="next-step-status" id="nextStepStatus">未設定</span>
+          </div>
+          <h2 class="next-step-title" id="nextStepTitle">今日の一歩を決めましょう</h2>
+          <p class="next-step-description" id="nextStepDescription">まずは小さな目標を1つ追加してみましょう。</p>
+        </section>
+
+
+        <nav class="tabs" aria-label="目標の期間">
+          <button class="tab-button is-active" type="button" data-tab="year">年間</button>
+          <button class="tab-button" type="button" data-tab="month">今月</button>
+          <button class="tab-button" type="button" data-tab="today">今日</button>
+        </nav>
+
+        <div class="layout">
+          <section class="panel" aria-label="目標管理">
+            <h2 class="section-title" id="currentTabTitle">年間の目標</h2>
+
+            <button class="form-toggle-button" type="button" id="toggleGoalFormButton" aria-expanded="false">
+              <span aria-hidden="true">＋</span>
+              今日やることを追加
+            </button>
+
+            <form class="goal-form is-collapsed" id="goalForm">
+              <div class="form-heading">
+                <p class="form-eyebrow">タスク入力</p>
+                <h3>今日やることを追加</h3>
+              </div>
+              <div class="field">
+                <label for="goalTitle">目標を入力</label>
+                <input id="goalTitle" type="text" placeholder="例：毎日15分読書する" maxlength="80" />
+              </div>
+              <div class="field">
+                <label for="goalCategory">カテゴリー</label>
+                <select id="goalCategory">
+                  <option value="仕事">仕事</option>
+                  <option value="学習">学習</option>
+                  <option value="健康">健康</option>
+                  <option value="家族">家族</option>
+                  <option value="お金">お金</option>
+                  <option value="その他" selected>その他</option>
+                </select>
+              </div>
+              <div class="field due-date-field">
+                <label for="goalDueDate">期限</label>
+                <input id="goalDueDate" type="date" />
+              </div>
+              <div class="field">
+                <label for="goalMonthlyGoal">今月の目標</label>
+                <select id="goalMonthlyGoal">
+                  <option value="">紐づけなし</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button class="button add-button" type="submit">追加する</button>
+                <button class="button secondary" type="button" id="closeGoalFormButton">閉じる</button>
+              </div>
+            </form>
+
+            <nav class="task-filter" aria-label="タスク表示フィルター">
+              <button class="task-filter-button is-active" type="button" data-filter="all">すべて</button>
+              <button class="task-filter-button" type="button" data-filter="today">今日</button>
+              <button class="task-filter-button" type="button" data-filter="week">今週</button>
+              <button class="task-filter-button" type="button" data-filter="noDue">期限なし</button>
+            </nav>
+            <nav class="category-filter" aria-label="カテゴリフィルター">
+              <button class="category-filter-button is-active" type="button" data-category-filter="all">すべて</button>
+              <button class="category-filter-button" type="button" data-category-filter="仕事">仕事</button>
+              <button class="category-filter-button" type="button" data-category-filter="学習">学習</button>
+              <button class="category-filter-button" type="button" data-category-filter="健康">健康</button>
+              <button class="category-filter-button" type="button" data-category-filter="家族">家族</button>
+              <button class="category-filter-button" type="button" data-category-filter="お金">お金</button>
+              <button class="category-filter-button" type="button" data-category-filter="その他">その他</button>
+            </nav>
+            <div class="goal-list" id="goalList"></div>
+          </section>
+
+                  </div>
+      </section>
+
+<section class="monthly-goal-card" id="monthly-goal-section" aria-label="今月の目標">
+        <div class="monthly-goal-head">
+          <div>
+            <p class="form-eyebrow" id="monthlyGoalPeriod">今月の目標</p>
+            <h2 class="section-title">今月取り組むこと</h2>
+            <p class="monthly-goal-count" id="monthlyGoalCount">0件の目標</p>
+          </div>
+          <button class="button secondary" type="button" id="toggleMonthlyGoalFormButton" aria-expanded="false">
+            今月の目標を追加
+          </button>
+        </div>
+
+        <form class="monthly-goal-form is-collapsed" id="monthlyGoalForm">
+          <div class="field">
+            <label for="monthlyGoalInput">今月の目標タイトル</label>
+            <input
+              id="monthlyGoalInput"
+              type="text"
+              maxlength="100"
+              placeholder="例：新規商談を5件作る"
+            />
+          </div>
+          <div class="field">
+            <label for="monthlyGoalCategory">カテゴリ</label>
+            <select id="monthlyGoalCategory">
+              <option value="仕事">仕事</option>
+              <option value="学習">学習</option>
+              <option value="健康">健康</option>
+              <option value="家族">家族</option>
+              <option value="お金">お金</option>
+              <option value="その他" selected>その他</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="monthlyGoalIcon">アイコン</label>
+            <select id="monthlyGoalIcon">
+              <option value="🎯" selected>🎯 目標</option>
+              <option value="💼">💼 仕事</option>
+              <option value="📘">📘 学習</option>
+              <option value="🌿">🌿 健康</option>
+              <option value="🏠">🏠 家族</option>
+              <option value="💰">💰 お金</option>
+              <option value="✨">✨ その他</option>
+            </select>
+          </div>
+          <div class="form-row compact-form-row">
+            <div class="field">
+              <label for="monthlyGoalTargetInput">目標値</label>
+              <input id="monthlyGoalTargetInput" type="number" min="0" step="any" placeholder="例：5" />
+            </div>
+            <div class="field">
+              <label for="monthlyGoalCurrentInput">現在値</label>
+              <input id="monthlyGoalCurrentInput" type="number" min="0" step="any" placeholder="例：2" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="monthlyGoalMemoInput">メモ</label>
+            <textarea
+              id="monthlyGoalMemoInput"
+              rows="4"
+              maxlength="400"
+              placeholder="例：月末までに商談候補をリスト化し、週ごとに連絡する。"
+            ></textarea>
+          </div>
+          <div class="monthly-goal-actions">
+            <button class="button" type="submit">保存する</button>
+            <button class="button secondary" type="button" id="cancelMonthlyGoalButton">キャンセル</button>
+          </div>
+        </form>
+
+        <div class="monthly-goal-list" id="monthlyGoalList"></div>
+        <div class="monthly-goal-archive" id="monthlyGoalArchive"></div>
+      </section>
 
       <section class="yearly-goal-card" id="yearly-goal-section" aria-label="年間目標">
         <div class="yearly-goal-head">
@@ -3718,151 +4631,7 @@
         </form>
       </section>
 
-      <section class="monthly-goal-card" id="monthly-goal-section" aria-label="今月の目標">
-        <div class="monthly-goal-head">
-          <div>
-            <p class="form-eyebrow" id="monthlyGoalPeriod">今月の目標</p>
-            <h2 class="section-title">今月取り組むこと</h2>
-            <p class="monthly-goal-count" id="monthlyGoalCount">0件の目標</p>
-          </div>
-          <button class="button secondary" type="button" id="toggleMonthlyGoalFormButton" aria-expanded="false">
-            今月の目標を追加
-          </button>
-        </div>
-
-        <form class="monthly-goal-form is-collapsed" id="monthlyGoalForm">
-          <div class="field">
-            <label for="monthlyGoalInput">今月の目標タイトル</label>
-            <input
-              id="monthlyGoalInput"
-              type="text"
-              maxlength="100"
-              placeholder="例：新規商談を5件作る"
-            />
-          </div>
-          <div class="field">
-            <label for="monthlyGoalCategory">カテゴリ</label>
-            <select id="monthlyGoalCategory">
-              <option value="仕事">仕事</option>
-              <option value="学習">学習</option>
-              <option value="健康">健康</option>
-              <option value="家族">家族</option>
-              <option value="お金">お金</option>
-              <option value="その他" selected>その他</option>
-            </select>
-          </div>
-          <div class="form-row compact-form-row">
-            <div class="field">
-              <label for="monthlyGoalTargetInput">目標値</label>
-              <input id="monthlyGoalTargetInput" type="number" min="0" step="any" placeholder="例：5" />
-            </div>
-            <div class="field">
-              <label for="monthlyGoalCurrentInput">現在値</label>
-              <input id="monthlyGoalCurrentInput" type="number" min="0" step="any" placeholder="例：2" />
-            </div>
-          </div>
-          <div class="field">
-            <label for="monthlyGoalMemoInput">メモ</label>
-            <textarea
-              id="monthlyGoalMemoInput"
-              rows="4"
-              maxlength="400"
-              placeholder="例：月末までに商談候補をリスト化し、週ごとに連絡する。"
-            ></textarea>
-          </div>
-          <div class="monthly-goal-actions">
-            <button class="button" type="submit">保存する</button>
-            <button class="button secondary" type="button" id="cancelMonthlyGoalButton">キャンセル</button>
-          </div>
-        </form>
-
-        <div class="monthly-goal-list" id="monthlyGoalList"></div>
-        <div class="monthly-goal-archive" id="monthlyGoalArchive"></div>
-      </section>
-
-      <section class="goal-console" id="goal-console" aria-label="目標管理コンソール">
-        <h2 class="section-heading console-heading">今日やること</h2>
-
-        <section class="next-step-card is-empty" id="nextStepCard" aria-label="次にやること">
-          <div class="next-step-head">
-            <p class="next-step-label">次にやること</p>
-            <span class="next-step-status" id="nextStepStatus">未設定</span>
-          </div>
-          <h2 class="next-step-title" id="nextStepTitle">今日の一歩を決めましょう</h2>
-          <p class="next-step-description" id="nextStepDescription">まずは小さな目標を1つ追加してみましょう。</p>
-        </section>
-
-
-        <nav class="tabs" aria-label="目標の期間">
-          <button class="tab-button is-active" type="button" data-tab="year">年間</button>
-          <button class="tab-button" type="button" data-tab="month">今月</button>
-          <button class="tab-button" type="button" data-tab="today">今日</button>
-        </nav>
-
-        <div class="layout">
-          <section class="panel" aria-label="目標管理">
-            <h2 class="section-title" id="currentTabTitle">年間の目標</h2>
-
-            <button class="form-toggle-button" type="button" id="toggleGoalFormButton" aria-expanded="false">
-              <span aria-hidden="true">＋</span>
-              今日やることを追加
-            </button>
-
-            <form class="goal-form is-collapsed" id="goalForm">
-              <div class="form-heading">
-                <p class="form-eyebrow">タスク入力</p>
-                <h3>今日やることを追加</h3>
-              </div>
-              <div class="field">
-                <label for="goalTitle">目標を入力</label>
-                <input id="goalTitle" type="text" placeholder="例：毎日15分読書する" maxlength="80" />
-              </div>
-              <div class="field">
-                <label for="goalCategory">カテゴリー</label>
-                <select id="goalCategory">
-                  <option value="仕事">仕事</option>
-                  <option value="学習">学習</option>
-                  <option value="健康">健康</option>
-                  <option value="家族">家族</option>
-                  <option value="お金">お金</option>
-                  <option value="その他" selected>その他</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="goalDueDate">期限</label>
-                <input id="goalDueDate" type="date" />
-              </div>
-              <div class="field">
-                <label for="goalMonthlyGoal">今月の目標</label>
-                <select id="goalMonthlyGoal">
-                  <option value="">紐づけなし</option>
-                </select>
-              </div>
-              <div class="form-actions">
-                <button class="button add-button" type="submit">追加する</button>
-                <button class="button secondary" type="button" id="closeGoalFormButton">閉じる</button>
-              </div>
-            </form>
-
-            <nav class="task-filter" aria-label="タスク表示フィルター">
-              <button class="task-filter-button is-active" type="button" data-filter="all">すべて</button>
-              <button class="task-filter-button" type="button" data-filter="today">今日</button>
-              <button class="task-filter-button" type="button" data-filter="week">今週</button>
-              <button class="task-filter-button" type="button" data-filter="noDue">期限なし</button>
-            </nav>
-            <nav class="category-filter" aria-label="カテゴリフィルター">
-              <button class="category-filter-button is-active" type="button" data-category-filter="all">すべて</button>
-              <button class="category-filter-button" type="button" data-category-filter="仕事">仕事</button>
-              <button class="category-filter-button" type="button" data-category-filter="学習">学習</button>
-              <button class="category-filter-button" type="button" data-category-filter="健康">健康</button>
-              <button class="category-filter-button" type="button" data-category-filter="家族">家族</button>
-              <button class="category-filter-button" type="button" data-category-filter="お金">お金</button>
-              <button class="category-filter-button" type="button" data-category-filter="その他">その他</button>
-            </nav>
-            <div class="goal-list" id="goalList"></div>
-          </section>
-
-          <aside class="progress-stack" id="progress-section" aria-label="進捗">
+      <aside class="progress-stack" id="progress-section" aria-label="進捗">
                   <section class="stats-grid" aria-label="進捗サマリー">
                     <article class="stat-card stat-card-primary">
                       <p class="stat-label">今日の達成率</p>
@@ -3989,9 +4758,7 @@
               </div>
             </details>
           </aside>
-        </div>
-
-                <section class="reflection-card" aria-label="振り返りメモ">
+        <section class="reflection-card" aria-label="振り返りメモ">
                   <div class="reflection-heading">
                     <div>
                       <h2 class="section-title">振り返りメモ</h2>
@@ -4035,8 +4802,6 @@
                     </div>
                   </div>
                 </section>
-      </section>
-
       <nav class="bottom-nav" aria-label="アプリ内ナビゲーション">
         <button class="bottom-nav-item is-active" type="button" data-nav="today" aria-label="今日のタスクへ移動">
           <span class="nav-icon" aria-hidden="true">✓</span>
@@ -4069,6 +4834,15 @@
         today: "今日",
       };
       const CATEGORIES = ["仕事", "学習", "健康", "家族", "お金", "その他"];
+      const MONTHLY_GOAL_ICONS = ["🎯", "💼", "📘", "🌿", "🏠", "💰", "✨"];
+      const CATEGORY_DEFAULT_ICONS = {
+        仕事: "💼",
+        学習: "📘",
+        健康: "🌿",
+        家族: "🏠",
+        お金: "💰",
+        その他: "🎯",
+      };
 
       const initialGoals = {
         year: [],
@@ -4111,6 +4885,7 @@
       const monthlyGoalForm = document.getElementById("monthlyGoalForm");
       const monthlyGoalInput = document.getElementById("monthlyGoalInput");
       const monthlyGoalCategory = document.getElementById("monthlyGoalCategory");
+      const monthlyGoalIcon = document.getElementById("monthlyGoalIcon");
       const monthlyGoalTargetInput = document.getElementById("monthlyGoalTargetInput");
       const monthlyGoalCurrentInput = document.getElementById("monthlyGoalCurrentInput");
       const monthlyGoalMemoInput = document.getElementById("monthlyGoalMemoInput");
@@ -4167,6 +4942,19 @@
       const nextStepStatus = document.getElementById("nextStepStatus");
       const nextStepTitle = document.getElementById("nextStepTitle");
       const nextStepDescription = document.getElementById("nextStepDescription");
+      const dashboardTodayPercent = document.getElementById("dashboardTodayPercent");
+      const dashboardTodayBar = document.getElementById("dashboardTodayBar");
+      const dashboardTodayNote = document.getElementById("dashboardTodayNote");
+      const dashboardRemainingCount = document.getElementById("dashboardRemainingCount");
+      const dashboardCompletedCount = document.getElementById("dashboardCompletedCount");
+      const dashboardMonthPercent = document.getElementById("dashboardMonthPercent");
+      const dashboardYearPercent = document.getElementById("dashboardYearPercent");
+      const dashboardMonthMiniBar = document.getElementById("dashboardMonthMiniBar");
+      const dashboardYearMiniBar = document.getElementById("dashboardYearMiniBar");
+      const dashboardNextCard = document.getElementById("dashboardNextCard");
+      const dashboardNextStatus = document.getElementById("dashboardNextStatus");
+      const dashboardNextTitle = document.getElementById("dashboardNextTitle");
+      const dashboardNextMeta = document.getElementById("dashboardNextMeta");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -4190,6 +4978,9 @@
       toggleMonthlyGoalFormButton.addEventListener("click", toggleMonthlyGoalForm);
       monthlyGoalForm.addEventListener("submit", addMonthlyGoal);
       cancelMonthlyGoalButton.addEventListener("click", closeMonthlyGoalForm);
+      monthlyGoalCategory.addEventListener("change", () => {
+        monthlyGoalIcon.value = getDefaultIconForCategory(monthlyGoalCategory.value);
+      });
       monthlyGoalList.addEventListener("submit", saveMonthlyGoalEdit);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
       toggleGoalFormButton.addEventListener("click", toggleGoalForm);
@@ -4442,18 +5233,28 @@
 
       function normalizeMonthlyGoal(goal) {
         const currentMonth = getCurrentMonthKey();
+        const category = CATEGORIES.includes(goal.category) ? goal.category : "その他";
         return {
           id: typeof goal.id === "string" && goal.id ? goal.id : `month-${currentMonth}-${Date.now()}`,
           yearGoalId: typeof goal.yearGoalId === "string" ? goal.yearGoalId : "",
           title: typeof goal.title === "string" ? goal.title : "",
           month: typeof goal.month === "string" && goal.month ? goal.month : currentMonth,
-          category: CATEGORIES.includes(goal.category) ? goal.category : "その他",
+          category,
+          icon: normalizeMonthlyGoalIcon(goal.icon, category),
           memo: typeof goal.memo === "string" ? goal.memo : "",
           targetValue: normalizeNumberInput(goal.targetValue),
           currentValue: normalizeNumberInput(goal.currentValue),
           createdAt: typeof goal.createdAt === "string" ? goal.createdAt : "",
           updatedAt: typeof goal.updatedAt === "string" ? goal.updatedAt : "",
         };
+      }
+
+      function getDefaultIconForCategory(category) {
+        return CATEGORY_DEFAULT_ICONS[category] || "🎯";
+      }
+
+      function normalizeMonthlyGoalIcon(icon, category = "その他") {
+        return MONTHLY_GOAL_ICONS.includes(icon) ? icon : getDefaultIconForCategory(category);
       }
 
       function normalizeNumberInput(value) {
@@ -4760,7 +5561,7 @@
             </div>`
           : `<div class="yearly-goal-empty">
               <p class="empty-title">年間目標を設定しましょう</p>
-              <p class="empty-text">今年達成したいことを追加できます。</p>
+              <p class="empty-text">今年の方向性を1つ決めます。</p>
             </div>`;
       }
 
@@ -4876,6 +5677,7 @@
         toggleMonthlyGoalFormButton.textContent = "今月の目標を追加";
         monthlyGoalForm.reset();
         monthlyGoalCategory.value = "その他";
+        monthlyGoalIcon.value = getDefaultIconForCategory("その他");
         monthlyGoalTargetInput.value = "";
         monthlyGoalCurrentInput.value = "";
       }
@@ -4905,6 +5707,7 @@
           title,
           month,
           category: monthlyGoalCategory.value,
+          icon: normalizeMonthlyGoalIcon(monthlyGoalIcon.value, monthlyGoalCategory.value),
           memo: monthlyGoalMemoInput.value.trim(),
           targetValue: normalizeNumberInput(monthlyGoalTargetInput.value),
           currentValue: normalizeNumberInput(monthlyGoalCurrentInput.value),
@@ -4979,6 +5782,7 @@
         const goalId = form.dataset.id;
         const titleInput = form.querySelector("[data-monthly-edit-title]");
         const categoryInput = form.querySelector("[data-monthly-edit-category]");
+        const iconInput = form.querySelector("[data-monthly-edit-icon]");
         const targetInput = form.querySelector("[data-monthly-edit-target]");
         const currentInput = form.querySelector("[data-monthly-edit-current]");
         const memoInput = form.querySelector("[data-monthly-edit-memo]");
@@ -4999,6 +5803,7 @@
                   ...goal,
                   title,
                   category: categoryInput.value,
+                  icon: normalizeMonthlyGoalIcon(iconInput.value, categoryInput.value),
                   targetValue: normalizeNumberInput(targetInput.value),
                   currentValue: normalizeNumberInput(currentInput.value),
                   memo: memoInput.value.trim(),
@@ -5020,6 +5825,44 @@
               category
             )}</option>`
         ).join("");
+      }
+
+      function renderIconOptions(selectedIcon) {
+        const labels = {
+          "🎯": "目標",
+          "💼": "仕事",
+          "📘": "学習",
+          "🌿": "健康",
+          "🏠": "家族",
+          "💰": "お金",
+          "✨": "その他",
+        };
+
+        return MONTHLY_GOAL_ICONS.map(
+          (icon) =>
+            `<option value="${escapeHtml(icon)}"${icon === selectedIcon ? " selected" : ""}>${escapeHtml(icon)} ${escapeHtml(
+              labels[icon] || "アイコン"
+            )}</option>`
+        ).join("");
+      }
+
+      function getMonthlyGoalIconTone(percent) {
+        if (percent >= 100) return "complete";
+        if (percent > 0) return "active";
+        return "empty";
+      }
+
+      function getProgressState(percent) {
+        if (percent >= 100) return "complete";
+        if (percent > 0) return "active";
+        return "empty";
+      }
+
+      function getProgressStateLabel(percent) {
+        const state = getProgressState(percent);
+        if (state === "complete") return "完了";
+        if (state === "active") return "進行中";
+        return "未着手";
       }
 
       function renderMonthlyGoalOptions(selectedGoalId = "") {
@@ -5048,6 +5891,8 @@
           ? goals
               .map((goal) => {
                 const progress = getMonthlyGoalProgress(goal.id);
+                const progressState = getProgressState(progress.percent);
+                const iconTone = getMonthlyGoalIconTone(progress.percent);
                 const progressText =
                   progress.total === 0 ? "まだ今日のタスクが紐づいていません" : `${progress.done} / ${progress.total} 完了`;
                 const isEditing = goal.id === editingMonthlyGoalId;
@@ -5062,10 +5907,12 @@
                 return `
                   <article class="monthly-goal-item${isEditing ? " is-editing" : ""}">
                     <div class="monthly-goal-item-head">
+                      <span class="monthly-goal-icon is-${iconTone}" aria-hidden="true">${escapeHtml(goal.icon)}</span>
                       <div class="monthly-goal-item-body">
                         <h3 class="monthly-goal-title">${escapeHtml(goal.title)}</h3>
                         <div class="monthly-goal-meta">
                           <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+                          <span class="progress-state-pill is-${progressState}">${getProgressStateLabel(progress.percent)}</span>
                         </div>
                       </div>
                       <div class="monthly-goal-controls">
@@ -5110,6 +5957,15 @@
                                 ${renderCategoryOptions(goal.category)}
                               </select>
                             </div>
+                            <div class="field">
+                              <label for="monthly-edit-icon-${escapeHtml(goal.id)}">アイコン</label>
+                              <select
+                                id="monthly-edit-icon-${escapeHtml(goal.id)}"
+                                data-monthly-edit-icon="${escapeHtml(goal.id)}"
+                              >
+                                ${renderIconOptions(goal.icon)}
+                              </select>
+                            </div>
                             <div class="form-row compact-form-row">
                               <div class="field">
                                 <label for="monthly-edit-target-${escapeHtml(goal.id)}">目標値</label>
@@ -5150,7 +6006,7 @@
                           </form>`
                         : ""
                     }
-                    <div class="monthly-goal-progress" aria-label="${escapeHtml(goal.title)}の進捗">
+                    <div class="monthly-goal-progress is-${progressState}" aria-label="${escapeHtml(goal.title)}の進捗">
                       <div class="monthly-goal-progress-head">
                         <p class="monthly-goal-progress-note">${escapeHtml(progressText)}</p>
                         <span class="monthly-goal-progress-rate">${progress.percent}%</span>
@@ -5166,7 +6022,7 @@
               .join("")
           : `<div class="monthly-goal-empty">
               <p class="empty-title">今月の目標を設定しましょう</p>
-              <p class="empty-text">年間目標から逆算して、今月取り組むことを決めます。</p>
+              <p class="empty-text">今月取り組むことを決めます。</p>
             </div>`;
 
         const historyGroups = goalPlan.monthlyGoals
@@ -5191,17 +6047,21 @@
                       ${historyGroups[month]
                         .map((goal) => {
                           const progress = getMonthlyGoalProgress(goal.id);
+                          const progressState = getProgressState(progress.percent);
+                          const iconTone = getMonthlyGoalIconTone(progress.percent);
                           return `
                             <article class="monthly-goal-item">
                               <div class="monthly-goal-item-head">
+                                <span class="monthly-goal-icon is-${iconTone}" aria-hidden="true">${escapeHtml(goal.icon)}</span>
                                 <div class="monthly-goal-item-body">
                                   <h3 class="monthly-goal-title">${escapeHtml(goal.title)}</h3>
                                   <div class="monthly-goal-meta">
                                     <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+                                    <span class="progress-state-pill is-${progressState}">${getProgressStateLabel(progress.percent)}</span>
                                   </div>
                                 </div>
                               </div>
-                              <div class="monthly-goal-progress" aria-label="${escapeHtml(goal.title)}の進捗">
+                              <div class="monthly-goal-progress is-${progressState}" aria-label="${escapeHtml(goal.title)}の進捗">
                                 <div class="monthly-goal-progress-head">
                                   <p class="monthly-goal-progress-note">${progress.total === 0 ? "紐づいたタスクなし" : `${progress.done} / ${progress.total} 完了`}</p>
                                   <span class="monthly-goal-progress-rate">${progress.percent}%</span>
@@ -5637,7 +6497,9 @@
           : "";
         const linkedMonthlyGoal = findMonthlyGoal(goal.monthlyGoalId);
         const monthlyGoalBadge = linkedMonthlyGoal
-          ? `<span class="goal-monthly-link">今月の目標：${escapeHtml(linkedMonthlyGoal.title)}</span>`
+          ? `<span class="goal-monthly-link"><span class="goal-monthly-icon" aria-hidden="true">${escapeHtml(
+              linkedMonthlyGoal.icon
+            )}</span>今月の目標：${escapeHtml(linkedMonthlyGoal.title)}</span>`
           : "";
         const isEditing = goal.id === editingGoalId;
 
@@ -5931,6 +6793,72 @@
         });
       }
 
+      function getAveragePercent(values) {
+        const validValues = values.filter((value) => Number.isFinite(value));
+        if (validValues.length === 0) return 0;
+        return Math.round(validValues.reduce((sum, value) => sum + value, 0) / validValues.length);
+      }
+
+      function getDashboardMonthProgress() {
+        const currentGoals = getCurrentMonthlyGoals();
+        return getAveragePercent(currentGoals.map((goal) => getMonthlyGoalProgress(goal.id).percent));
+      }
+
+      function getDashboardYearProgress() {
+        const yearlyGoals = Array.isArray(goalPlan.yearlyGoals) ? goalPlan.yearlyGoals : [];
+        return getAveragePercent(yearlyGoals.map((goal) => getYearlyGoalProgress(goal.id).percent));
+      }
+
+      function renderDashboard() {
+        const todayGoals = goalsByTab.today || [];
+        const todayProgress = getProgress(todayGoals);
+        const remainingCount = Math.max(todayProgress.total - todayProgress.done, 0);
+        const monthPercent = getDashboardMonthProgress();
+        const yearPercent = getDashboardYearProgress();
+        const nextGoal = sortGoals(todayGoals).find((goal) => !goal.done);
+        const nextDueMeta = nextGoal ? getDueMeta(nextGoal) : null;
+
+        dashboardTodayPercent.textContent = `${todayProgress.percent}%`;
+        dashboardTodayBar.style.width = `${todayProgress.percent}%`;
+        dashboardTodayNote.textContent = `${todayProgress.done} / ${todayProgress.total} 完了`;
+        dashboardRemainingCount.textContent = `${remainingCount}件`;
+        dashboardCompletedCount.textContent = `${todayProgress.done}件`;
+        dashboardMonthPercent.textContent = `${monthPercent}%`;
+        dashboardYearPercent.textContent = `${yearPercent}%`;
+        dashboardMonthMiniBar.style.width = `${Math.max(0, Math.min(monthPercent, 100))}%`;
+        dashboardYearMiniBar.style.width = `${Math.max(0, Math.min(yearPercent, 100))}%`;
+        dashboardMonthPercent.closest(".dashboard-metric").classList.toggle("is-complete", monthPercent >= 100);
+        dashboardYearPercent.closest(".dashboard-metric").classList.toggle("is-complete", yearPercent >= 100);
+
+        let status = "未設定";
+        let title = "今日やることを追加";
+        let meta = "最初のタスクを入力してください。";
+        let cardStatus = "empty";
+
+        if (nextGoal) {
+          const linkedMonthlyGoal = findMonthlyGoal(nextGoal.monthlyGoalId);
+          const metaItems = [
+            linkedMonthlyGoal ? `今月の目標：${linkedMonthlyGoal.title}` : "",
+            nextDueMeta ? nextDueMeta.label : "",
+          ].filter(Boolean);
+
+          status = "進行中";
+          title = linkedMonthlyGoal ? `${linkedMonthlyGoal.icon} ${nextGoal.title}` : nextGoal.title;
+          meta = metaItems.length ? metaItems.join(" / ") : "このタスクから進める。";
+          cardStatus = "active";
+        } else if (todayGoals.length > 0) {
+          status = "完了";
+          title = "今日のタスクはすべて完了しています";
+          meta = "お疲れ様でした！";
+          cardStatus = "clear";
+        }
+
+        dashboardNextCard.dataset.status = cardStatus;
+        dashboardNextStatus.textContent = status;
+        dashboardNextTitle.textContent = title;
+        dashboardNextMeta.textContent = meta;
+      }
+
       function renderNextStep() {
         const todayGoals = goalsByTab.today;
         const nextGoal = sortGoals(todayGoals).find((goal) => !goal.done);
@@ -5976,6 +6904,7 @@
         renderFilters();
         renderGoals();
         renderProgress();
+        renderDashboard();
         renderWeeklyProgress();
         renderAchievementHistory();
         renderStreakProgress();
@@ -5998,3 +6927,4 @@
     </script>
   </body>
 </html>
+
