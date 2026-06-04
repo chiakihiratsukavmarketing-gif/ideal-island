@@ -2366,7 +2366,7 @@
 
       .goal-item.is-done {
         background: #f4f5f2;
-        opacity: 0.78;
+        opacity: 1;
       }
 
       .goal-item.is-editing {
@@ -2777,7 +2777,7 @@
         border: 1px solid rgba(36, 38, 34, 0.08);
         border-radius: 999px;
         background: #fbfbf9;
-        color: #8b9086;
+        color: #72786e;
         padding: 5px 11px;
         font-size: 0.76rem;
         font-weight: 650;
@@ -2802,9 +2802,9 @@
 
       .task-filter-button.is-active,
       .category-filter-button.is-active {
-        border-color: rgba(184, 217, 106, 0.5);
-        background: rgba(244, 249, 232, 0.95);
-        color: #4f5f3d;
+        border-color: rgba(143, 179, 63, 0.55);
+        background: #eef6dc;
+        color: #3d4a32;
         font-weight: 750;
       }
 
@@ -2821,14 +2821,15 @@
         gap: 12px;
         min-height: 68px;
         padding: 12px 12px;
-        border: 1px solid rgba(176, 199, 97, 0.2);
+        border: 1.5px solid rgba(176, 199, 97, 0.32);
         border-radius: 22px;
-        background: #f9fbf5;
+        background: #ffffff;
+        box-shadow: 0 4px 14px rgba(28, 32, 25, 0.05);
       }
 
       .goal-item.has-due-date:not(.is-done) {
-        background: #fffcf6;
-        border-color: rgba(226, 181, 72, 0.22);
+        background: #fffdf8;
+        border-color: rgba(210, 190, 120, 0.38);
       }
 
       .goal-content {
@@ -2853,9 +2854,9 @@
       .goal-meta {
         margin-top: 6px;
         max-width: 100%;
-        border: 1px solid rgba(36, 38, 34, 0.06);
-        background: #f5f6f2;
-        color: #9aa097;
+        border: 1px solid rgba(36, 38, 34, 0.08);
+        background: #f3f5ef;
+        color: #7f8578;
         font-size: 0.68rem;
         font-weight: 650;
         line-height: 1.35;
@@ -2985,8 +2986,9 @@
       }
 
       .goal-item.is-done {
-        background: #f3f4f1;
-        border-color: rgba(36, 38, 34, 0.06);
+        background: #f0f2eb;
+        border-color: rgba(36, 38, 34, 0.12);
+        box-shadow: none;
         opacity: 1;
       }
 
@@ -3090,8 +3092,14 @@
         border-radius: 10px;
         background: rgba(247, 249, 243, 0.95);
         color: currentColor;
-        font-size: 0.92rem;
-        line-height: 1;
+        line-height: 0;
+      }
+
+      .nav-icon svg {
+        display: block;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
       }
 
       .bottom-nav-item.is-active .nav-icon {
@@ -4280,6 +4288,11 @@
         box-sizing: border-box;
       }
 
+      .dashboard-primary {
+        border-color: rgba(176, 199, 97, 0.38);
+        background: #f1f8e8;
+      }
+
       .dashboard-primary-head,
       .dashboard-next-head {
         display: flex;
@@ -4311,15 +4324,24 @@
         height: 8px;
         overflow: hidden;
         border-radius: 999px;
-        background: #edf0e7;
+        background: #dce8c8;
       }
 
       .dashboard-bar-fill {
         width: 0%;
         height: 100%;
         border-radius: inherit;
-        background: var(--lime);
+        background: linear-gradient(90deg, #94be4a 0%, #b5d66a 100%);
         transition: width 180ms ease;
+      }
+
+      .dashboard-primary .dashboard-label {
+        color: #5a6b4f;
+        font-weight: 750;
+      }
+
+      .dashboard-primary .dashboard-number {
+        color: #2f3828;
       }
 
       .dashboard-metrics {
@@ -4606,23 +4628,49 @@
       .today-tasks-card {
         display: grid;
         gap: 10px;
+        padding: 12px 14px;
+        border: 1.5px solid rgba(176, 199, 97, 0.22);
+        border-radius: 22px;
+        background: #fcfdf9;
+      }
+
+      .today-todo-heading {
+        margin: 0 0 8px;
+        color: #4a5742;
+        font-size: 0.92rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
       }
 
       .today-add-card {
         display: grid;
-        gap: 0;
+        gap: 10px;
         width: min(100%, 720px);
         margin: 10px auto 0;
-        padding: 0;
+        padding: 12px 14px;
+        border: 1.5px solid rgba(176, 199, 97, 0.38);
+        border-radius: 22px;
+        background: linear-gradient(180deg, #f7fbf2 0%, #f0f6e6 100%);
         box-sizing: border-box;
+        box-shadow: 0 6px 18px rgba(28, 32, 25, 0.05);
       }
 
       .today-add-card .form-toggle-button {
-        margin: 0 0 10px;
+        margin: 0;
+        background: #e5f1d2;
+        border: 1.5px solid rgba(143, 179, 63, 0.5);
+        color: #3a4a30;
+      }
+
+      .today-add-card .form-toggle-button:hover,
+      .today-add-card .form-toggle-button:active {
+        background: #dcebc0;
       }
 
       .today-add-card .goal-form {
         margin: 0;
+        border: 1px solid rgba(176, 199, 97, 0.25);
+        background: #ffffff;
       }
 
       .goal-console > .next-step-card {
@@ -4975,6 +5023,127 @@
         box-shadow: none;
         transform: none;
       }
+
+      .mile-points-card {
+        border-color: rgba(176, 199, 97, 0.28);
+        background: #f4f8ec;
+      }
+
+      .mile-world-card {
+        border-color: rgba(176, 199, 97, 0.3);
+      }
+
+      .monthly-goal-card,
+      .yearly-goal-card {
+        border-color: rgba(36, 38, 34, 0.1);
+        background: #ffffff;
+      }
+
+      .settings-fold {
+        display: grid;
+        gap: 0;
+        width: min(100%, 720px);
+        margin: 0 auto 12px;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 22px;
+        background: #ffffff;
+        box-shadow: var(--shadow-soft);
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      .settings-fold-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 48px;
+        padding: 12px 14px;
+        border-bottom: 1px solid transparent;
+        color: var(--text);
+        font-size: 0.88rem;
+        font-weight: 800;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .settings-fold-summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .settings-fold-summary-cloud {
+        flex-wrap: wrap;
+      }
+
+      .settings-fold-summary-main {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .settings-fold-summary-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-left: auto;
+      }
+
+      .settings-fold-chevron {
+        flex: 0 0 auto;
+        color: var(--muted);
+        font-size: 1.1rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .settings-fold .summary-close {
+        display: none;
+      }
+
+      .settings-fold[open] .summary-open {
+        display: none;
+      }
+
+      .settings-fold[open] .summary-close {
+        display: inline;
+      }
+
+      .settings-fold[open] .settings-fold-summary {
+        border-bottom-color: var(--line-soft);
+      }
+
+      .settings-fold[open] .settings-fold-chevron {
+        transform: rotate(45deg);
+      }
+
+      .settings-fold-body {
+        display: grid;
+        gap: 14px;
+        padding: 14px 16px 16px;
+      }
+
+      .settings-fold.profile-settings-card,
+      .settings-fold.cloud-card {
+        margin-bottom: 12px;
+        padding: 0;
+        gap: 0;
+      }
+
+      .cloud-badge-inline {
+        flex: 0 0 auto;
+        font-size: 0.72rem;
+      }
+
+      .cloud-sync-status-inline {
+        margin: 0;
+        padding: 4px 8px;
+        font-size: 0.72rem;
+      }
+
+      .settings-fold .cloud-heading {
+        margin-top: 0;
+      }
     </style>
   </head>
   <body>
@@ -5107,6 +5276,8 @@
         <div class="layout">
           <section class="panel today-tasks-card" aria-label="今日やること一覧">
             <h2 class="section-title ui-heading-hidden" id="currentTabTitle" aria-hidden="true">年間の目標</h2>
+
+            <p class="today-todo-heading">今日のToDo</p>
 
             <nav class="task-filter" aria-label="タスク表示フィルター">
               <button class="task-filter-button is-active" type="button" data-filter="all">すべて</button>
@@ -5447,7 +5618,13 @@
                   </div>
                 </section>
 
-                <section class="profile-settings-card" id="profile-settings-section" aria-label="プロフィール設定">
+                <details class="profile-settings-card settings-fold" id="profile-settings-section" aria-label="プロフィール設定">
+                  <summary class="settings-fold-summary">
+                    <span class="summary-open">プロフィール設定を開く</span>
+                    <span class="summary-close">プロフィール設定を閉じる</span>
+                    <span class="settings-fold-chevron" aria-hidden="true">+</span>
+                  </summary>
+                  <div class="settings-fold-body">
                   <div class="profile-settings-heading">
                     <h2 class="section-title">プロフィール設定</h2>
                     <p class="cloud-copy">表示名とアイコンをこの端末に保存します（クラウド同期対象外）。</p>
@@ -5471,18 +5648,28 @@
                     <button class="button secondary" type="button" id="resetProfileButton">自動表示に戻す</button>
                     <span class="profile-settings-status" id="profileSettingsStatus" aria-live="polite"></span>
                   </div>
-                </section>
+                  </div>
+                </details>
 
-                <section class="cloud-card" id="settings-section" aria-label="クラウド保存" data-state="signed-out">
+                <details class="cloud-card settings-fold" id="settings-section" aria-label="クラウド保存" data-state="signed-out">
+                  <summary class="settings-fold-summary settings-fold-summary-cloud">
+                    <span class="settings-fold-summary-main">
+                      <span class="summary-open">クラウド保存・同期を開く</span>
+                      <span class="summary-close">クラウド保存・同期を閉じる</span>
+                    </span>
+                    <span class="settings-fold-summary-meta">
+                      <span class="cloud-badge cloud-badge-inline" id="cloudStatusBadge">未ログイン</span>
+                      <span class="cloud-sync-status cloud-sync-status-inline" id="cloudSyncStatus" aria-live="polite">端末に保存済み</span>
+                    </span>
+                    <span class="settings-fold-chevron" aria-hidden="true">+</span>
+                  </summary>
+                  <div class="settings-fold-body">
                   <div class="cloud-heading">
                     <div>
                       <h2 class="section-title">クラウド保存</h2>
                       <p class="cloud-copy" id="cloudDescription">基本はこの端末に保存されています。ログインすると自動でクラウド保存され、手動保存も使えます。</p>
                     </div>
-                    <span class="cloud-badge" id="cloudStatusBadge">未ログイン</span>
                   </div>
-
-                  <p class="cloud-sync-status" id="cloudSyncStatus" aria-live="polite">端末に保存済み</p>
 
                   <div class="cloud-panel" id="cloudSignedOutPanel">
                     <p class="cloud-copy">ログイン後、変更は自動でクラウド保存されます。手動保存・読み込みも使えます。メールアドレスを入力してログインリンクを送信してください。</p>
@@ -5509,7 +5696,8 @@
                   </div>
 
                   <p class="cloud-status" id="cloudAuthStatus" aria-live="polite"></p>
-                </section>
+                  </div>
+                </details>
 
                 <section class="slogan-card" id="slogan-section" aria-label="スローガン">
                   <div class="slogan-display" id="sloganDisplay">
@@ -5530,19 +5718,43 @@
                 </section>
       <nav class="bottom-nav" aria-label="アプリ内ナビゲーション">
         <button class="bottom-nav-item is-active" type="button" data-nav="today" aria-label="今日のタスクへ移動">
-          <span class="nav-icon" aria-hidden="true">📝</span>
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+              <path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+          </span>
           <span>今日</span>
         </button>
         <button class="bottom-nav-item" type="button" data-nav="goals" aria-label="目標リストへ移動">
-          <span class="nav-icon" aria-hidden="true">🎯</span>
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+            </svg>
+          </span>
           <span>目標</span>
         </button>
         <button class="bottom-nav-item" type="button" data-nav="progress" aria-label="詳しい進捗へ移動">
-          <span class="nav-icon" aria-hidden="true">📊</span>
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 20V11" />
+              <path d="M10 20V6" />
+              <path d="M15 20V14" />
+              <path d="M20 20V4" />
+            </svg>
+          </span>
           <span>詳しい</span>
         </button>
         <button class="bottom-nav-item" type="button" data-nav="settings" aria-label="設定へ移動">
-          <span class="nav-icon" aria-hidden="true">🛠️</span>
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2.75v2.1M12 19.15v2.1M4.72 4.72l1.48 1.48M17.8 17.8l1.48 1.48M2.75 12h2.1M19.15 12h2.1M4.72 19.28l1.48-1.48M17.8 6.2l1.48-1.48" />
+            </svg>
+          </span>
           <span>設定</span>
         </button>
       </nav>
@@ -5823,6 +6035,8 @@
           }
 
           if (nav === "settings") {
+            const profileFold = document.getElementById("profile-settings-section");
+            if (profileFold) profileFold.open = true;
             scrollToSection("profile-settings-section");
           }
         });
