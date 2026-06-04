@@ -1290,6 +1290,33 @@
         color: var(--danger);
       }
 
+      .cloud-sync-status {
+        margin: 0;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: #f7f8f4;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 750;
+        line-height: 1.5;
+      }
+
+      .cloud-sync-status.is-dirty {
+        border: 1px solid rgba(255, 180, 60, 0.35);
+        background: #fff8eb;
+        color: #8a6219;
+      }
+
+      .cloud-sync-status.is-saving {
+        background: #f0f7ff;
+        color: #2f5f87;
+      }
+
+      .cloud-sync-status.is-error {
+        background: #fff3f3;
+        color: var(--danger);
+      }
+
       .cloud-user {
         display: grid;
         gap: 4px;
@@ -5007,13 +5034,15 @@
                   <div class="cloud-heading">
                     <div>
                       <h2 class="section-title">クラウド保存</h2>
-                      <p class="cloud-copy" id="cloudDescription">基本はこの端末に保存されています。ログインすると手動でクラウド保存できます。</p>
+                      <p class="cloud-copy" id="cloudDescription">基本はこの端末に保存されています。ログインすると自動でクラウド保存され、手動保存も使えます。</p>
                     </div>
                     <span class="cloud-badge" id="cloudStatusBadge">未ログイン</span>
                   </div>
 
+                  <p class="cloud-sync-status" id="cloudSyncStatus" aria-live="polite">端末に保存済み</p>
+
                   <div class="cloud-panel" id="cloudSignedOutPanel">
-                    <p class="cloud-copy">ログイン後、「クラウドに保存」「クラウドから読み込み」が使えます。メールアドレスを入力してログインリンクを送信してください。</p>
+                    <p class="cloud-copy">ログイン後、変更は自動でクラウド保存されます。手動保存・読み込みも使えます。メールアドレスを入力してログインリンクを送信してください。</p>
                     <div class="field">
                       <label for="cloudEmailInput">メールアドレス</label>
                       <input id="cloudEmailInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
@@ -5086,6 +5115,9 @@
       const CLOUD_LOGIN_LAST_SENT_STORAGE_KEY = "mileCloudLoginLastSentAt";
       const CLOUD_LOGIN_RESEND_COOLDOWN_MS = 60 * 1000;
       const CLOUD_LOGIN_RESEND_LABEL = "ログインリンクを送る";
+      const CLOUD_SAVED_SNAPSHOT_STORAGE_KEY = "mileCloudSavedSnapshotHash";
+      const CLOUD_LAST_SAVED_AT_STORAGE_KEY = "mileCloudLastSavedAt";
+      const CLOUD_AUTO_SAVE_DEBOUNCE_MS = 45 * 1000;
       const PROFILE_ICON_OPTIONS = ["🌱", "☁️", "🏝️", "🌼", "🪴", "✨"];
       const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWVkcmtwdnJ3a3N6YmthaGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODYwMDMsImV4cCI6MjA5NjA2MjAwM30.ZTaJhkZPzd0CAqiCfMYTAib3iNSWXtT70285m5mxbOI";
@@ -5127,6 +5159,12 @@
       let supabaseClient = createSupabaseClient();
       let cloudSession = null;
       let cloudLoginCooldownTimer = null;
+      let cloudSavedSnapshotHash = "";
+      let cloudLastSavedAt = 0;
+      let cloudSyncState = "idle";
+      let cloudAutoSaveTimer = null;
+      let cloudSyncRefreshTimer = null;
+      let cloudApplyInProgress = false;
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -5173,6 +5211,7 @@
       const cloudLogoutButton = document.getElementById("cloudLogoutButton");
       const cloudUserEmail = document.getElementById("cloudUserEmail");
       const cloudAuthStatus = document.getElementById("cloudAuthStatus");
+      const cloudSyncStatus = document.getElementById("cloudSyncStatus");
       const userProfileSection = document.getElementById("user-profile");
       const userProfileGreeting = document.getElementById("userProfileGreeting");
       const userProfileIcon = document.getElementById("userProfileIcon");
@@ -5264,7 +5303,7 @@
       monthlyGoalList.addEventListener("submit", saveMonthlyGoalEdit);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
       sendLoginLinkButton.addEventListener("click", sendCloudLoginLink);
-      cloudSaveButton.addEventListener("click", saveAppDataToCloud);
+      cloudSaveButton.addEventListener("click", () => saveAppDataToCloud());
       cloudLoadButton.addEventListener("click", loadAppDataFromCloud);
       cloudLogoutButton.addEventListener("click", signOutCloud);
       toggleGoalFormButton.addEventListener("click", toggleGoalForm);
@@ -5514,6 +5553,130 @@
         };
       }
 
+      function loadCloudSyncMeta() {
+        cloudSavedSnapshotHash = localStorage.getItem(CLOUD_SAVED_SNAPSHOT_STORAGE_KEY) || "";
+        const savedAt = Number(localStorage.getItem(CLOUD_LAST_SAVED_AT_STORAGE_KEY));
+        cloudLastSavedAt = Number.isFinite(savedAt) && savedAt > 0 ? savedAt : 0;
+      }
+
+      function getLocalAppDataSnapshotHash() {
+        return JSON.stringify(collectLocalAppData().data);
+      }
+
+      function isCloudDataDirty() {
+        if (!cloudSavedSnapshotHash) return true;
+        return getLocalAppDataSnapshotHash() !== cloudSavedSnapshotHash;
+      }
+
+      function formatCloudRelativeSavedTime(timestamp) {
+        const diffSec = Math.floor((Date.now() - timestamp) / 1000);
+        if (diffSec < 60) return "たった今";
+        const diffMin = Math.floor(diffSec / 60);
+        if (diffMin < 60) return `${diffMin}分前`;
+        const diffHour = Math.floor(diffMin / 60);
+        if (diffHour < 24) return `${diffHour}時間前`;
+        return `${Math.floor(diffHour / 24)}日前`;
+      }
+
+      function getCloudSyncStatusMessage() {
+        const user = getCloudUser();
+
+        if (!user) {
+          return "端末に保存済み";
+        }
+
+        if (cloudSyncState === "saving") {
+          return "保存中…";
+        }
+
+        if (cloudSyncState === "failed") {
+          return "保存失敗。再度お試しください。";
+        }
+
+        if (isCloudDataDirty()) {
+          return "端末に保存済み · クラウド未保存の変更があります";
+        }
+
+        if (cloudLastSavedAt > 0) {
+          return `クラウドに保存済み（最終保存：${formatCloudRelativeSavedTime(cloudLastSavedAt)}）`;
+        }
+
+        return "端末に保存済み（クラウド未同期）";
+      }
+
+      function updateCloudSyncStatusUI() {
+        if (!cloudSyncStatus) return;
+
+        const message = getCloudSyncStatusMessage();
+        cloudSyncStatus.textContent = message;
+        cloudSyncStatus.classList.toggle("is-dirty", Boolean(getCloudUser()) && isCloudDataDirty());
+        cloudSyncStatus.classList.toggle("is-saving", cloudSyncState === "saving");
+        cloudSyncStatus.classList.toggle("is-error", cloudSyncState === "failed");
+      }
+
+      function clearCloudAutoSaveTimer() {
+        if (cloudAutoSaveTimer) {
+          clearTimeout(cloudAutoSaveTimer);
+          cloudAutoSaveTimer = null;
+        }
+      }
+
+      function scheduleCloudAutoSave() {
+        if (!getCloudUser() || cloudApplyInProgress || !isCloudDataDirty()) return;
+
+        clearCloudAutoSaveTimer();
+        cloudAutoSaveTimer = setTimeout(() => {
+          if (isCloudDataDirty()) {
+            saveAppDataToCloud({ auto: true });
+          }
+        }, CLOUD_AUTO_SAVE_DEBOUNCE_MS);
+      }
+
+      function markCloudDataDirty() {
+        if (cloudApplyInProgress) {
+          updateCloudSyncStatusUI();
+          return;
+        }
+
+        if (cloudSyncState !== "saving") {
+          cloudSyncState = "idle";
+        }
+
+        updateCloudSyncStatusUI();
+
+        if (getCloudUser()) {
+          scheduleCloudAutoSave();
+        }
+      }
+
+      function markCloudDataSynced() {
+        cloudSavedSnapshotHash = getLocalAppDataSnapshotHash();
+        cloudLastSavedAt = Date.now();
+        cloudSyncState = "saved";
+        localStorage.setItem(CLOUD_SAVED_SNAPSHOT_STORAGE_KEY, cloudSavedSnapshotHash);
+        localStorage.setItem(CLOUD_LAST_SAVED_AT_STORAGE_KEY, String(cloudLastSavedAt));
+        clearCloudAutoSaveTimer();
+        updateCloudSyncStatusUI();
+      }
+
+      function startCloudSyncStatusRefresh() {
+        stopCloudSyncStatusRefresh();
+        if (!getCloudUser()) return;
+
+        cloudSyncRefreshTimer = setInterval(() => {
+          if (cloudSyncState !== "saving") {
+            updateCloudSyncStatusUI();
+          }
+        }, 30000);
+      }
+
+      function stopCloudSyncStatusRefresh() {
+        if (cloudSyncRefreshTimer) {
+          clearInterval(cloudSyncRefreshTimer);
+          cloudSyncRefreshTimer = null;
+        }
+      }
+
       function backupLocalAppData() {
         const backup = {
           createdAt: new Date().toISOString(),
@@ -5535,47 +5698,68 @@
           throw new Error("Invalid cloud app data.");
         }
 
-        if ("goalsByTab" in nextData) {
-          localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(nextData.goalsByTab || initialGoals));
-        }
+        cloudApplyInProgress = true;
 
-        if ("goalPlan" in nextData) {
-          localStorage.setItem(GOAL_PLAN_STORAGE_KEY, JSON.stringify(nextData.goalPlan || createEmptyGoalPlan()));
-        }
+        try {
+          if ("goalsByTab" in nextData) {
+            localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(nextData.goalsByTab || initialGoals));
+          }
 
-        if ("reflectionNotes" in nextData) {
-          localStorage.setItem(REFLECTION_STORAGE_KEY, JSON.stringify(nextData.reflectionNotes || {}));
-        }
+          if ("goalPlan" in nextData) {
+            localStorage.setItem(GOAL_PLAN_STORAGE_KEY, JSON.stringify(nextData.goalPlan || createEmptyGoalPlan()));
+          }
 
-        if ("slogan" in nextData) {
-          localStorage.setItem(SLOGAN_STORAGE_KEY, String(nextData.slogan || DEFAULT_SLOGAN));
-        }
+          if ("reflectionNotes" in nextData) {
+            localStorage.setItem(REFLECTION_STORAGE_KEY, JSON.stringify(nextData.reflectionNotes || {}));
+          }
 
-        goalsByTab = loadGoals();
-        goalPlan = loadGoalPlan();
-        reflectionNotes = loadReflectionNotes();
-        slogan = loadSlogan();
-        editingYearlyGoalId = "";
-        editingMonthlyGoalId = "";
-        editingGoalId = "";
-        isGoalFormOpen = false;
-        render();
-        renderReflectionNotes();
+          if ("slogan" in nextData) {
+            localStorage.setItem(SLOGAN_STORAGE_KEY, String(nextData.slogan || DEFAULT_SLOGAN));
+          }
+
+          goalsByTab = loadGoals();
+          goalPlan = loadGoalPlan();
+          reflectionNotes = loadReflectionNotes();
+          slogan = loadSlogan();
+          editingYearlyGoalId = "";
+          editingMonthlyGoalId = "";
+          editingGoalId = "";
+          isGoalFormOpen = false;
+          render();
+          renderReflectionNotes();
+          markCloudDataSynced();
+        } finally {
+          cloudApplyInProgress = false;
+        }
       }
 
-      async function saveAppDataToCloud() {
+      async function saveAppDataToCloud(options = {}) {
+        const auto = options.auto === true;
         const user = getCloudUser();
 
         if (!supabaseClient || !user) {
-          setCloudStatusMessage("ログイン後にクラウド保存を使えます。", "error");
-          return;
+          if (!auto) {
+            setCloudStatusMessage("ログイン後にクラウド保存を使えます。", "error");
+          }
+          return false;
         }
 
-        setCloudActionButtonsDisabled(true);
-        setCloudStatusMessage("クラウドに保存しています...");
+        if (cloudSyncState === "saving") {
+          return false;
+        }
+
+        clearCloudAutoSaveTimer();
+        cloudSyncState = "saving";
+        updateCloudSyncStatusUI();
+
+        if (!auto) {
+          setCloudActionButtonsDisabled(true);
+          setCloudStatusMessage("クラウドに保存しています...");
+        }
 
         try {
           const appData = collectLocalAppData();
+          const savingSnapshotHash = JSON.stringify(appData.data);
           const { error } = await supabaseClient
             .from("user_app_data")
             .upsert(
@@ -5587,12 +5771,51 @@
             );
 
           if (error) throw error;
-          setCloudStatusMessage("クラウドに保存しました。");
+
+          const currentSnapshotHash = getLocalAppDataSnapshotHash();
+          if (currentSnapshotHash === savingSnapshotHash) {
+            markCloudDataSynced();
+
+            if (auto) {
+              setCloudAuthStatus("クラウドに自動保存しました。");
+            } else {
+              setCloudStatusMessage("クラウドに保存しました。");
+            }
+
+            return true;
+          }
+
+          cloudSyncState = "idle";
+          scheduleCloudAutoSave();
+          updateCloudSyncStatusUI();
+
+          if (!auto) {
+            setCloudStatusMessage("保存中に変更があったため、未保存の変更が残っています。");
+          }
+
+          return false;
         } catch (error) {
           console.warn("Cloud save failed.", error);
-          setCloudStatusMessage("クラウドに保存できませんでした。時間を置いて再度お試しください。", "error");
+          cloudSyncState = "failed";
+          updateCloudSyncStatusUI();
+
+          if (auto) {
+            setCloudAuthStatus("クラウド自動保存に失敗しました。時間を置いて再度お試しください。", "error");
+          } else {
+            setCloudStatusMessage("クラウドに保存できませんでした。時間を置いて再度お試しください。", "error");
+          }
+
+          return false;
         } finally {
-          setCloudActionButtonsDisabled(false);
+          if (!auto) {
+            setCloudActionButtonsDisabled(false);
+          }
+
+          if (cloudSyncState === "saving") {
+            cloudSyncState = isCloudDataDirty() ? "idle" : "saved";
+          }
+
+          updateCloudSyncStatusUI();
         }
       }
 
@@ -5652,13 +5875,20 @@
         cloudUserEmail.textContent = userEmail || "";
 
         if (userEmail) {
-          cloudDescription.textContent = "ログイン中です。「クラウドに保存」と「クラウドから読み込み」が使えます。";
+          cloudDescription.textContent = "ログイン中です。変更は自動でクラウド保存されます。「クラウドから読み込み」も使えます。";
           cloudStatusBadge.textContent = "ログイン中";
           renderUserProfile();
+          startCloudSyncStatusRefresh();
+          updateCloudSyncStatusUI();
+          if (isCloudDataDirty()) {
+            scheduleCloudAutoSave();
+          }
           return;
         }
 
-        cloudDescription.textContent = "基本はこの端末に保存されています。ログインすると手動でクラウド保存できます。";
+        stopCloudSyncStatusRefresh();
+        clearCloudAutoSaveTimer();
+        cloudDescription.textContent = "基本はこの端末に保存されています。ログインすると自動でクラウド保存され、手動保存も使えます。";
         cloudStatusBadge.textContent = isConfigured ? "未ログイン" : "未設定";
 
         if (!isConfigured) {
@@ -5666,6 +5896,7 @@
         }
 
         renderUserProfile();
+        updateCloudSyncStatusUI();
       }
 
       async function initializeSupabaseAuth() {
@@ -5939,6 +6170,7 @@
 
       function saveGoals() {
         localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goalsByTab));
+        markCloudDataDirty();
       }
 
       function loadReflectionNotes() {
@@ -5961,6 +6193,7 @@
 
       function saveReflectionNotes() {
         localStorage.setItem(REFLECTION_STORAGE_KEY, JSON.stringify(reflectionNotes));
+        markCloudDataDirty();
       }
 
       function createEmptyGoalPlan() {
@@ -6077,6 +6310,7 @@
 
       function saveGoalPlan() {
         localStorage.setItem(GOAL_PLAN_STORAGE_KEY, JSON.stringify(goalPlan));
+        markCloudDataDirty();
       }
 
       function scrollToSection(id) {
@@ -6098,6 +6332,7 @@
         localStorage.setItem(SLOGAN_STORAGE_KEY, slogan);
         closeSloganEdit();
         renderSlogan();
+        markCloudDataDirty();
       }
 
       function cancelSloganEdit() {
@@ -7747,7 +7982,9 @@
       render();
       renderReflectionNotes();
       renderUserProfile();
+      loadCloudSyncMeta();
       restoreCloudLoginResendCooldown();
+      updateCloudSyncStatusUI();
       initializeSupabaseAuth();
     </script>
   </body>
