@@ -5620,8 +5620,7 @@
 
                 <details class="profile-settings-card settings-fold" id="profile-settings-section" aria-label="プロフィール設定">
                   <summary class="settings-fold-summary">
-                    <span class="summary-open">プロフィール設定を開く</span>
-                    <span class="summary-close">プロフィール設定を閉じる</span>
+                    <span class="settings-fold-summary-label">プロフィール</span>
                     <span class="settings-fold-chevron" aria-hidden="true">+</span>
                   </summary>
                   <div class="settings-fold-body">
@@ -5654,8 +5653,7 @@
                 <details class="cloud-card settings-fold" id="settings-section" aria-label="クラウド保存" data-state="signed-out">
                   <summary class="settings-fold-summary settings-fold-summary-cloud">
                     <span class="settings-fold-summary-main">
-                      <span class="summary-open">クラウド保存・同期を開く</span>
-                      <span class="summary-close">クラウド保存・同期を閉じる</span>
+                      <span class="settings-fold-summary-label">クラウド保存・同期</span>
                     </span>
                     <span class="settings-fold-summary-meta">
                       <span class="cloud-badge cloud-badge-inline" id="cloudStatusBadge">未ログイン</span>
@@ -6135,9 +6133,23 @@
         return PROFILE_ICON_OPTIONS[Math.abs(hash) % PROFILE_ICON_OPTIONS.length];
       }
 
+      function getGreetingDisplayName(displayName) {
+        const trimmed = String(displayName || "").trim();
+        if (!trimmed) {
+          return "";
+        }
+
+        if (/さん$/u.test(trimmed)) {
+          return trimmed;
+        }
+
+        return `${trimmed}さん`;
+      }
+
       function getProfileGreeting(displayName) {
-        if (displayName) {
-          return `Hello, ${displayName}!`;
+        const greetingName = getGreetingDisplayName(displayName);
+        if (greetingName) {
+          return `Hello, ${greetingName}!`;
         }
 
         return "Hello!";
