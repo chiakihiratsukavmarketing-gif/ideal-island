@@ -5083,6 +5083,9 @@
       const REFLECTION_STORAGE_KEY = "mileReflectionNotes";
       const GOAL_PLAN_STORAGE_KEY = "mileGoalPlan";
       const USER_PROFILE_STORAGE_KEY = "mileUserProfile";
+      const CLOUD_LOGIN_LAST_SENT_STORAGE_KEY = "mileCloudLoginLastSentAt";
+      const CLOUD_LOGIN_RESEND_COOLDOWN_MS = 60 * 1000;
+      const CLOUD_LOGIN_RESEND_LABEL = "ログインリンクを送る";
       const PROFILE_ICON_OPTIONS = ["🌱", "☁️", "🏝️", "🌼", "🪴", "✨"];
       const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWVkcmtwdnJ3a3N6YmthaGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODYwMDMsImV4cCI6MjA5NjA2MjAwM30.ZTaJhkZPzd0CAqiCfMYTAib3iNSWXtT70285m5mxbOI";
@@ -5123,6 +5126,7 @@
       let isCompletedTasksOpen = false;
       let supabaseClient = createSupabaseClient();
       let cloudSession = null;
+      let cloudLoginCooldownTimer = null;
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -5685,6 +5689,14 @@
 
       async function sendCloudLoginLink() {
         const email = cloudEmailInput.value.trim();
+        const cooldownRemainingMs = getCloudLoginCooldownRemainingMs();
+
+        if (cooldownRemainingMs > 0) {
+          const remainingSec = Math.ceil(cooldownRemainingMs / 1000);
+          updateCloudLoginCooldownUI(cooldownRemainingMs);
+          setCloudAuthStatus(`再送まであと${remainingSec}秒お待ちください。`, "error");
+          return;
+        }
 
         if (!supabaseClient) {
           setCloudAuthStatus("Supabase接続情報を差し替えてからログインリンクを送信してください。", "error");
@@ -5710,12 +5722,110 @@
 
           if (error) throw error;
           setCloudAuthStatus("ログインリンクを送信しました。メールをご確認ください。");
+          startCloudLoginResendCooldown({ showReadyMessage: true });
         } catch (error) {
           logCloudAuthError("sendCloudLoginLink failed", error);
           setCloudAuthStatus(describeCloudLoginLinkError(error), "error");
-        } finally {
-          sendLoginLinkButton.disabled = false;
+
+          if (isCloudLoginRateLimitError(error)) {
+            startCloudLoginResendCooldown({ showReadyMessage: false });
+          } else {
+            resetCloudLoginSendButton();
+          }
         }
+      }
+
+      function getCloudLoginCooldownRemainingMs() {
+        const rawValue = localStorage.getItem(CLOUD_LOGIN_LAST_SENT_STORAGE_KEY);
+        const lastSentAt = Number(rawValue);
+
+        if (!Number.isFinite(lastSentAt) || lastSentAt <= 0) {
+          return 0;
+        }
+
+        return Math.max(0, CLOUD_LOGIN_RESEND_COOLDOWN_MS - (Date.now() - lastSentAt));
+      }
+
+      function saveCloudLoginLastSentAt() {
+        localStorage.setItem(CLOUD_LOGIN_LAST_SENT_STORAGE_KEY, String(Date.now()));
+      }
+
+      function isCloudLoginRateLimitError(error) {
+        const message = String(error?.message || "").toLowerCase();
+        const code = String(error?.code || "").toLowerCase();
+        const status = Number(error?.status);
+
+        return (
+          status === 429 ||
+          code.includes("rate") ||
+          message.includes("rate limit") ||
+          message.includes("too many")
+        );
+      }
+
+      function clearCloudLoginCooldownTimer() {
+        if (!cloudLoginCooldownTimer) {
+          return;
+        }
+
+        clearInterval(cloudLoginCooldownTimer);
+        cloudLoginCooldownTimer = null;
+      }
+
+      function resetCloudLoginSendButton() {
+        sendLoginLinkButton.disabled = false;
+        sendLoginLinkButton.textContent = CLOUD_LOGIN_RESEND_LABEL;
+      }
+
+      function updateCloudLoginCooldownUI(remainingMs) {
+        if (remainingMs > 0) {
+          const remainingSec = Math.ceil(remainingMs / 1000);
+          sendLoginLinkButton.disabled = true;
+          sendLoginLinkButton.textContent = `再送まであと${remainingSec}秒`;
+          return;
+        }
+
+        resetCloudLoginSendButton();
+      }
+
+      function runCloudLoginResendCooldownTimer({ showReadyMessage = false } = {}) {
+        clearCloudLoginCooldownTimer();
+
+        const tick = () => {
+          const remainingMs = getCloudLoginCooldownRemainingMs();
+
+          if (remainingMs > 0) {
+            updateCloudLoginCooldownUI(remainingMs);
+            return;
+          }
+
+          clearCloudLoginCooldownTimer();
+          updateCloudLoginCooldownUI(0);
+
+          if (showReadyMessage) {
+            setCloudAuthStatus("再送できます。");
+          }
+        };
+
+        tick();
+        cloudLoginCooldownTimer = setInterval(tick, 1000);
+      }
+
+      function startCloudLoginResendCooldown({ showReadyMessage = false } = {}) {
+        saveCloudLoginLastSentAt();
+        runCloudLoginResendCooldownTimer({ showReadyMessage });
+      }
+
+      function restoreCloudLoginResendCooldown() {
+        const remainingMs = getCloudLoginCooldownRemainingMs();
+
+        if (remainingMs <= 0) {
+          resetCloudLoginSendButton();
+          return;
+        }
+
+        updateCloudLoginCooldownUI(remainingMs);
+        runCloudLoginResendCooldownTimer({ showReadyMessage: false });
       }
 
       async function signOutCloud() {
@@ -7637,6 +7747,7 @@
       render();
       renderReflectionNotes();
       renderUserProfile();
+      restoreCloudLoginResendCooldown();
       initializeSupabaseAuth();
     </script>
   </body>
