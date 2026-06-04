@@ -4518,6 +4518,121 @@
         font-weight: 700;
       }
 
+      .mile-world-card {
+        display: grid;
+        gap: 12px;
+        width: min(100%, 720px);
+        margin: 10px auto 0;
+        padding: 16px;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 26px;
+        background: #ffffff;
+        box-shadow: var(--shadow-soft);
+        box-sizing: border-box;
+      }
+
+      .mile-world-stage {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid var(--line-soft);
+        border-radius: 20px;
+        background: #f8fbf2;
+      }
+
+      .mile-world-stage-icon {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: #ffffff;
+        font-size: 1.6rem;
+        line-height: 1;
+      }
+
+      .mile-world-stage-copy {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .mile-world-stage-label,
+      .mile-world-badges-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
+      .mile-world-stage-name {
+        margin: 0;
+        color: var(--text);
+        font-size: 1rem;
+        font-weight: 800;
+      }
+
+      .mile-world-stage-next {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .mile-world-streak {
+        display: grid;
+        gap: 2px;
+        padding: 10px 12px;
+        border: 1px solid rgba(176, 199, 97, 0.35);
+        border-radius: 16px;
+        background: #fbfcf8;
+      }
+
+      .mile-world-streak-count {
+        margin: 0;
+        color: var(--text);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      .mile-world-streak-message {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      .mile-world-badges {
+        display: grid;
+        gap: 8px;
+      }
+
+      .mile-world-badges-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .mile-world-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border: 1px solid rgba(176, 199, 97, 0.45);
+        border-radius: 999px;
+        background: #f4f9e8;
+        color: var(--text);
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .mile-world-badges-empty {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
       .goal-console > .next-step-card {
         display: none;
       }
@@ -4887,6 +5002,28 @@
             <p class="dashboard-next-title" id="dashboardNextTitle">今日やることを追加</p>
             <p class="dashboard-next-meta" id="dashboardNextMeta">最初のタスクを入力してください。</p>
           </article>
+        </div>
+      </section>
+
+      <section class="mile-world-card" id="mile-world-section" aria-label="MILEステージ">
+        <div class="mile-world-stage">
+          <span class="mile-world-stage-icon" id="mileWorldStageIcon" aria-hidden="true">🌱</span>
+          <div class="mile-world-stage-copy">
+            <p class="mile-world-stage-label">ステージ</p>
+            <p class="mile-world-stage-name" id="mileWorldStageName">はじめの一歩</p>
+            <p class="mile-world-stage-next" id="mileWorldStageNext">次のステージまであと1MILE</p>
+          </div>
+        </div>
+        <div class="mile-world-streak" aria-label="連続達成">
+          <p class="mile-world-streak-count" id="mileWorldStreakCount">0日連続</p>
+          <p class="mile-world-streak-message" id="mileWorldStreakMessage">
+            今日のタスクを完了すると記録が始まります
+          </p>
+        </div>
+        <div class="mile-world-badges" aria-label="バッジ">
+          <p class="mile-world-badges-label">バッジ</p>
+          <div class="mile-world-badges-list" id="mileWorldBadgesList"></div>
+          <p class="mile-world-badges-empty" id="mileWorldBadgesEmpty">まだバッジはありません</p>
         </div>
       </section>
 
@@ -5379,6 +5516,19 @@
       const CLOUD_LAST_SAVED_AT_STORAGE_KEY = "mileCloudLastSavedAt";
       const CLOUD_AUTO_SAVE_DEBOUNCE_MS = 45 * 1000;
       const PROFILE_ICON_OPTIONS = ["🌱", "☁️", "🏝️", "🌼", "🪴", "✨", "🌿", "🍀", "🌙", "🕊️"];
+      const MILE_WORLD_STAGES = [
+        { min: 0, max: 4, icon: "🌱", name: "はじめの一歩" },
+        { min: 5, max: 14, icon: "🌿", name: "小さな芽" },
+        { min: 15, max: 29, icon: "🪴", name: "育ってきた" },
+        { min: 30, max: 49, icon: "🌼", name: "花が咲きそう" },
+        { min: 50, max: Infinity, icon: "🏝️", name: "自分の道が見えてきた" },
+      ];
+      const MILE_BADGE_DEFS = [
+        { id: "first-step", label: "はじめの一歩", check: (stats) => stats.totalMile >= 1 },
+        { id: "steady", label: "コツコツさん", check: (stats) => stats.streakDays >= 3 },
+        { id: "week-good", label: "今週いい感じ", check: (stats) => stats.weekMile >= 5 },
+        { id: "forward", label: "かなり前進", check: (stats) => stats.totalMile >= 30 },
+      ];
       const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWVkcmtwdnJ3a3N6YmthaGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODYwMDMsImV4cCI6MjA5NjA2MjAwM30.ZTaJhkZPzd0CAqiCfMYTAib3iNSWXtT70285m5mxbOI";
       const TAB_LABELS = {
@@ -5545,6 +5695,13 @@
       const dashboardTodayMile = document.getElementById("dashboardTodayMile");
       const dashboardWeekMile = document.getElementById("dashboardWeekMile");
       const mileToast = document.getElementById("mileToast");
+      const mileWorldStageIcon = document.getElementById("mileWorldStageIcon");
+      const mileWorldStageName = document.getElementById("mileWorldStageName");
+      const mileWorldStageNext = document.getElementById("mileWorldStageNext");
+      const mileWorldStreakCount = document.getElementById("mileWorldStreakCount");
+      const mileWorldStreakMessage = document.getElementById("mileWorldStreakMessage");
+      const mileWorldBadgesList = document.getElementById("mileWorldBadgesList");
+      const mileWorldBadgesEmpty = document.getElementById("mileWorldBadgesEmpty");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -7663,16 +7820,142 @@
         }
       }
 
-      function getMilePoints() {
+      function getTodayMileGoals() {
+        return goalsByTab.today || [];
+      }
+
+      function getCompletedDatesFromTodayGoals(todayGoals = getTodayMileGoals()) {
+        const completedDates = new Set();
+
+        todayGoals.forEach((goal) => {
+          const completedKey = getDateKeyFromValue(goal.completedAt);
+          if (completedKey) completedDates.add(completedKey);
+        });
+
+        return completedDates;
+      }
+
+      function getMileStreakDays(completedDates = getCompletedDatesFromTodayGoals()) {
         const todayKey = getTodayKey();
-        const todayGoals = goalsByTab.today || [];
+        const yesterdayKey = addDays(todayKey, -1);
+        const startKey = completedDates.has(todayKey)
+          ? todayKey
+          : completedDates.has(yesterdayKey)
+            ? yesterdayKey
+            : "";
+
+        if (!startKey) return 0;
+
+        let count = 0;
+        let currentKey = startKey;
+
+        while (completedDates.has(currentKey)) {
+          count += 1;
+          currentKey = addDays(currentKey, -1);
+        }
+
+        return count;
+      }
+
+      function getMileStatsFromTodayGoals(todayGoals) {
+        const todayKey = getTodayKey();
         const { start, end } = getWeekRange();
         const todayMile = todayGoals.filter(
           (goal) => getDateKeyFromValue(goal.completedAt) === todayKey
         ).length;
         const weekMile = todayGoals.filter((goal) => isDateInRange(goal.completedAt, start, end)).length;
+        const totalMile = todayGoals.filter((goal) => Boolean(getDateKeyFromValue(goal.completedAt))).length;
+        const completedDates = getCompletedDatesFromTodayGoals(todayGoals);
+        const streakDays = getMileStreakDays(completedDates);
 
+        return { todayMile, weekMile, totalMile, streakDays, todayKey };
+      }
+
+      function getMileStats() {
+        return getMileStatsFromTodayGoals(getTodayMileGoals());
+      }
+
+      function getMilePoints() {
+        const { todayMile, weekMile } = getMileStats();
         return { todayMile, weekMile };
+      }
+
+      function getMileStreakDisplayMessage(streakDays) {
+        if (streakDays === 0) return "今日のタスクを完了すると記録が始まります";
+        if (streakDays === 1) return "今日の一歩を記録しました";
+        return "コツコツ継続中";
+      }
+
+      function getMileBadges(stats) {
+        return MILE_BADGE_DEFS.map((badge) => ({
+          id: badge.id,
+          label: badge.label,
+          earned: badge.check(stats),
+        }));
+      }
+
+      function getMileStage(stats) {
+        const totalMile = stats.totalMile;
+        let current = MILE_WORLD_STAGES[0];
+
+        MILE_WORLD_STAGES.forEach((stage) => {
+          if (totalMile >= stage.min && totalMile <= stage.max) {
+            current = stage;
+          }
+        });
+
+        const currentIndex = MILE_WORLD_STAGES.indexOf(current);
+        const nextStage = MILE_WORLD_STAGES[currentIndex + 1];
+
+        if (!nextStage) {
+          return {
+            icon: current.icon,
+            name: current.name,
+            nextRemaining: 0,
+            isMax: true,
+          };
+        }
+
+        return {
+          icon: current.icon,
+          name: current.name,
+          nextRemaining: Math.max(0, nextStage.min - totalMile),
+          isMax: false,
+        };
+      }
+
+      function renderMileWorld() {
+        const stats = getMileStats();
+        const stage = getMileStage(stats);
+        const earnedBadges = getMileBadges(stats).filter((badge) => badge.earned);
+
+        if (mileWorldStageIcon) mileWorldStageIcon.textContent = stage.icon;
+        if (mileWorldStageName) mileWorldStageName.textContent = stage.name;
+        if (mileWorldStageNext) {
+          mileWorldStageNext.textContent = stage.isMax
+            ? "最高ステージです"
+            : `次のステージまであと${stage.nextRemaining}MILE`;
+        }
+
+        if (mileWorldStreakCount) {
+          mileWorldStreakCount.textContent =
+            stats.streakDays === 0 ? "0日連続" : `${stats.streakDays}日連続`;
+        }
+        if (mileWorldStreakMessage) {
+          mileWorldStreakMessage.textContent = getMileStreakDisplayMessage(stats.streakDays);
+        }
+
+        if (mileWorldBadgesList && mileWorldBadgesEmpty) {
+          if (earnedBadges.length === 0) {
+            mileWorldBadgesList.innerHTML = "";
+            mileWorldBadgesEmpty.hidden = false;
+          } else {
+            mileWorldBadgesEmpty.hidden = true;
+            mileWorldBadgesList.innerHTML = earnedBadges
+              .map((badge) => `<span class="mile-world-badge">${escapeHtml(badge.label)}</span>`)
+              .join("");
+          }
+        }
       }
 
       function showMileToast() {
@@ -7789,8 +8072,7 @@
       function getStreakMessage(days) {
         if (days === 0) return "タスクを完了すると、連続記録が始まります";
         if (days === 1) return "今日の一歩を記録しました";
-        if (days < 7) return "少しずつ積み上がっています";
-        return "継続のリズムができています";
+        return "コツコツ継続中";
       }
 
       function getStreakProgress() {
@@ -8364,6 +8646,7 @@
         renderGoals();
         renderProgress();
         renderDashboard();
+        renderMileWorld();
         renderWeeklyProgress();
         renderAchievementHistory();
         renderStreakProgress();
