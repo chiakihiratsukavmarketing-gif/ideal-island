@@ -166,9 +166,8 @@
         align-items: start;
         gap: 12px 16px;
         width: 100%;
-        max-width: 720px;
-        margin: 0 auto;
-        padding: 0 2px 14px;
+        margin: 0 auto 12px;
+        padding: 0 2px 4px;
         text-align: left;
       }
 
@@ -3579,7 +3578,7 @@
       .hero {
         gap: 12px;
         min-height: auto;
-        justify-items: stretch;
+        justify-items: center;
         padding: 26px 22px 24px;
         border-radius: 32px;
         background: rgba(255, 255, 255, 0.92);
@@ -3610,10 +3609,8 @@
       }
 
       .user-profile {
-        max-width: none;
-        padding: 0 0 12px;
-        border-bottom: 1px solid var(--line-soft);
-        margin-bottom: 4px;
+        padding: 0 4px 6px;
+        margin: 0 0 14px;
       }
 
       .user-profile-avatar {
@@ -3641,7 +3638,6 @@
         min-width: min(100%, 300px);
         min-height: 54px;
         margin-top: 10px;
-        justify-self: center;
         border-width: 1.25px;
         background: #c8e27e;
         box-shadow: 0 10px 22px rgba(143, 179, 63, 0.14);
@@ -4562,15 +4558,15 @@
   </head>
   <body>
     <main class="app">
-      <header class="hero">
-        <section class="user-profile" id="user-profile" aria-label="ユーザープロフィール" data-state="guest">
-          <div class="user-profile-lead">
-            <p class="user-profile-greeting" id="userProfileGreeting">Hello!</p>
-            <p class="user-profile-tagline" id="userProfileTagline" hidden>今日も一歩進めましょう</p>
-          </div>
-          <div class="user-profile-avatar" id="userProfileIcon" aria-hidden="true">🌱</div>
-        </section>
+      <section class="user-profile" id="user-profile" aria-label="ユーザープロフィール" data-state="guest">
+        <div class="user-profile-lead">
+          <p class="user-profile-greeting" id="userProfileGreeting">Hello!</p>
+          <p class="user-profile-tagline" id="userProfileTagline" hidden>今日も一歩進めましょう</p>
+        </div>
+        <div class="user-profile-avatar" id="userProfileIcon" aria-hidden="true">🌱</div>
+      </section>
 
+      <header class="hero">
         <div class="hero-brand">
           <div class="hero-icon" aria-hidden="true">✓</div>
           <h1 class="app-title">MILE</h1>
