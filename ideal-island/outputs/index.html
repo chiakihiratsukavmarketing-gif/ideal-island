@@ -1945,7 +1945,7 @@
 
       .app {
         width: min(100%, 980px);
-        padding: 28px 18px 88px;
+        padding: 24px 18px 84px;
       }
 
       .hero,
@@ -3261,7 +3261,7 @@
       }
 
       .goal-console {
-        margin-top: 14px;
+        margin-top: 10px;
       }
 
       .console-heading,
@@ -3273,7 +3273,7 @@
       .layout {
         width: 100%;
         grid-template-columns: minmax(0, 1fr);
-        gap: 14px;
+        gap: 12px;
       }
 
       .panel,
@@ -3603,28 +3603,28 @@
       }
 
       .hero {
-        gap: 12px;
+        gap: 10px;
         min-height: auto;
         justify-items: center;
-        padding: 26px 22px 24px;
+        padding: 22px 18px 18px;
         border-radius: 32px;
         background: rgba(255, 255, 255, 0.92);
       }
 
       .hero-icon {
-        width: 58px;
-        height: 58px;
+        width: 54px;
+        height: 54px;
         border-width: 1.25px;
-        border-radius: 20px;
+        border-radius: 18px;
         background: #f5f8ec;
         color: #2d3129;
-        font-size: 1.55rem;
+        font-size: 1.45rem;
         font-weight: 500;
       }
 
       .app-title {
-        margin: 8px 0 0;
-        font-size: clamp(2.55rem, 10vw, 4.15rem);
+        margin: 6px 0 0;
+        font-size: clamp(2.45rem, 10vw, 4rem);
         font-weight: 820;
         letter-spacing: 0.14em;
         text-indent: 0.14em;
@@ -3636,8 +3636,8 @@
       }
 
       .user-profile {
-        padding: 0 4px 6px;
-        margin: 0 0 14px;
+        padding: 0 2px 0;
+        margin: 0 0 8px;
       }
 
       .user-profile-avatar {
@@ -3652,6 +3652,18 @@
 
       .hero-brand {
         justify-items: center;
+        gap: 6px;
+      }
+
+      .goal-flow-hint {
+        width: min(100%, 720px);
+        margin: 6px auto 0;
+        padding: 0 4px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+        line-height: 1.45;
+        text-align: center;
       }
 
       .hero-copy {
@@ -3663,8 +3675,8 @@
 
       .cta-button {
         min-width: min(100%, 300px);
-        min-height: 54px;
-        margin-top: 10px;
+        min-height: 52px;
+        margin-top: 8px;
         border-width: 1.25px;
         background: #c8e27e;
         box-shadow: 0 10px 22px rgba(143, 179, 63, 0.14);
@@ -3692,12 +3704,34 @@
 
       @media (max-width: 760px) {
         .app {
-          padding: 16px 14px 74px;
+          padding: 12px 14px 72px;
+        }
+
+        .user-profile {
+          margin-bottom: 6px;
+        }
+
+        .user-profile-greeting {
+          font-size: clamp(0.98rem, 3.2vw, 1.12rem);
+        }
+
+        .goal-flow-hint {
+          margin: 4px auto 0;
+          font-size: 0.8rem;
+        }
+
+        .dashboard-card {
+          margin-top: 6px;
+        }
+
+        .goal-console {
+          margin-top: 8px;
         }
 
         .hero {
-          border-radius: 30px;
-          padding: 26px 18px 24px;
+          border-radius: 28px;
+          gap: 10px;
+          padding: 18px 16px 16px;
         }
 
         .user-profile-avatar {
@@ -3836,21 +3870,24 @@
           border-radius: 20px;
         }
 
-        .hero {
-          padding: 24px 18px 22px;
-        }
-
         .hero-icon {
-          width: 54px;
-          height: 54px;
-          border-radius: 18px;
-          font-size: 1.45rem;
+          width: 48px;
+          height: 48px;
+          border-radius: 16px;
+          font-size: 1.32rem;
         }
 
         .app-title {
-          font-size: clamp(2.45rem, 13vw, 3.6rem);
-          letter-spacing: 0.12em;
-          text-indent: 0.12em;
+          font-size: clamp(2.1rem, 12vw, 3rem);
+          letter-spacing: 0.1em;
+          text-indent: 0.1em;
+        }
+
+        .cta-button {
+          min-height: 50px;
+          margin-top: 6px;
+          padding: 9px 16px;
+          font-size: 0.92rem;
         }
 
         .hero-copy {
@@ -4133,7 +4170,7 @@
         width: min(100%, 720px);
         max-width: 100%;
         min-width: 0;
-        margin: 12px auto 0;
+        margin: 8px auto 0;
         padding: 16px;
         border: 1.5px solid var(--line-soft);
         border-radius: 26px;
@@ -5057,7 +5094,7 @@
                       <span>ログイン中</span>
                       <strong id="cloudUserEmail">user@example.com</strong>
                     </div>
-                    <p class="cloud-copy">「クラウドに保存」でこの端末のデータをクラウドへ送れます。「クラウドから読み込み」でクラウドのデータをこの端末に反映します（この端末のデータは上書きされ、読み込み前に確認が表示されます）。</p>
+                    <p class="cloud-copy">変更は自動でクラウド保存されます。必要に応じて手動保存や読み込みもできます。</p>
                     <div class="cloud-actions">
                       <button class="button" type="button" id="cloudSaveButton">クラウドに保存</button>
                       <button class="button secondary" type="button" id="cloudLoadButton">クラウドから読み込み</button>
