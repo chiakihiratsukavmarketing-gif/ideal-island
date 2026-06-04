@@ -4427,6 +4427,97 @@
         background: #fafafa;
       }
 
+      .mile-points-card {
+        display: grid;
+        gap: 8px;
+        min-width: 0;
+        padding: 12px;
+        border: 1px solid var(--line-soft);
+        border-radius: 20px;
+        background: #f8fbf2;
+        box-sizing: border-box;
+      }
+
+      .mile-points-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .mile-points-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .mile-points-metric {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+        padding: 10px;
+        border: 1px solid rgba(176, 199, 97, 0.35);
+        border-radius: 16px;
+        background: #ffffff;
+      }
+
+      .mile-points-metric span {
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 750;
+      }
+
+      .mile-points-metric strong {
+        color: var(--text);
+        font-size: 1.2rem;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .mile-toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+        z-index: 40;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        max-width: min(92vw, 320px);
+        padding: 10px 14px;
+        border: 1.5px solid rgba(143, 179, 63, 0.55);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 10px 28px rgba(58, 74, 32, 0.12);
+        color: var(--text);
+        font-size: 0.86rem;
+        font-weight: 750;
+        opacity: 0;
+        transform: translate(-50%, 10px);
+        pointer-events: none;
+        transition:
+          opacity 180ms ease,
+          transform 180ms ease;
+      }
+
+      .mile-toast.is-visible {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      .mile-toast-points {
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(184, 217, 106, 0.28);
+        color: #4f6a1d;
+        font-weight: 800;
+      }
+
+      .mile-toast-copy {
+        color: var(--muted);
+        font-weight: 700;
+      }
+
       .goal-console > .next-step-card {
         display: none;
       }
@@ -4773,6 +4864,20 @@
               </div>
             </article>
           </div>
+
+          <article class="mile-points-card" aria-label="MILEポイント">
+            <p class="mile-points-label">MILEポイント</p>
+            <div class="mile-points-metrics">
+              <div class="mile-points-metric">
+                <span>今日のMILE</span>
+                <strong id="dashboardTodayMile">0</strong>
+              </div>
+              <div class="mile-points-metric">
+                <span>今週のMILE</span>
+                <strong id="dashboardWeekMile">0</strong>
+              </div>
+            </div>
+          </article>
 
           <article class="dashboard-next" id="dashboardNextCard">
             <div class="dashboard-next-head">
@@ -5255,6 +5360,11 @@
       </nav>
     </main>
 
+    <div class="mile-toast" id="mileToast" role="status" aria-live="polite" hidden>
+      <span class="mile-toast-points">+1 MILE</span>
+      <span class="mile-toast-copy">いい一歩！</span>
+    </div>
+
     <script>
       const DEFAULT_SLOGAN = "目標達成までの一歩を、今日から整える";
       const SLOGAN_STORAGE_KEY = "idealIslandSlogan";
@@ -5303,6 +5413,7 @@
       let goalPlan = loadGoalPlan();
       let reflectionStatusTimer = 0;
       let profileSettingsStatusTimer = 0;
+      let mileToastTimer = 0;
       let selectedProfileIcon = "";
       let editingYearlyGoalId = "";
       let editingMonthlyGoalId = "";
@@ -5431,6 +5542,9 @@
       const dashboardNextStatus = document.getElementById("dashboardNextStatus");
       const dashboardNextTitle = document.getElementById("dashboardNextTitle");
       const dashboardNextMeta = document.getElementById("dashboardNextMeta");
+      const dashboardTodayMile = document.getElementById("dashboardTodayMile");
+      const dashboardWeekMile = document.getElementById("dashboardWeekMile");
+      const mileToast = document.getElementById("mileToast");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -7531,6 +7645,11 @@
         if (editingGoalId === goalId) {
           editingGoalId = "";
         }
+
+        const shouldCelebrate =
+          activeTab === "today" &&
+          goalsByTab.today.some((goal) => goal.id === goalId && !goal.done);
+
         goalsByTab[activeTab] = goalsByTab[activeTab].map((goal) =>
           goal.id === goalId
             ? { ...goal, done: !goal.done, completedAt: !goal.done ? new Date().toISOString() : "" }
@@ -7538,6 +7657,34 @@
         );
         saveGoals();
         render();
+
+        if (shouldCelebrate) {
+          showMileToast();
+        }
+      }
+
+      function getMilePoints() {
+        const todayKey = getTodayKey();
+        const todayGoals = goalsByTab.today || [];
+        const { start, end } = getWeekRange();
+        const todayMile = todayGoals.filter(
+          (goal) => getDateKeyFromValue(goal.completedAt) === todayKey
+        ).length;
+        const weekMile = todayGoals.filter((goal) => isDateInRange(goal.completedAt, start, end)).length;
+
+        return { todayMile, weekMile };
+      }
+
+      function showMileToast() {
+        if (!mileToast) return;
+
+        window.clearTimeout(mileToastTimer);
+        mileToast.hidden = false;
+        mileToast.classList.add("is-visible");
+        mileToastTimer = window.setTimeout(() => {
+          mileToast.classList.remove("is-visible");
+          mileToast.hidden = true;
+        }, 1800);
       }
 
       function deleteGoal(goalId) {
@@ -8165,6 +8312,10 @@
         dashboardNextStatus.textContent = status;
         dashboardNextTitle.textContent = title;
         dashboardNextMeta.textContent = meta;
+
+        const { todayMile, weekMile } = getMilePoints();
+        if (dashboardTodayMile) dashboardTodayMile.textContent = String(todayMile);
+        if (dashboardWeekMile) dashboardWeekMile.textContent = String(weekMile);
       }
 
       function renderNextStep() {
