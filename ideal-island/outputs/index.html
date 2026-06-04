@@ -2773,38 +2773,39 @@
       .task-filter-button,
       .category-filter-button {
         flex: 0 0 auto;
-        min-height: 38px;
-        border: 1.5px solid var(--line);
+        min-height: 30px;
+        border: 1px solid rgba(36, 38, 34, 0.08);
         border-radius: 999px;
-        background: #ffffff;
-        color: var(--text);
-        padding: 7px 14px;
-        font-size: 0.84rem;
-        font-weight: 800;
+        background: #fbfbf9;
+        color: #8b9086;
+        padding: 5px 11px;
+        font-size: 0.76rem;
+        font-weight: 650;
         transition:
           background 180ms ease,
-          border-color 180ms ease,
-          transform 180ms ease;
+          border-color 180ms ease;
       }
 
       .category-filter-button {
-        min-height: 34px;
-        padding: 6px 12px;
-        font-size: 0.8rem;
+        min-height: 28px;
+        padding: 4px 10px;
+        font-size: 0.72rem;
       }
 
       .task-filter-button:hover,
       .task-filter-button:active,
       .category-filter-button:hover,
       .category-filter-button:active {
-        transform: translateY(-1px);
+        border-color: rgba(36, 38, 34, 0.12);
+        background: #f6f7f3;
       }
 
       .task-filter-button.is-active,
       .category-filter-button.is-active {
-        border-color: rgba(36, 38, 34, 0.16);
-        background: var(--lime);
-        color: #1f2718;
+        border-color: rgba(184, 217, 106, 0.5);
+        background: rgba(244, 249, 232, 0.95);
+        color: #4f5f3d;
+        font-weight: 750;
       }
 
       .goal-list {
@@ -2820,9 +2821,14 @@
         gap: 12px;
         min-height: 68px;
         padding: 12px 12px;
-        border: 1.5px solid var(--line-soft);
+        border: 1px solid rgba(176, 199, 97, 0.2);
         border-radius: 22px;
-        background: #ffffff;
+        background: #f9fbf5;
+      }
+
+      .goal-item.has-due-date:not(.is-done) {
+        background: #fffcf6;
+        border-color: rgba(226, 181, 72, 0.22);
       }
 
       .goal-content {
@@ -2847,48 +2853,24 @@
       .goal-meta {
         margin-top: 6px;
         max-width: 100%;
-        border-color: var(--line-soft);
-        background: #f4f6ef;
-        color: var(--muted);
-        font-size: 0.74rem;
+        border: 1px solid rgba(36, 38, 34, 0.06);
+        background: #f5f6f2;
+        color: #9aa097;
+        font-size: 0.68rem;
+        font-weight: 650;
         line-height: 1.35;
         white-space: normal;
       }
 
-      .goal-meta.is-work {
-        border-color: rgba(107, 178, 171, 0.34);
-        background: #eef9f7;
-        color: #4c7f79;
-      }
-
-      .goal-meta.is-study {
-        border-color: rgba(143, 179, 63, 0.28);
-        background: #f4f9e8;
-        color: #6f8733;
-      }
-
-      .goal-meta.is-health {
-        border-color: rgba(117, 178, 121, 0.28);
-        background: #eff8ee;
-        color: #5f835f;
-      }
-
-      .goal-meta.is-family {
-        border-color: rgba(226, 181, 72, 0.34);
-        background: #fff8e6;
-        color: #856a23;
-      }
-
-      .goal-meta.is-money {
-        border-color: rgba(166, 154, 132, 0.28);
-        background: #f5f2eb;
-        color: #776d5d;
-      }
-
+      .goal-meta.is-work,
+      .goal-meta.is-study,
+      .goal-meta.is-health,
+      .goal-meta.is-family,
+      .goal-meta.is-money,
       .goal-meta.is-other {
-        border-color: var(--line-soft);
-        background: #f3f4f1;
-        color: var(--muted);
+        border-color: rgba(36, 38, 34, 0.06);
+        background: #f5f6f2;
+        color: #9aa097;
       }
 
       .goal-meta-row {
@@ -2910,13 +2892,14 @@
         width: auto;
         max-width: 100%;
         align-items: center;
-        min-height: 24px;
-        border: 1px solid var(--line-soft);
+        min-height: 22px;
+        border: 1px solid rgba(36, 38, 34, 0.06);
         border-radius: 999px;
-        padding: 2px 9px;
-        color: var(--muted);
-        font-size: 0.74rem;
-        font-weight: 800;
+        padding: 2px 8px;
+        background: #f8f6f0;
+        color: #a39e92;
+        font-size: 0.68rem;
+        font-weight: 650;
         line-height: 1.35;
         overflow-wrap: anywhere;
         white-space: normal;
@@ -3002,7 +2985,8 @@
       }
 
       .goal-item.is-done {
-        background: #f6f7f3;
+        background: #f3f4f1;
+        border-color: rgba(36, 38, 34, 0.06);
         opacity: 1;
       }
 
@@ -3100,12 +3084,18 @@
 
       .nav-icon {
         display: grid;
-        width: 22px;
-        height: 22px;
+        width: 28px;
+        height: 28px;
         place-items: center;
+        border-radius: 10px;
+        background: rgba(247, 249, 243, 0.95);
         color: currentColor;
-        font-size: 1rem;
+        font-size: 0.92rem;
         line-height: 1;
+      }
+
+      .bottom-nav-item.is-active .nav-icon {
+        background: rgba(255, 255, 255, 0.72);
       }
 
       .stats-grid {
@@ -4907,11 +4897,83 @@
           padding: 11px;
         }
 
-        .monthly-goal-head .button {
-          min-height: 34px;
-          padding: 6px 8px;
+        .monthly-goal-head .button,
+        .monthly-add-button {
+          min-height: 30px;
+          padding: 5px 10px;
           font-size: 0.72rem;
         }
+      }
+
+      .ui-heading-hidden {
+        display: none !important;
+        margin: 0 !important;
+      }
+
+      .dashboard-card:has(.ui-heading-hidden) .dashboard-main {
+        margin-top: 0;
+      }
+
+      .goal-console > .console-heading.ui-heading-hidden + .next-step-card,
+      .goal-console > .console-heading.ui-heading-hidden + nav {
+        margin-top: 0;
+      }
+
+      .monthly-add-button {
+        flex: 0 0 auto;
+        min-height: 32px;
+        border: 1px solid var(--line-soft);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--muted);
+        padding: 6px 12px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        white-space: nowrap;
+        transition:
+          background 180ms ease,
+          border-color 180ms ease,
+          color 180ms ease;
+      }
+
+      .monthly-add-button:hover,
+      .monthly-add-button:active {
+        border-color: rgba(36, 38, 34, 0.12);
+        background: #fbfbf9;
+        color: #6f7469;
+      }
+
+      .monthly-goal-head .monthly-add-button {
+        min-height: 32px;
+        padding: 6px 12px;
+      }
+
+      .task-filter,
+      .category-filter {
+        margin-top: 8px;
+      }
+
+      .today-tasks-card .task-filter {
+        margin-top: 0;
+      }
+
+      .hero-icon {
+        font-size: 1.35rem;
+        line-height: 1;
+      }
+
+      .form-toggle-button {
+        background: #f6faef;
+        border: 1px solid rgba(176, 199, 97, 0.35);
+        color: #4f5f3d;
+        font-weight: 800;
+      }
+
+      .form-toggle-button:hover,
+      .form-toggle-button:active {
+        background: #f0f6e6;
+        box-shadow: none;
+        transform: none;
       }
     </style>
   </head>
@@ -4927,7 +4989,7 @@
 
       <header class="hero">
         <div class="hero-brand">
-          <div class="hero-icon" aria-hidden="true">✓</div>
+          <div class="hero-icon" aria-hidden="true">🌱</div>
           <h1 class="app-title">MILE</h1>
           <p class="hero-kicker">目標管理アプリ</p>
         </div>
@@ -4938,7 +5000,7 @@
       <p class="goal-flow-hint">年間目標から、今月の目標と今日の行動を整理します。</p>
 
       <section class="dashboard-card" id="dashboard-section" aria-label="ダッシュボード">
-        <div class="dashboard-head">
+        <div class="dashboard-head ui-heading-hidden" aria-hidden="true">
           <div>
             <p class="form-eyebrow">Dashboard</p>
             <h2 class="section-title">今日の状況</h2>
@@ -5024,7 +5086,7 @@
       </section>
 
       <section class="goal-console" id="goal-console" aria-label="目標管理コンソール">
-        <h2 class="section-heading console-heading">今日やること</h2>
+        <h2 class="section-heading console-heading ui-heading-hidden" aria-hidden="true">今日やること</h2>
 
         <section class="next-step-card is-empty" id="nextStepCard" aria-label="次にやること">
           <div class="next-step-head">
@@ -5044,7 +5106,7 @@
 
         <div class="layout">
           <section class="panel today-tasks-card" aria-label="今日やること一覧">
-            <h2 class="section-title" id="currentTabTitle">年間の目標</h2>
+            <h2 class="section-title ui-heading-hidden" id="currentTabTitle" aria-hidden="true">年間の目標</h2>
 
             <nav class="task-filter" aria-label="タスク表示フィルター">
               <button class="task-filter-button is-active" type="button" data-filter="all">すべて</button>
@@ -5114,11 +5176,11 @@
         <div class="monthly-goal-head">
           <div>
             <p class="form-eyebrow" id="monthlyGoalPeriod">今月の目標</p>
-            <h2 class="section-title">今月取り組むこと</h2>
+            <h2 class="section-title ui-heading-hidden" aria-hidden="true">今月取り組むこと</h2>
             <p class="monthly-goal-count" id="monthlyGoalCount">0件の目標</p>
           </div>
-          <button class="button secondary" type="button" id="toggleMonthlyGoalFormButton" aria-expanded="false">
-            今月の目標を追加
+          <button class="monthly-add-button" type="button" id="toggleMonthlyGoalFormButton" aria-expanded="false">
+            ＋ 追加
           </button>
         </div>
 
@@ -5188,7 +5250,7 @@
         <div class="yearly-goal-head">
           <div>
             <p class="form-eyebrow">年間目標</p>
-            <h2 class="section-title">今年の目標</h2>
+            <h2 class="section-title ui-heading-hidden" aria-hidden="true">今年の目標</h2>
           </div>
           <button
             class="icon-button"
@@ -5468,19 +5530,19 @@
                 </section>
       <nav class="bottom-nav" aria-label="アプリ内ナビゲーション">
         <button class="bottom-nav-item is-active" type="button" data-nav="today" aria-label="今日のタスクへ移動">
-          <span class="nav-icon" aria-hidden="true">✓</span>
+          <span class="nav-icon" aria-hidden="true">📝</span>
           <span>今日</span>
         </button>
         <button class="bottom-nav-item" type="button" data-nav="goals" aria-label="目標リストへ移動">
-          <span class="nav-icon" aria-hidden="true">☰</span>
+          <span class="nav-icon" aria-hidden="true">🎯</span>
           <span>目標</span>
         </button>
         <button class="bottom-nav-item" type="button" data-nav="progress" aria-label="詳しい進捗へ移動">
-          <span class="nav-icon" aria-hidden="true">◔</span>
+          <span class="nav-icon" aria-hidden="true">📊</span>
           <span>詳しい</span>
         </button>
         <button class="bottom-nav-item" type="button" data-nav="settings" aria-label="設定へ移動">
-          <span class="nav-icon" aria-hidden="true">⚙</span>
+          <span class="nav-icon" aria-hidden="true">🛠️</span>
           <span>設定</span>
         </button>
       </nav>
@@ -7236,14 +7298,14 @@
         editingMonthlyGoalId = "";
         monthlyGoalForm.classList.remove("is-collapsed");
         toggleMonthlyGoalFormButton.setAttribute("aria-expanded", "true");
-        toggleMonthlyGoalFormButton.textContent = "入力フォームを閉じる";
+        toggleMonthlyGoalFormButton.textContent = "閉じる";
         monthlyGoalInput.focus();
       }
 
       function closeMonthlyGoalForm() {
         monthlyGoalForm.classList.add("is-collapsed");
         toggleMonthlyGoalFormButton.setAttribute("aria-expanded", "false");
-        toggleMonthlyGoalFormButton.textContent = "今月の目標を追加";
+        toggleMonthlyGoalFormButton.textContent = "＋ 追加";
         monthlyGoalForm.reset();
         monthlyGoalCategory.value = "その他";
         monthlyGoalIcon.value = getDefaultIconForCategory("その他");
@@ -8227,7 +8289,7 @@
         const isEditing = goal.id === editingGoalId;
 
         return `
-          <article class="goal-item ${goal.done ? "is-done" : ""} ${isEditing ? "is-editing" : ""}">
+          <article class="goal-item ${goal.done ? "is-done" : ""} ${goal.dueDate ? "has-due-date" : ""} ${isEditing ? "is-editing" : ""}">
             <button
               class="goal-check"
               type="button"
