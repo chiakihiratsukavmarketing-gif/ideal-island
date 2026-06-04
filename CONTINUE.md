@@ -6,7 +6,7 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `be9c25f` feat: add MILE points display and completion toast
+- 最新コミット: `3eb179b` feat: add MILE stage, badges, and streak display
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -94,6 +94,14 @@
   - 今日タスク達成時の +1 MILE トースト（「今日」タブ・未完了→完了のみ）
   - 新規 `localStorage` キーなし、`completedAt` から算出
   - クラウド同期対象の追加なし
+- Phase World-2
+  - ダッシュボード直下に MILEステージカード
+  - 累計MILEによるステージ表示（アイコン・ステージ名）
+  - 次のステージまであと○MILE
+  - 連続達成日数（今日タブの `completedAt` から算出）
+  - 条件達成バッジ（はじめの一歩 / コツコツさん / 今週いい感じ / かなり前進）
+  - 今日のMILE / 今週のMILE / 累計MILE と連動
+  - 新規 `localStorage` キーなし、クラウド同期対象の追加なし
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -110,18 +118,20 @@
 1. プロフィール（Hello / アイコン）
 2. ヘッダー（MILEカード）
 3. ダッシュボード
-4. 今日やること
-5. 今月の目標
-6. 年間目標
-7. 進捗詳細
-8. 振り返りメモ
-9. プロフィール設定（下部ナビ「設定」→ 先頭にスクロール）
-10. クラウド保存
-11. スローガン
+4. MILEステージ（ダッシュボード直下）
+5. 今日やること
+6. 今月の目標
+7. 年間目標
+8. 進捗詳細
+9. 振り返りメモ
+10. プロフィール設定（下部ナビ「設定」→ 先頭にスクロール）
+11. クラウド保存
+12. スローガン
 
 ## 直近の変更内容
 
-- Phase World-1: MILEポイント表示・達成時トースト、3 HTML 同期、push 済み（`be9c25f`）
+- Phase World-2: MILEステージ・バッジ・連続達成、3 HTML 同期、push 済み（`3eb179b`）
+- Phase World-1: MILEポイント表示・達成時トースト（`be9c25f`）
 - Phase Profile-5: プロフィールアイコン候補更新
 - Phase Data-1: データ仕様の調査・ドキュメント化（README / CONTINUE）
 - Phase Profile-4: プロフィール設定 UI
@@ -144,6 +154,9 @@
 - ダッシュボード数値表示
 - MILEポイント（今日のMILE / 今週のMILE、`completedAt` から算出）
 - タスク達成時の +1 MILE トースト
+- MILEステージカード（累計MILE・次のステージまであと○MILE）
+- 連続達成日数（MILEステージカード内）
+- 条件達成バッジ（獲得済みのみ表示）
 - 期限つきタスク
 - カテゴリ機能
 - 期限フィルター
@@ -170,10 +183,10 @@
   - `mileCloudLoadBackup` の復元 UI または失敗時ロールバック
   - プロフィール（`mileUserProfile`）のクラウド同期要否の決定と実装
   - `idealIslandGoals` と `mileGoalPlan` の二重構造整理（影響大・設計先行）
-- **Phase World-2**: バッジ・連続達成・ステージ演出
 - **Phase Release-2**: β版利用フィードバック反映
+- **Phase World-3**: バッジ追加・ステージ演出改善・達成演出の改善
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2
 
 ## 注意点
 
