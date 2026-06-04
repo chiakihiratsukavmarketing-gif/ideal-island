@@ -1702,7 +1702,8 @@
 
       .progress-stack {
         display: grid;
-        gap: 14px;
+        gap: 12px;
+        margin-top: 12px;
       }
 
       .progress-card {
@@ -2677,11 +2678,11 @@
       .form-toggle-button {
         display: inline-flex;
         width: 100%;
-        min-height: 52px;
+        min-height: 48px;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        margin: 14px 0 12px;
+        margin: 0 0 10px;
         border: 1.5px solid var(--line);
         border-radius: 999px;
         background: var(--lime);
@@ -3218,7 +3219,7 @@
 
       .progress-details {
         display: grid;
-        order: 2;
+        order: 1;
         gap: 10px;
       }
 
@@ -3266,13 +3267,10 @@
         padding-top: 10px;
       }
 
-      .progress-details-content .streak-card {
-        display: none;
-      }
-
       .yearly-goal-card,
       .monthly-goal-card,
       .goal-console,
+      .today-add-card,
       .reflection-card,
       .profile-settings-card,
       .cloud-card,
@@ -4520,12 +4518,12 @@
 
       .mile-world-card {
         display: grid;
-        gap: 12px;
+        gap: 10px;
         width: min(100%, 720px);
-        margin: 10px auto 0;
-        padding: 16px;
+        margin: 8px auto 0;
+        padding: 12px 14px;
         border: 1.5px solid var(--line-soft);
-        border-radius: 26px;
+        border-radius: 22px;
         background: #ffffff;
         box-shadow: var(--shadow-soft);
         box-sizing: border-box;
@@ -4534,21 +4532,21 @@
       .mile-world-stage {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 12px;
+        gap: 10px;
+        padding: 10px 12px;
         border: 1px solid var(--line-soft);
-        border-radius: 20px;
+        border-radius: 18px;
         background: #f8fbf2;
       }
 
       .mile-world-stage-icon {
         display: grid;
         place-items: center;
-        width: 48px;
-        height: 48px;
-        border-radius: 16px;
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
         background: #ffffff;
-        font-size: 1.6rem;
+        font-size: 1.45rem;
         line-height: 1;
       }
 
@@ -4580,32 +4578,13 @@
         font-weight: 700;
       }
 
-      .mile-world-streak {
-        display: grid;
-        gap: 2px;
-        padding: 10px 12px;
-        border: 1px solid rgba(176, 199, 97, 0.35);
-        border-radius: 16px;
-        background: #fbfcf8;
-      }
-
-      .mile-world-streak-count {
-        margin: 0;
-        color: var(--text);
-        font-size: 1.05rem;
-        font-weight: 800;
-      }
-
-      .mile-world-streak-message {
-        margin: 0;
-        color: var(--muted);
-        font-size: 0.82rem;
-        font-weight: 700;
-      }
-
       .mile-world-badges {
         display: grid;
-        gap: 8px;
+        gap: 6px;
+      }
+
+      .mile-world-badges.is-empty {
+        gap: 4px;
       }
 
       .mile-world-badges-list {
@@ -4629,8 +4608,31 @@
       .mile-world-badges-empty {
         margin: 0;
         color: var(--muted);
-        font-size: 0.82rem;
-        font-weight: 700;
+        font-size: 0.74rem;
+        font-weight: 650;
+        line-height: 1.45;
+      }
+
+      .today-tasks-card {
+        display: grid;
+        gap: 10px;
+      }
+
+      .today-add-card {
+        display: grid;
+        gap: 0;
+        width: min(100%, 720px);
+        margin: 10px auto 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .today-add-card .form-toggle-button {
+        margin: 0 0 10px;
+      }
+
+      .today-add-card .goal-form {
+        margin: 0;
       }
 
       .goal-console > .next-step-card {
@@ -5014,13 +5016,7 @@
             <p class="mile-world-stage-next" id="mileWorldStageNext">次のステージまであと1MILE</p>
           </div>
         </div>
-        <div class="mile-world-streak" aria-label="連続達成">
-          <p class="mile-world-streak-count" id="mileWorldStreakCount">0日連続</p>
-          <p class="mile-world-streak-message" id="mileWorldStreakMessage">
-            今日のタスクを完了すると記録が始まります
-          </p>
-        </div>
-        <div class="mile-world-badges" aria-label="バッジ">
+        <div class="mile-world-badges" aria-label="バッジ" id="mileWorldBadges">
           <p class="mile-world-badges-label">バッジ</p>
           <div class="mile-world-badges-list" id="mileWorldBadgesList"></div>
           <p class="mile-world-badges-empty" id="mileWorldBadgesEmpty">まだバッジはありません</p>
@@ -5047,49 +5043,8 @@
         </nav>
 
         <div class="layout">
-          <section class="panel" aria-label="目標管理">
+          <section class="panel today-tasks-card" aria-label="今日やること一覧">
             <h2 class="section-title" id="currentTabTitle">年間の目標</h2>
-
-            <button class="form-toggle-button" type="button" id="toggleGoalFormButton" aria-expanded="false">
-              <span aria-hidden="true">＋</span>
-              今日やることを追加
-            </button>
-
-            <form class="goal-form is-collapsed" id="goalForm">
-              <div class="form-heading">
-                <p class="form-eyebrow">タスク入力</p>
-                <h3>今日やることを追加</h3>
-              </div>
-              <div class="field">
-                <label for="goalTitle">目標を入力</label>
-                <input id="goalTitle" type="text" placeholder="例：毎日15分読書する" maxlength="80" />
-              </div>
-              <div class="field">
-                <label for="goalCategory">カテゴリー</label>
-                <select id="goalCategory">
-                  <option value="仕事">仕事</option>
-                  <option value="学習">学習</option>
-                  <option value="健康">健康</option>
-                  <option value="家族">家族</option>
-                  <option value="お金">お金</option>
-                  <option value="その他" selected>その他</option>
-                </select>
-              </div>
-              <div class="field due-date-field">
-                <label for="goalDueDate">期限</label>
-                <input id="goalDueDate" type="date" />
-              </div>
-              <div class="field">
-                <label for="goalMonthlyGoal">今月の目標</label>
-                <select id="goalMonthlyGoal">
-                  <option value="">紐づけなし</option>
-                </select>
-              </div>
-              <div class="form-actions">
-                <button class="button add-button" type="submit">追加する</button>
-                <button class="button secondary" type="button" id="closeGoalFormButton">閉じる</button>
-              </div>
-            </form>
 
             <nav class="task-filter" aria-label="タスク表示フィルター">
               <button class="task-filter-button is-active" type="button" data-filter="all">すべて</button>
@@ -5110,6 +5065,49 @@
           </section>
 
                   </div>
+      </section>
+
+      <section class="today-add-card" id="today-add-section" aria-label="今日やることを追加">
+        <button class="form-toggle-button" type="button" id="toggleGoalFormButton" aria-expanded="false">
+          <span aria-hidden="true">＋</span>
+          今日やることを追加
+        </button>
+
+        <form class="goal-form is-collapsed" id="goalForm">
+          <div class="form-heading">
+            <p class="form-eyebrow">タスク入力</p>
+            <h3>今日やることを追加</h3>
+          </div>
+          <div class="field">
+            <label for="goalTitle">目標を入力</label>
+            <input id="goalTitle" type="text" placeholder="例：毎日15分読書する" maxlength="80" />
+          </div>
+          <div class="field">
+            <label for="goalCategory">カテゴリー</label>
+            <select id="goalCategory">
+              <option value="仕事">仕事</option>
+              <option value="学習">学習</option>
+              <option value="健康">健康</option>
+              <option value="家族">家族</option>
+              <option value="お金">お金</option>
+              <option value="その他" selected>その他</option>
+            </select>
+          </div>
+          <div class="field due-date-field">
+            <label for="goalDueDate">期限</label>
+            <input id="goalDueDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="goalMonthlyGoal">今月の目標</label>
+            <select id="goalMonthlyGoal">
+              <option value="">紐づけなし</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="button add-button" type="submit">追加する</button>
+            <button class="button secondary" type="button" id="closeGoalFormButton">閉じる</button>
+          </div>
+        </form>
       </section>
 
 <section class="monthly-goal-card" id="monthly-goal-section" aria-label="今月の目標">
@@ -5279,6 +5277,13 @@
               <p class="progress-note" id="overallCount">0個中0個達成</p>
             </section>
 
+            <details class="progress-details">
+              <summary class="progress-details-summary">
+                <span class="summary-open">詳しい進捗を見る</span>
+                <span class="summary-close">詳しい進捗を閉じる</span>
+                <span aria-hidden="true">+</span>
+              </summary>
+              <div class="progress-details-content">
             <section class="progress-card streak-card">
               <div class="progress-head">
                 <p class="progress-label">連続達成日数</p>
@@ -5288,13 +5293,6 @@
               <div class="streak-dots" id="streakDots" aria-label="直近7日間の達成状態"></div>
             </section>
 
-            <details class="progress-details">
-              <summary class="progress-details-summary">
-                <span class="summary-open">詳しい進捗を見る</span>
-                <span class="summary-close">進捗詳細を閉じる</span>
-                <span aria-hidden="true">+</span>
-              </summary>
-              <div class="progress-details-content">
             <section class="progress-card weekly-card">
               <div class="progress-head">
                 <p class="progress-label">今週の進捗</p>
@@ -5351,15 +5349,6 @@
                 </div>
                 <div class="achievement-bars" id="achievementBars" aria-label="直近7日間の完了数"></div>
               </div>
-            </section>
-
-            <section class="progress-card streak-card">
-              <div class="progress-head">
-                <p class="progress-label">連続達成日数</p>
-                <span class="progress-number">0日</span>
-              </div>
-              <p class="streak-message">タスクを完了すると、連続記録が始まります</p>
-              <div class="streak-dots" aria-label="直近7日間の達成状態"></div>
             </section>
 
             <section class="progress-card">
@@ -5486,9 +5475,9 @@
           <span class="nav-icon" aria-hidden="true">☰</span>
           <span>目標</span>
         </button>
-        <button class="bottom-nav-item" type="button" data-nav="progress" aria-label="進捗状況へ移動">
+        <button class="bottom-nav-item" type="button" data-nav="progress" aria-label="詳しい進捗へ移動">
           <span class="nav-icon" aria-hidden="true">◔</span>
-          <span>進捗</span>
+          <span>詳しい</span>
         </button>
         <button class="bottom-nav-item" type="button" data-nav="settings" aria-label="設定へ移動">
           <span class="nav-icon" aria-hidden="true">⚙</span>
@@ -5698,8 +5687,7 @@
       const mileWorldStageIcon = document.getElementById("mileWorldStageIcon");
       const mileWorldStageName = document.getElementById("mileWorldStageName");
       const mileWorldStageNext = document.getElementById("mileWorldStageNext");
-      const mileWorldStreakCount = document.getElementById("mileWorldStreakCount");
-      const mileWorldStreakMessage = document.getElementById("mileWorldStreakMessage");
+      const mileWorldBadges = document.getElementById("mileWorldBadges");
       const mileWorldBadgesList = document.getElementById("mileWorldBadgesList");
       const mileWorldBadgesEmpty = document.getElementById("mileWorldBadgesEmpty");
 
@@ -5766,6 +5754,8 @@
           }
 
           if (nav === "progress") {
+            const progressDetails = document.querySelector(".progress-details");
+            if (progressDetails) progressDetails.open = true;
             scrollToSection("progress-section");
             return;
           }
@@ -7937,12 +7927,8 @@
             : `次のステージまであと${stage.nextRemaining}MILE`;
         }
 
-        if (mileWorldStreakCount) {
-          mileWorldStreakCount.textContent =
-            stats.streakDays === 0 ? "0日連続" : `${stats.streakDays}日連続`;
-        }
-        if (mileWorldStreakMessage) {
-          mileWorldStreakMessage.textContent = getMileStreakDisplayMessage(stats.streakDays);
+        if (mileWorldBadges) {
+          mileWorldBadges.classList.toggle("is-empty", earnedBadges.length === 0);
         }
 
         if (mileWorldBadgesList && mileWorldBadgesEmpty) {
