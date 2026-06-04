@@ -162,58 +162,76 @@
 
       .user-profile {
         display: grid;
-        justify-items: center;
-        gap: 8px;
-        width: min(100%, 720px);
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 12px 16px;
+        width: 100%;
+        max-width: 720px;
         margin: 0 auto;
-        padding: 0 18px 4px;
-        text-align: center;
+        padding: 0 2px 14px;
+        text-align: left;
       }
 
-      .user-profile-avatar {
+      .user-profile-lead {
         display: grid;
-        place-items: center;
-        width: 54px;
-        height: 54px;
-        border: 1px solid rgba(80, 208, 255, 0.18);
-        border-radius: 999px;
-        background: rgba(12, 18, 36, 0.72);
-        font-size: 1.55rem;
-        line-height: 1;
+        gap: 4px;
+        min-width: 0;
+        padding-top: 4px;
       }
 
-      .user-profile-name {
+      .user-profile-greeting {
         margin: 0;
-        font-size: 1rem;
+        font-size: clamp(1.02rem, 3.4vw, 1.24rem);
         font-weight: 820;
         color: var(--text);
+        line-height: 1.3;
       }
 
       .user-profile-tagline {
         margin: 0;
         color: var(--muted);
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         font-weight: 650;
+        line-height: 1.45;
+      }
+
+      .user-profile-avatar {
+        display: grid;
+        place-items: center;
+        width: clamp(56px, 14vw, 68px);
+        height: clamp(56px, 14vw, 68px);
+        border: 1px solid rgba(80, 208, 255, 0.18);
+        border-radius: 999px;
+        background: rgba(12, 18, 36, 0.72);
+        font-size: clamp(1.45rem, 4.2vw, 1.72rem);
+        line-height: 1;
+        flex-shrink: 0;
       }
 
       .user-profile[data-state="guest"] {
-        opacity: 0.78;
+        opacity: 0.84;
+      }
+
+      .user-profile[data-state="guest"] .user-profile-greeting {
+        font-weight: 780;
+        color: var(--muted);
       }
 
       .user-profile[data-state="guest"] .user-profile-avatar {
-        width: 46px;
-        height: 46px;
-        font-size: 1.2rem;
-      }
-
-      .user-profile[data-state="guest"] .user-profile-name {
-        font-size: 0.92rem;
-        font-weight: 750;
-        color: var(--muted);
+        width: clamp(52px, 13vw, 60px);
+        height: clamp(52px, 13vw, 60px);
+        font-size: clamp(1.28rem, 3.8vw, 1.5rem);
       }
 
       .user-profile[data-state="guest"] .user-profile-tagline {
         display: none;
+      }
+
+      .hero-brand {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        width: 100%;
       }
 
       .hero-copy {
@@ -3560,6 +3578,8 @@
 
       .hero {
         gap: 12px;
+        min-height: auto;
+        justify-items: stretch;
         padding: 26px 22px 24px;
         border-radius: 32px;
         background: rgba(255, 255, 255, 0.92);
@@ -3590,9 +3610,10 @@
       }
 
       .user-profile {
-        gap: 7px;
-        margin: 0 auto 2px;
-        padding: 0 18px 2px;
+        max-width: none;
+        padding: 0 0 12px;
+        border-bottom: 1px solid var(--line-soft);
+        margin-bottom: 4px;
       }
 
       .user-profile-avatar {
@@ -3603,6 +3624,10 @@
 
       .user-profile[data-state="guest"] .user-profile-avatar {
         background: #f7f8f4;
+      }
+
+      .hero-brand {
+        justify-items: center;
       }
 
       .hero-copy {
@@ -3616,6 +3641,7 @@
         min-width: min(100%, 300px);
         min-height: 54px;
         margin-top: 10px;
+        justify-self: center;
         border-width: 1.25px;
         background: #c8e27e;
         box-shadow: 0 10px 22px rgba(143, 179, 63, 0.14);
@@ -3628,6 +3654,12 @@
 
         .hero {
           margin-top: 10px;
+        }
+
+        .user-profile-avatar {
+          width: 72px;
+          height: 72px;
+          font-size: 1.82rem;
         }
 
         .goal-console {
@@ -3643,6 +3675,12 @@
         .hero {
           border-radius: 30px;
           padding: 26px 18px 24px;
+        }
+
+        .user-profile-avatar {
+          width: 60px;
+          height: 60px;
+          font-size: 1.58rem;
         }
 
         .app-title {
@@ -4525,17 +4563,22 @@
   <body>
     <main class="app">
       <header class="hero">
-        <div class="hero-icon" aria-hidden="true">✓</div>
-        <h1 class="app-title">MILE</h1>
-        <p class="hero-kicker">目標管理アプリ</p>
+        <section class="user-profile" id="user-profile" aria-label="ユーザープロフィール" data-state="guest">
+          <div class="user-profile-lead">
+            <p class="user-profile-greeting" id="userProfileGreeting">Hello!</p>
+            <p class="user-profile-tagline" id="userProfileTagline" hidden>今日も一歩進めましょう</p>
+          </div>
+          <div class="user-profile-avatar" id="userProfileIcon" aria-hidden="true">🌱</div>
+        </section>
+
+        <div class="hero-brand">
+          <div class="hero-icon" aria-hidden="true">✓</div>
+          <h1 class="app-title">MILE</h1>
+          <p class="hero-kicker">目標管理アプリ</p>
+        </div>
+
         <a class="cta-button" href="#goal-console">今日のタスクを確認する <span aria-hidden="true">→</span></a>
       </header>
-
-      <section class="user-profile" id="user-profile" aria-label="ユーザープロフィール" data-state="guest">
-        <div class="user-profile-avatar" id="userProfileIcon" aria-hidden="true">🌱</div>
-        <p class="user-profile-name" id="userProfileName">ゲスト</p>
-        <p class="user-profile-tagline" id="userProfileTagline" hidden>今日も一歩進めましょう</p>
-      </section>
 
       <p class="goal-flow-hint">年間目標から、今月の目標と今日の行動を整理します。</p>
 
@@ -5131,8 +5174,8 @@
       const cloudUserEmail = document.getElementById("cloudUserEmail");
       const cloudAuthStatus = document.getElementById("cloudAuthStatus");
       const userProfileSection = document.getElementById("user-profile");
+      const userProfileGreeting = document.getElementById("userProfileGreeting");
       const userProfileIcon = document.getElementById("userProfileIcon");
-      const userProfileName = document.getElementById("userProfileName");
       const userProfileTagline = document.getElementById("userProfileTagline");
       const tabButtons = document.querySelectorAll(".tab-button");
       const bottomNavButtons = document.querySelectorAll(".bottom-nav-item");
@@ -5356,6 +5399,14 @@
         return PROFILE_ICON_OPTIONS[Math.abs(hash) % PROFILE_ICON_OPTIONS.length];
       }
 
+      function getProfileGreeting(displayName, isSignedIn) {
+        if (isSignedIn && displayName) {
+          return `Hello, ${displayName}!`;
+        }
+
+        return "Hello!";
+      }
+
       function renderUserProfile() {
         if (!userProfileSection) {
           return;
@@ -5365,12 +5416,12 @@
         const email = cloudSession?.user?.email || "";
         const isSignedIn = Boolean(email);
         const displayName =
-          savedProfile.displayName || (isSignedIn ? getCloudDisplayName(email) : "ゲスト");
+          savedProfile.displayName || (isSignedIn ? getCloudDisplayName(email) : "");
         const icon = savedProfile.icon || (isSignedIn ? getCloudUserIcon(email) : "🌱");
 
         userProfileSection.dataset.state = isSignedIn ? "signed-in" : "guest";
+        userProfileGreeting.textContent = getProfileGreeting(displayName, isSignedIn);
         userProfileIcon.textContent = icon;
-        userProfileName.textContent = displayName;
         userProfileTagline.textContent = "今日も一歩進めましょう";
         userProfileTagline.hidden = !isSignedIn;
       }
