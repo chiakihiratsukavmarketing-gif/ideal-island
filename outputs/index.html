@@ -4890,13 +4890,13 @@
                   <div class="cloud-heading">
                     <div>
                       <h2 class="section-title">クラウド保存</h2>
-                      <p class="cloud-copy" id="cloudDescription">現在はこの端末だけに保存されています。</p>
+                      <p class="cloud-copy" id="cloudDescription">基本はこの端末に保存されています。ログインすると手動でクラウド保存できます。</p>
                     </div>
                     <span class="cloud-badge" id="cloudStatusBadge">未ログイン</span>
                   </div>
 
                   <div class="cloud-panel" id="cloudSignedOutPanel">
-                    <p class="cloud-copy">メールアドレスを入力してログインリンクを送信できます。</p>
+                    <p class="cloud-copy">ログイン後、「クラウドに保存」「クラウドから読み込み」が使えます。メールアドレスを入力してログインリンクを送信してください。</p>
                     <div class="field">
                       <label for="cloudEmailInput">メールアドレス</label>
                       <input id="cloudEmailInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
@@ -4911,7 +4911,7 @@
                       <span>ログイン中</span>
                       <strong id="cloudUserEmail">user@example.com</strong>
                     </div>
-                    <p class="cloud-copy">手動でこの端末のデータをクラウドへ保存できます。読み込み前には確認が表示されます。</p>
+                    <p class="cloud-copy">「クラウドに保存」でこの端末のデータをクラウドへ送れます。「クラウドから読み込み」でクラウドのデータをこの端末に反映します（この端末のデータは上書きされ、読み込み前に確認が表示されます）。</p>
                     <div class="cloud-actions">
                       <button class="button" type="button" id="cloudSaveButton">クラウドに保存</button>
                       <button class="button secondary" type="button" id="cloudLoadButton">クラウドから読み込み</button>
@@ -5399,12 +5399,12 @@
         cloudUserEmail.textContent = userEmail || "";
 
         if (userEmail) {
-          cloudDescription.textContent = "ログイン状態を確認できています。";
+          cloudDescription.textContent = "ログイン中です。「クラウドに保存」と「クラウドから読み込み」が使えます。";
           cloudStatusBadge.textContent = "ログイン中";
           return;
         }
 
-        cloudDescription.textContent = "現在はこの端末だけに保存されています。";
+        cloudDescription.textContent = "基本はこの端末に保存されています。ログインすると手動でクラウド保存できます。";
         cloudStatusBadge.textContent = isConfigured ? "未ログイン" : "未設定";
 
         if (!isConfigured) {
