@@ -187,15 +187,11 @@ const mileGoalPlan = {
 
 ## 今後の追加予定
 
-- Phase Profile-4: アイコン / 名前変更UI
-- Phase UX-1: トップ画面・余白の微調整
-- Phase World-1: ステージ / 進捗演出
-- Phase Data-1: データ構造整理
-- Phase Release-1: β版公開チェックリスト作成
-- データエクスポート / インポート
-- AIによる目標分解
-- READMEにスクリーンショット追加
-- CSS / JS 分離
+- Phase Release-1: β版公開前の総点検
+- Phase UX-1: トップ画面と基本UIの微調整
+- Phase Profile-4: プロフィール編集機能
+- Phase World-1: ステージ・進捗演出
+- Phase Data-1: データ構造と同期の安定化
 
 ## 作業時の確認コマンド
 
