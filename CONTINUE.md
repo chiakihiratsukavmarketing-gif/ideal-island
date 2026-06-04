@@ -6,12 +6,19 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
+- 最新コミット: `0af472d` feat: add cloud sync status, auto-save, and save race guard
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
-- 基本保存は `localStorage`
-- Supabaseログインに対応
-- 手動クラウド保存 / 手動クラウド読み込みに対応（ログイン後）
-- 自動同期はなし
+
+### 動作確認済み
+
+- 端末保存は自動（`localStorage`）
+- ログイン中はクラウド自動保存（45秒 debounce）
+- 保存状態表示あり
+- スマホ表示OK
+- PWAアイコンOK
+- 別端末確認OK
+- Vercel公開済み
 
 ## ここまで完了したフェーズ
 
@@ -40,28 +47,52 @@
   - SupabaseログインUI
   - 手動クラウド保存 / 読み込み
 - Phase Cloud-5
-  - クラウド保存UIの文言整理（未ログイン / ログイン後の説明を明確化）
+  - クラウド保存UIの文言整理
   - README / CONTINUE を現状に合わせて更新
   - 3つの HTML 同期
+- Phase Cloud-6
+  - クラウド保存 E2E 確認完了（ログイン → 保存 → 別端末読み込み）
+- Phase Cloud-7
+  - ログインリンク再送クールダウン（60秒）完了
+- Phase Cloud-8
+  - クラウド保存忘れ防止UI完了（未保存の変更表示）
+- Phase Cloud-9
+  - クラウド自動保存完了（45秒 debounce）
+- Phase Cloud-10
+  - 同期状態・最終保存日時表示完了
+  - 保存中編集時の誤同期防止（保存開始スナップショット比較）
+- Phase Profile-1
+  - プロフィール表示（Hello / アイコン）完了
+- Phase Profile-2
+  - プロフィール上部ヘッダー化完了
+- Phase Profile-3
+  - Hello / アイコンを MILE hero カード外へ分離完了
+- Phase PWA-1
+  - PWAアイコン修正完了（`assets/icons/`）
+- Phase Beta-1
+  - スマホ実機確認完了
+- Phase Docs-1
+  - README / CONTINUE を現状に合わせて更新完了
 
 ## 現在の画面順
 
-1. ヘッダー
-2. ダッシュボード
-3. 今日やること
-4. 今月の目標
-5. 年間目標
-6. 進捗詳細
-7. 振り返りメモ
-8. クラウド保存（下部ナビ「設定」からスクロール）
-9. スローガン
+1. プロフィール（Hello / アイコン）
+2. ヘッダー（MILEカード）
+3. ダッシュボード
+4. 今日やること
+5. 今月の目標
+6. 年間目標
+7. 進捗詳細
+8. 振り返りメモ
+9. クラウド保存（下部ナビ「設定」からスクロール）
+10. スローガン
 
-## 直近の変更内容（Phase Cloud-5）
+## 直近の変更内容
 
-- クラウド保存セクションの説明文を更新
-  - 未ログイン時: ログイン後にクラウド保存が使えることを明示
-  - ログイン後: 保存と読み込みの違い、上書き注意を明示
-- README / CONTINUE の古い記載（クラウド未対応など）を修正
+- Phase Cloud-8〜10: 同期状態UI、自動保存、保存中編集の安全判定
+- Phase Cloud-6: 別端末を含むクラウド E2E 確認完了
+- Phase Beta-1: スマホ実機での主要操作確認完了
+- Phase Docs-1: ドキュメントを現状に合わせて整理
 
 ## 実装済み機能
 
@@ -87,26 +118,23 @@
 - 達成履歴
 - 連続達成日数
 - 振り返りメモ
-- localStorage保存
+- localStorage保存（端末への自動保存）
+- プロフィール表示（ログイン前後、上部ヘッダー）
 - Supabaseログイン（メールリンク）
+- ログインリンク再送クールダウン
+- クラウド同期状態表示
+- クラウド自動保存（45秒 debounce）
 - 手動クラウド保存
 - 手動クラウド読み込み
-
-## 現在の未コミット変更
-
-- `index.html`
-- `outputs/index.html`
-- `ideal-island/outputs/index.html`
-- `README.md`
-- `CONTINUE.md`
+- PWAアイコン / manifest
 
 ## 次にやる候補
 
-- Phase Cloud-6: 実機でのログイン → 保存 → 別端末読み込みの一連確認
-- β版として実機スマホで一通り操作確認
-- Phase Fun-1.5 実機確認
-- Phase Beta-2 公開URL確認
-- PWAアイコン同梱（`/assets/icons/`）
+- Phase Profile-4: アイコン / 名前変更UI
+- Phase UX-1: トップ画面・余白の微調整
+- Phase World-1: ステージ / 進捗演出
+- Phase Data-1: データ構造整理
+- Phase Release-1: β版公開チェックリスト作成
 - データエクスポート / インポート
 - AIによる目標分解
 - CSS / JS 分離
@@ -114,25 +142,18 @@
 ## 注意点
 
 - 3つのHTMLを同期する運用
-- `localStorage` 構造は現状維持
+- `localStorage` 構造は現状維持（大きな変更は Phase Data-1 で検討）
 - コミット前にJavaScript構文チェック
 - コミット前にスマホ横スクロール確認
 - `git add .` は避ける
 - `work/` と `ideal-island/work/` はコミットしない
 - Vercel公開に使われる想定ファイルはプロジェクト直下の `index.html`
 - クラウド保存・読み込みはログイン後の `cloudSignedInPanel` 内ボタンから操作
+- ログイン中の変更は自動保存されるが、debounce のため即時同期ではない
 
 ## 次回作業開始時の確認コマンド
 
 ```bash
 git status
 git log --oneline -5
-```
-
-## コミット候補（Phase Cloud-5 完了後）
-
-```bash
-git add index.html outputs/index.html ideal-island/outputs/index.html README.md CONTINUE.md
-git commit -m "docs: clarify cloud save UI and update project docs"
-git push
 ```
