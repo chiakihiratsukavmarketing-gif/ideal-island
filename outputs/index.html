@@ -5219,6 +5219,52 @@
         return window.location.origin + window.location.pathname;
       }
 
+      function logCloudAuthError(context, error) {
+        console.error(`[MILE cloud auth] ${context}:`, error?.message || error);
+        if (error?.code) {
+          console.error("[MILE cloud auth] code:", error.code);
+        }
+        if (error?.status) {
+          console.error("[MILE cloud auth] status:", error.status);
+        }
+      }
+
+      function describeCloudLoginLinkError(error) {
+        const message = String(error?.message || "").toLowerCase();
+        const code = String(error?.code || "").toLowerCase();
+        const status = Number(error?.status);
+
+        if (
+          status === 429 ||
+          code.includes("rate") ||
+          message.includes("rate limit") ||
+          message.includes("too many")
+        ) {
+          return "送信回数の上限に達した可能性があります。しばらく時間を置いてから再度お試しください。";
+        }
+
+        if (
+          message.includes("invalid") &&
+          (message.includes("email") || message.includes("address"))
+        ) {
+          return "メールアドレスの形式を確認してください。";
+        }
+
+        if (
+          message.includes("redirect") ||
+          code.includes("redirect") ||
+          message.includes("not allowed")
+        ) {
+          return "ログイン先URLの設定に問題がある可能性があります。時間を置いて再度お試しください。";
+        }
+
+        if (message.includes("smtp") || message.includes("email provider")) {
+          return "メール送信の設定に問題がある可能性があります。時間を置いて再度お試しください。";
+        }
+
+        return "ログインリンクを送信できませんでした。メールアドレスを確認し、時間を置いて再度お試しください。";
+      }
+
       function setCloudStatusMessage(message, type = "") {
         cloudAuthStatus.textContent = message;
         cloudAuthStatus.classList.toggle("is-error", type === "error");
@@ -5459,7 +5505,8 @@
           if (error) throw error;
           setCloudAuthStatus("ログインリンクを送信しました。メールをご確認ください。");
         } catch (error) {
-          setCloudAuthStatus("ログインリンクを送信できませんでした。設定とメールアドレスを確認してください。", "error");
+          logCloudAuthError("sendCloudLoginLink failed", error);
+          setCloudAuthStatus(describeCloudLoginLinkError(error), "error");
         } finally {
           sendLoginLinkButton.disabled = false;
         }
