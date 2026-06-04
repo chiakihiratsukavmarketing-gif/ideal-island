@@ -6,7 +6,7 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `8d07bce` feat: add profile settings UI with local display name and icon
+- 最新コミット: `be9c25f` feat: add MILE points display and completion toast
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -87,6 +87,13 @@
   - `localStorage` キー・クラウド同期対象・バックアップ・version・プロフィール方針を整理
   - README / CONTINUE に仕様を反映
   - 今すぐ修正すべきブロッカーなし
+- Phase Profile-5
+  - プロフィールアイコン候補を MILE らしい絵文字セットに更新（🌿 🍀 🌙 🕊️ 等）
+- Phase World-1
+  - ダッシュボードに MILEポイント表示（今日のMILE / 今週のMILE）
+  - 今日タスク達成時の +1 MILE トースト（「今日」タブ・未完了→完了のみ）
+  - 新規 `localStorage` キーなし、`completedAt` から算出
+  - クラウド同期対象の追加なし
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -96,7 +103,7 @@
 - **プロフィール同期**: 今回は対象外のまま → **Data-2 候補**
 - **バックアップ**: 読み込み前に同期対象 4 キーのみ退避。復元 UI は未実装 → **Data-2 候補**
 - **自動保存（Cloud-8〜10）**: dirty / hash / 45秒 debounce / 保存中レース対策は妥当と評価
-- **プロフィールアイコン候補**: 現状維持。見た目整理は **Profile-5 候補**（画像アイコンは別フェーズ）
+- **プロフィールアイコン候補**: Profile-5 で更新済み（画像アイコンは別フェーズ）
 
 ## 現在の画面順
 
@@ -114,10 +121,11 @@
 
 ## 直近の変更内容
 
+- Phase World-1: MILEポイント表示・達成時トースト、3 HTML 同期、push 済み（`be9c25f`）
+- Phase Profile-5: プロフィールアイコン候補更新
 - Phase Data-1: データ仕様の調査・ドキュメント化（README / CONTINUE）
-- Phase Profile-4: プロフィール設定 UI、3 HTML 同期、push 済み
+- Phase Profile-4: プロフィール設定 UI
 - Phase UX-1: トップ余白・モバイル hero 調整
-- Phase Release-1: β版公開前総点検完了（2026-06-04）
 
 ## 実装済み機能
 
@@ -134,6 +142,8 @@
 - 今日タスクの完了 / 未完了切り替え
 - 今日タスクと今月目標の紐づけ
 - ダッシュボード数値表示
+- MILEポイント（今日のMILE / 今週のMILE、`completedAt` から算出）
+- タスク達成時の +1 MILE トースト
 - 期限つきタスク
 - カテゴリ機能
 - 期限フィルター
@@ -160,10 +170,10 @@
   - `mileCloudLoadBackup` の復元 UI または失敗時ロールバック
   - プロフィール（`mileUserProfile`）のクラウド同期要否の決定と実装
   - `idealIslandGoals` と `mileGoalPlan` の二重構造整理（影響大・設計先行）
-- **Phase Profile-5**: プロフィールアイコン候補のアップデート（絵文字の世界観整理。🔥⭐🐾🧭 等）
-- **Phase World-1**: ステージ・進捗演出
+- **Phase World-2**: バッジ・連続達成・ステージ演出
+- **Phase Release-2**: β版利用フィードバック反映
 
-完了済み（参考）: UX-1, Profile-4, Data-1（調査・ドキュメント）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1
 
 ## 注意点
 
