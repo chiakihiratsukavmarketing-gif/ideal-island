@@ -6,7 +6,7 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `19e7830` refactor(ui): refine Release-3 colors and settings folds
+- 最新コミット: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -21,6 +21,7 @@
 - Vercel公開済み
 - β版公開前総点検済み（Release-1、2026-06-04）
 - Release-3 UI・配色・ナビ・設定折りたたみ（`19e7830`、Vercel反映済み）
+- Release-4 文言整理（summary・Hello「さん」、`56bc682`、Vercel反映済み）
 
 ## ここまで完了したフェーズ
 
@@ -120,6 +121,14 @@
   - 新規 `localStorage` キーなし、`collectLocalAppData()` 変更なし
   - クラウド同期対象の追加なし、Supabase設定変更なし
   - 3 HTML 同期、push 済み（`19e7830`）、Vercel反映済み
+- Phase Release-4
+  - プロフィール折りたたみ summary を「プロフィール」に
+  - クラウド折りたたみ summary を「クラウド保存・同期」に（「開く」「閉じる」表記をやめる）
+  - Hello 挨拶に「さん」を付与（`getGreetingDisplayName`、表示のみ。保存データは変更しない）
+  - 末尾が「さん」の表示名は二重付与しない
+  - 新規 `localStorage` キーなし、`collectLocalAppData()` 変更なし
+  - クラウド同期対象の追加なし、Supabase設定変更なし
+  - 3 HTML 同期、push 済み（`56bc682`）、Vercel反映済み
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -143,12 +152,14 @@
 8. 年間目標
 9. 進捗サマリー / 詳しい進捗（連続達成・週間・達成履歴など）
 10. 振り返りメモ
-11. プロフィール設定（折りたたみ・下部ナビ「設定」で開いてスクロール）
-12. クラウド保存・同期（折りたたみ・summary に状態表示）
+11. プロフィール（折りたたみ・summary「プロフィール」・下部ナビ「設定」で開いてスクロール）
+12. クラウド保存・同期（折りたたみ・summary「クラウド保存・同期」＋状態表示）
 13. スローガン
 
 ## 直近の変更内容
 
+- Phase Release-4: summary「プロフィール」「クラウド保存・同期」、Hello「さん」、3 HTML 同期、push 済み（`56bc682`）
+- Phase Release-3 Docs: README / CONTINUE に Release-3 反映（`b00c35d`）
 - Phase Release-3: 配色・「今日のToDo」見出し・タスクカード視認性・下部ナビ SVG・プロフィール/クラウド折りたたみ、3 HTML 同期、push 済み（`19e7830`）
 - Phase Release-2: 今日追加フォーム分離・連続達成を詳しい進捗へ、3 HTML 同期、push 済み（`96fd991`）
 - Phase World-2: MILEステージ・バッジ（`3eb179b`）
@@ -183,6 +194,9 @@
   - 「今日のToDo」見出し、ToDoカード視認性の改善
   - 下部ナビ inline SVG 線画アイコン（今日 / 目標 / 詳しい / 設定）
   - プロフィール設定・クラウド保存・同期の折りたたみ（`<details>`、開閉状態は未保存）
+- Release-4 文言整理
+  - summary「プロフィール」「クラウド保存・同期」
+  - Hello 挨拶 `Hello, ○○さん!`（表示のみ。「さん」二重付与防止あり）
 - 連続達成日数（詳しい進捗内、`getStreakProgress`）
 - 期限つきタスク
 - カテゴリ機能
@@ -209,10 +223,9 @@
   - `mileCloudLoadBackup` の復元 UI または失敗時ロールバック
   - プロフィール（`mileUserProfile`）のクラウド同期要否の決定と実装
   - `idealIslandGoals` と `mileGoalPlan` の二重構造整理（影響大・設計先行）
-- **Phase Release-4**: 実利用フィードバックの反映（UI・文言・導線の微調整）
 - **Phase World-3**: バッジ追加・ステージ演出改善・達成演出の改善
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, Release-2, Release-3
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, Release-2, Release-3, Release-4
 
 ## 注意点
 
@@ -225,7 +238,7 @@
 - `git add .` は避ける
 - `work/` と `ideal-island/work/` はコミットしない
 - Vercel公開に使われる想定ファイルはプロジェクト直下の `index.html`
-- クラウド保存・読み込みは設定エリアの「クラウド保存・同期を開く」から展開し、ログイン後は `cloudSignedInPanel` 内ボタンから操作
+- クラウド保存・読み込みは設定エリアの折りたたみ「クラウド保存・同期」（summary）を展開し、ログイン後は `cloudSignedInPanel` 内ボタンから操作
 - 下部ナビは inline SVG 線画アイコン（絵文字ではない）
 - ログイン中の変更は自動保存されるが、debounce のため即時同期ではない
 
