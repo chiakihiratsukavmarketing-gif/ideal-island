@@ -1317,6 +1317,92 @@
         color: var(--danger);
       }
 
+      .profile-settings-card {
+        display: grid;
+        gap: 14px;
+        width: min(100%, 720px);
+        margin: 0 auto 14px;
+        padding: 20px;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 26px;
+        background: #ffffff;
+        box-shadow: var(--shadow-soft);
+        box-sizing: border-box;
+      }
+
+      .profile-settings-heading {
+        display: grid;
+        gap: 4px;
+      }
+
+      .profile-icon-field {
+        display: grid;
+        gap: 10px;
+      }
+
+      .profile-icon-label {
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 800;
+      }
+
+      .profile-icon-picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .profile-icon-option {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 999px;
+        background: #fbfcf8;
+        font-size: 1.35rem;
+        line-height: 1;
+        transition:
+          border-color 160ms ease,
+          background 160ms ease,
+          transform 160ms ease;
+      }
+
+      .profile-icon-option.is-selected {
+        border-color: rgba(143, 179, 63, 0.65);
+        background: #f4f9e8;
+        box-shadow: 0 0 0 3px rgba(184, 217, 106, 0.22);
+      }
+
+      .profile-icon-option:active {
+        transform: scale(0.96);
+      }
+
+      .profile-settings-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .profile-settings-actions .button {
+        min-height: 46px;
+      }
+
+      .profile-settings-status {
+        min-height: 1.2em;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 750;
+        opacity: 0;
+        transition: opacity 180ms ease;
+      }
+
+      .profile-settings-status.is-visible {
+        opacity: 1;
+      }
+
       .cloud-user {
         display: grid;
         gap: 4px;
@@ -3188,6 +3274,7 @@
       .monthly-goal-card,
       .goal-console,
       .reflection-card,
+      .profile-settings-card,
       .cloud-card,
       .slogan-card {
         width: min(100%, 720px);
@@ -5067,6 +5154,32 @@
                   </div>
                 </section>
 
+                <section class="profile-settings-card" id="profile-settings-section" aria-label="プロフィール設定">
+                  <div class="profile-settings-heading">
+                    <h2 class="section-title">プロフィール設定</h2>
+                    <p class="cloud-copy">表示名とアイコンをこの端末に保存します（クラウド同期対象外）。</p>
+                  </div>
+                  <div class="field">
+                    <label for="profileDisplayNameInput">表示名</label>
+                    <input
+                      id="profileDisplayNameInput"
+                      type="text"
+                      maxlength="32"
+                      autocomplete="nickname"
+                      placeholder="ゲスト"
+                    />
+                  </div>
+                  <div class="profile-icon-field">
+                    <span class="profile-icon-label" id="profileIconPickerLabel">アイコン</span>
+                    <div class="profile-icon-picker" id="profileIconPicker" role="radiogroup" aria-labelledby="profileIconPickerLabel"></div>
+                  </div>
+                  <div class="profile-settings-actions">
+                    <button class="button" type="button" id="saveProfileButton">保存する</button>
+                    <button class="button secondary" type="button" id="resetProfileButton">自動表示に戻す</button>
+                    <span class="profile-settings-status" id="profileSettingsStatus" aria-live="polite"></span>
+                  </div>
+                </section>
+
                 <section class="cloud-card" id="settings-section" aria-label="クラウド保存" data-state="signed-out">
                   <div class="cloud-heading">
                     <div>
@@ -5155,7 +5268,7 @@
       const CLOUD_SAVED_SNAPSHOT_STORAGE_KEY = "mileCloudSavedSnapshotHash";
       const CLOUD_LAST_SAVED_AT_STORAGE_KEY = "mileCloudLastSavedAt";
       const CLOUD_AUTO_SAVE_DEBOUNCE_MS = 45 * 1000;
-      const PROFILE_ICON_OPTIONS = ["🌱", "☁️", "🏝️", "🌼", "🪴", "✨"];
+      const PROFILE_ICON_OPTIONS = ["🌱", "☁️", "🏝️", "🌼", "🪴", "✨", "🔥", "⭐", "🐾", "🧭"];
       const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWVkcmtwdnJ3a3N6YmthaGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODYwMDMsImV4cCI6MjA5NjA2MjAwM30.ZTaJhkZPzd0CAqiCfMYTAib3iNSWXtT70285m5mxbOI";
       const TAB_LABELS = {
@@ -5189,6 +5302,8 @@
       let reflectionNotes = loadReflectionNotes();
       let goalPlan = loadGoalPlan();
       let reflectionStatusTimer = 0;
+      let profileSettingsStatusTimer = 0;
+      let selectedProfileIcon = "";
       let editingYearlyGoalId = "";
       let editingMonthlyGoalId = "";
       let editingGoalId = "";
@@ -5253,6 +5368,11 @@
       const userProfileGreeting = document.getElementById("userProfileGreeting");
       const userProfileIcon = document.getElementById("userProfileIcon");
       const userProfileTagline = document.getElementById("userProfileTagline");
+      const profileDisplayNameInput = document.getElementById("profileDisplayNameInput");
+      const profileIconPicker = document.getElementById("profileIconPicker");
+      const saveProfileButton = document.getElementById("saveProfileButton");
+      const resetProfileButton = document.getElementById("resetProfileButton");
+      const profileSettingsStatus = document.getElementById("profileSettingsStatus");
       const tabButtons = document.querySelectorAll(".tab-button");
       const bottomNavButtons = document.querySelectorAll(".bottom-nav-item");
       const taskFilterButtons = document.querySelectorAll(".task-filter-button");
@@ -5339,6 +5459,8 @@
       });
       monthlyGoalList.addEventListener("submit", saveMonthlyGoalEdit);
       saveReflectionButton.addEventListener("click", saveReflectionNote);
+      saveProfileButton.addEventListener("click", saveProfileSettings);
+      resetProfileButton.addEventListener("click", resetProfileSettings);
       sendLoginLinkButton.addEventListener("click", sendCloudLoginLink);
       cloudSaveButton.addEventListener("click", () => saveAppDataToCloud());
       cloudLoadButton.addEventListener("click", loadAppDataFromCloud);
@@ -5378,7 +5500,7 @@
           }
 
           if (nav === "settings") {
-            scrollToSection("settings-section");
+            scrollToSection("profile-settings-section");
           }
         });
       });
@@ -5446,6 +5568,7 @@
         };
         localStorage.setItem(USER_PROFILE_STORAGE_KEY, JSON.stringify(nextProfile));
         renderUserProfile();
+        syncProfileSettingsForm();
       }
 
       function getCloudDisplayName(email) {
@@ -5475,12 +5598,34 @@
         return PROFILE_ICON_OPTIONS[Math.abs(hash) % PROFILE_ICON_OPTIONS.length];
       }
 
-      function getProfileGreeting(displayName, isSignedIn) {
-        if (isSignedIn && displayName) {
+      function getProfileGreeting(displayName) {
+        if (displayName) {
           return `Hello, ${displayName}!`;
         }
 
         return "Hello!";
+      }
+
+      function getEffectiveUserProfile() {
+        const savedProfile = loadUserProfile();
+        const email = cloudSession?.user?.email || "";
+        const isSignedIn = Boolean(email);
+        const customDisplayName = savedProfile.displayName.trim();
+        const customIcon = savedProfile.icon.trim();
+        const autoDisplayName = isSignedIn ? getCloudDisplayName(email) : "";
+        const autoIcon = isSignedIn ? getCloudUserIcon(email) : "🌱";
+
+        return {
+          savedProfile,
+          isSignedIn,
+          email,
+          customDisplayName,
+          customIcon,
+          displayName: customDisplayName || autoDisplayName,
+          icon: customIcon || autoIcon,
+          autoDisplayName,
+          autoIcon,
+        };
       }
 
       function renderUserProfile() {
@@ -5488,18 +5633,85 @@
           return;
         }
 
-        const savedProfile = loadUserProfile();
-        const email = cloudSession?.user?.email || "";
-        const isSignedIn = Boolean(email);
-        const displayName =
-          savedProfile.displayName || (isSignedIn ? getCloudDisplayName(email) : "");
-        const icon = savedProfile.icon || (isSignedIn ? getCloudUserIcon(email) : "🌱");
+        const { isSignedIn, displayName, icon } = getEffectiveUserProfile();
 
         userProfileSection.dataset.state = isSignedIn ? "signed-in" : "guest";
-        userProfileGreeting.textContent = getProfileGreeting(displayName, isSignedIn);
+        userProfileGreeting.textContent = getProfileGreeting(displayName);
         userProfileIcon.textContent = icon;
         userProfileTagline.textContent = "今日も一歩進めましょう";
         userProfileTagline.hidden = !isSignedIn;
+      }
+
+      function initializeProfileSettingsUI() {
+        if (!profileIconPicker || profileIconPicker.dataset.ready === "true") {
+          return;
+        }
+
+        profileIconPicker.dataset.ready = "true";
+        profileIconPicker.innerHTML = PROFILE_ICON_OPTIONS.map(
+          (icon) =>
+            `<button type="button" class="profile-icon-option" data-icon="${icon}" aria-label="アイコン ${icon}" aria-pressed="false">${icon}</button>`
+        ).join("");
+
+        profileIconPicker.addEventListener("click", (event) => {
+          const button = event.target.closest(".profile-icon-option");
+          if (!button) return;
+
+          selectedProfileIcon = button.dataset.icon || "";
+          updateProfileIconPickerSelection();
+        });
+      }
+
+      function updateProfileIconPickerSelection() {
+        if (!profileIconPicker) return;
+
+        profileIconPicker.querySelectorAll(".profile-icon-option").forEach((button) => {
+          const isSelected = button.dataset.icon === selectedProfileIcon;
+          button.classList.toggle("is-selected", isSelected);
+          button.setAttribute("aria-pressed", String(isSelected));
+        });
+      }
+
+      function syncProfileSettingsForm() {
+        if (!profileDisplayNameInput || !profileIconPicker) {
+          return;
+        }
+
+        const { savedProfile, isSignedIn, autoDisplayName, autoIcon } = getEffectiveUserProfile();
+
+        profileDisplayNameInput.value = savedProfile.displayName;
+        profileDisplayNameInput.placeholder = isSignedIn ? autoDisplayName || "ゲスト" : "ゲスト";
+        selectedProfileIcon = savedProfile.icon || autoIcon;
+        updateProfileIconPickerSelection();
+      }
+
+      function showProfileSettingsStatus(message) {
+        if (!profileSettingsStatus) return;
+
+        window.clearTimeout(profileSettingsStatusTimer);
+        profileSettingsStatus.textContent = message;
+        profileSettingsStatus.classList.add("is-visible");
+        profileSettingsStatusTimer = window.setTimeout(() => {
+          profileSettingsStatus.classList.remove("is-visible");
+          profileSettingsStatus.textContent = "";
+        }, 2200);
+      }
+
+      function saveProfileSettings() {
+        const displayName = profileDisplayNameInput.value.trim();
+        const icon = PROFILE_ICON_OPTIONS.includes(selectedProfileIcon)
+          ? selectedProfileIcon
+          : PROFILE_ICON_OPTIONS[0];
+
+        saveUserProfile({ displayName, icon });
+        showProfileSettingsStatus("保存しました");
+      }
+
+      function resetProfileSettings() {
+        localStorage.removeItem(USER_PROFILE_STORAGE_KEY);
+        renderUserProfile();
+        syncProfileSettingsForm();
+        showProfileSettingsStatus("自動表示に戻しました");
       }
 
       function logCloudAuthError(context, error) {
@@ -5915,6 +6127,7 @@
           cloudDescription.textContent = "ログイン中です。変更は自動でクラウド保存されます。「クラウドから読み込み」も使えます。";
           cloudStatusBadge.textContent = "ログイン中";
           renderUserProfile();
+          syncProfileSettingsForm();
           startCloudSyncStatusRefresh();
           updateCloudSyncStatusUI();
           if (isCloudDataDirty()) {
@@ -5933,6 +6146,7 @@
         }
 
         renderUserProfile();
+        syncProfileSettingsForm();
         updateCloudSyncStatusUI();
       }
 
@@ -8018,7 +8232,9 @@
 
       render();
       renderReflectionNotes();
+      initializeProfileSettingsUI();
       renderUserProfile();
+      syncProfileSettingsForm();
       loadCloudSyncMeta();
       restoreCloudLoginResendCooldown();
       updateCloudSyncStatusUI();
