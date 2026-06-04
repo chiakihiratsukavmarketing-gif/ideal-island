@@ -6,7 +6,7 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `96fd991` refactor(ui): split today add form and move streak to details
+- 最新コミット: `19e7830` refactor(ui): refine Release-3 colors and settings folds
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -20,6 +20,7 @@
 - 別端末確認OK
 - Vercel公開済み
 - β版公開前総点検済み（Release-1、2026-06-04）
+- Release-3 UI・配色・ナビ・設定折りたたみ（`19e7830`、Vercel反映済み）
 
 ## ここまで完了したフェーズ
 
@@ -107,7 +108,18 @@
   - MILEステージカードのコンパクト化、バッジ未獲得時の控えめ表示
   - 下部ナビ「進捗」→「詳しい」（タップで詳しい進捗を開く）
   - 新規 `localStorage` キーなし、クラウド同期対象の追加なし
-  - 3 HTML 同期、push 済み（`96fd991`）
+  - 3 HTML 同期、push 済み（`96fd991` / `6f66f0b` / `8fbc1e1` 含む Release-2 系）
+- Phase Release-3
+  - 今日の達成率カードを淡い緑系へ調整
+  - 「今日のToDo」見出しを追加（`.today-todo-heading`）
+  - ToDoタスクカードの視認性を改善（通常 / 期限あり / 完了済み）
+  - 今日やること追加カード（`#today-add-section`）を淡い緑系へ調整
+  - 下部ナビを inline SVG 線画アイコン化（絵文字廃止、外部ライブラリなし）
+  - プロフィール設定を `<details>` で折りたたみ化（初期は閉、開閉状態は保存しない）
+  - クラウド保存・同期を `<details>` で折りたたみ化（summary にバッジ・同期状態）
+  - 新規 `localStorage` キーなし、`collectLocalAppData()` 変更なし
+  - クラウド同期対象の追加なし、Supabase設定変更なし
+  - 3 HTML 同期、push 済み（`19e7830`）、Vercel反映済み
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -123,20 +135,21 @@
 
 1. プロフィール（Hello / アイコン）
 2. ヘッダー（MILEカード）
-3. ダッシュボード
+3. ダッシュボード（今日の達成率・淡い緑系）
 4. MILEステージ（ダッシュボード直下・ステージとバッジ）
-5. 今日やること一覧
-6. 今日やることを追加（独立カード）
+5. 今日のToDo（見出し + フィルター + タスク一覧）
+6. 今日やることを追加（独立カード・淡い緑系）
 7. 今月の目標
 8. 年間目標
 9. 進捗サマリー / 詳しい進捗（連続達成・週間・達成履歴など）
 10. 振り返りメモ
-11. プロフィール設定（下部ナビ「設定」→ 先頭にスクロール）
-12. クラウド保存
+11. プロフィール設定（折りたたみ・下部ナビ「設定」で開いてスクロール）
+12. クラウド保存・同期（折りたたみ・summary に状態表示）
 13. スローガン
 
 ## 直近の変更内容
 
+- Phase Release-3: 配色・「今日のToDo」見出し・タスクカード視認性・下部ナビ SVG・プロフィール/クラウド折りたたみ、3 HTML 同期、push 済み（`19e7830`）
 - Phase Release-2: 今日追加フォーム分離・連続達成を詳しい進捗へ、3 HTML 同期、push 済み（`96fd991`）
 - Phase World-2: MILEステージ・バッジ（`3eb179b`）
 - Phase World-1: MILEポイント表示・達成時トースト（`be9c25f`）
@@ -165,6 +178,11 @@
 - MILEステージカード（累計MILE・次のステージまであと○MILE）
 - 条件達成バッジ（獲得済みのみ表示）
 - 今日やること一覧と追加フォームの分離（`#today-add-section`）
+- Release-3 UI整理
+  - 今日の達成率カード・今日追加カードの淡い緑系配色
+  - 「今日のToDo」見出し、ToDoカード視認性の改善
+  - 下部ナビ inline SVG 線画アイコン（今日 / 目標 / 詳しい / 設定）
+  - プロフィール設定・クラウド保存・同期の折りたたみ（`<details>`、開閉状態は未保存）
 - 連続達成日数（詳しい進捗内、`getStreakProgress`）
 - 期限つきタスク
 - カテゴリ機能
@@ -175,7 +193,7 @@
 - 達成履歴（詳しい進捗内）
 - 振り返りメモ
 - localStorage保存（端末への自動保存）
-- プロフィール表示・編集（ログイン前後、上部ヘッダー + 設定タブ）
+- プロフィール表示・編集（ログイン前後、上部ヘッダー + 設定内の折りたたみプロフィール設定）
 - Supabaseログイン（メールリンク）
 - ログインリンク再送クールダウン
 - クラウド同期状態表示
@@ -191,9 +209,10 @@
   - `mileCloudLoadBackup` の復元 UI または失敗時ロールバック
   - プロフィール（`mileUserProfile`）のクラウド同期要否の決定と実装
   - `idealIslandGoals` と `mileGoalPlan` の二重構造整理（影響大・設計先行）
+- **Phase Release-4**: 実利用フィードバックの反映（UI・文言・導線の微調整）
 - **Phase World-3**: バッジ追加・ステージ演出改善・達成演出の改善
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, Release-2
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, Release-2, Release-3
 
 ## 注意点
 
@@ -206,7 +225,8 @@
 - `git add .` は避ける
 - `work/` と `ideal-island/work/` はコミットしない
 - Vercel公開に使われる想定ファイルはプロジェクト直下の `index.html`
-- クラウド保存・読み込みはログイン後の `cloudSignedInPanel` 内ボタンから操作
+- クラウド保存・読み込みは設定エリアの「クラウド保存・同期を開く」から展開し、ログイン後は `cloudSignedInPanel` 内ボタンから操作
+- 下部ナビは inline SVG 線画アイコン（絵文字ではない）
 - ログイン中の変更は自動保存されるが、debounce のため即時同期ではない
 
 ## 次回作業開始時の確認コマンド
