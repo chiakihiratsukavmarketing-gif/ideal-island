@@ -6,7 +6,7 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `86b07a0` docs: consolidate next phase roadmap
+- 最新コミット: `8d07bce` feat: add profile settings UI with local display name and icon
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -78,6 +78,25 @@
   - β版公開前の総点検完了
   - git / 公開URL / PWA / クラウド同期 / スマホ表示 / ドキュメント確認済み
   - β版公開を止める致命的問題なし
+- Phase UX-1
+  - トップ余白・モバイル hero の微調整完了
+- Phase Profile-4
+  - プロフィール設定 UI（表示名・アイコン）完了
+  - `mileUserProfile` はクラウド同期対象外のまま
+- Phase Data-1（調査完了、コード変更なし）
+  - `localStorage` キー・クラウド同期対象・バックアップ・version・プロフィール方針を整理
+  - README / CONTINUE に仕様を反映
+  - 今すぐ修正すべきブロッカーなし
+
+## Phase Data-1 調査メモ（2026-06）
+
+- **コード変更**: なし（`index.html` は未変更）
+- **クラウド同期対象**: `goalsByTab`, `goalPlan`, `reflectionNotes`, `slogan`（`appData.version: 1`）
+- **同期対象外**: `mileUserProfile`, 同期メタ, ログイン再送クールダウン, `mileCloudLoadBackup`
+- **プロフィール同期**: 今回は対象外のまま → **Data-2 候補**
+- **バックアップ**: 読み込み前に同期対象 4 キーのみ退避。復元 UI は未実装 → **Data-2 候補**
+- **自動保存（Cloud-8〜10）**: dirty / hash / 45秒 debounce / 保存中レース対策は妥当と評価
+- **プロフィールアイコン候補**: 現状維持。見た目整理は **Profile-5 候補**（画像アイコンは別フェーズ）
 
 ## 現在の画面順
 
@@ -89,14 +108,16 @@
 6. 年間目標
 7. 進捗詳細
 8. 振り返りメモ
-9. クラウド保存（下部ナビ「設定」からスクロール）
-10. スローガン
+9. プロフィール設定（下部ナビ「設定」→ 先頭にスクロール）
+10. クラウド保存
+11. スローガン
 
 ## 直近の変更内容
 
+- Phase Data-1: データ仕様の調査・ドキュメント化（README / CONTINUE）
+- Phase Profile-4: プロフィール設定 UI、3 HTML 同期、push 済み
+- Phase UX-1: トップ余白・モバイル hero 調整
 - Phase Release-1: β版公開前総点検完了（2026-06-04）
-- Phase Docs-1: 次回候補フェーズの整理、現状ドキュメント更新
-- Phase Cloud-8〜10: 同期状態UI、自動保存、保存中編集の安全判定
 
 ## 実装済み機能
 
@@ -123,7 +144,7 @@
 - 連続達成日数
 - 振り返りメモ
 - localStorage保存（端末への自動保存）
-- プロフィール表示（ログイン前後、上部ヘッダー）
+- プロフィール表示・編集（ログイン前後、上部ヘッダー + 設定タブ）
 - Supabaseログイン（メールリンク）
 - ログインリンク再送クールダウン
 - クラウド同期状態表示
@@ -134,15 +155,22 @@
 
 ## 次にやる候補
 
-- Phase UX-1: トップ画面と基本UIの微調整
-- Phase Profile-4: プロフィール編集機能
-- Phase World-1: ステージ・進捗演出
-- Phase Data-1: データ構造と同期の安定化
+- **Phase Data-2**: 同期対象・バックアップ・version 検証の整理（実装）
+  - version 読み込み時検証 / マイグレーション
+  - `mileCloudLoadBackup` の復元 UI または失敗時ロールバック
+  - プロフィール（`mileUserProfile`）のクラウド同期要否の決定と実装
+  - `idealIslandGoals` と `mileGoalPlan` の二重構造整理（影響大・設計先行）
+- **Phase Profile-5**: プロフィールアイコン候補のアップデート（絵文字の世界観整理。🔥⭐🐾🧭 等）
+- **Phase World-1**: ステージ・進捗演出
+
+完了済み（参考）: UX-1, Profile-4, Data-1（調査・ドキュメント）
 
 ## 注意点
 
 - 3つのHTMLを同期する運用
-- `localStorage` 構造は現状維持（大きな変更は Phase Data-1 で検討）
+- `localStorage` 構造は Data-1 時点で文書化済み。破壊的変更は Data-2 以降で設計してから
+- プロフィール（`mileUserProfile`）はクラウド同期対象外。Data-2 まで含めない
+- `localStorage` キー名統一（`idealIsland*` → `mile*`）は影響が大きいため後回し
 - コミット前にJavaScript構文チェック
 - コミット前にスマホ横スクロール確認
 - `git add .` は避ける

@@ -36,9 +36,10 @@ https://ideal-island.vercel.app/
 
 ## 主な機能
 
-- プロフィール表示
-  - ログイン前: `Hello!`
+- プロフィール表示・編集
+  - ログイン前: `Hello!`（未設定時）
   - ログイン後: メールアドレスから表示名を推定（例: `Hello, maymay!`）
+  - 設定タブ内「プロフィール設定」で表示名・アイコンを編集可能（端末ローカルのみ保存）
   - プロフィールアイコン表示（ログイン前は 🌱 など）
   - Hello / アイコンは MILE hero カード外の上部ヘッダーに表示
 - 上部ダッシュボード
@@ -101,25 +102,64 @@ https://ideal-island.vercel.app/
 
 ## データ保存仕様
 
-### 基本保存（localStorage）
+Phase Data-1（2026-06）で整理済み。コード変更は行わず、本節を仕様の参照先としています。
+
+### 保存の二層構造
+
+| 層 | 保存先 | 用途 |
+|----|--------|------|
+| 端末保存 | ブラウザ `localStorage` | 通常操作はすべて即時反映 |
+| クラウド保存 | Supabase `user_app_data.app_data` | ログイン中のバックアップ・別端末復元 |
+
+- ログイン中は、同期対象データの変更が **45秒 debounce** でクラウド自動保存されます。
+- クラウド payload には **`version: 1`** を含めます（`appName: "MILE"`, `savedAt`, `data`）。
+
+### localStorage キー一覧
+
+| キー | 用途 | クラウド同期 | 備考 |
+|------|------|-------------|------|
+| `idealIslandGoals` | 年間 / 今月 / 今日タブのタスク一覧 | 対象（`goalsByTab`） | タスクの期限・カテゴリ・完了状態など |
+| `mileGoalPlan` | 年間・今月目標の構造化データ | 対象（`goalPlan`） | 下記スキーマ参照 |
+| `mileReflectionNotes` | 振り返りメモ（日付キー） | 対象（`reflectionNotes`） | `{ "YYYY-MM-DD": "text" }` |
+| `idealIslandSlogan` | スローガン | 対象（`slogan`） | 文字列 |
+| `mileUserProfile` | プロフィール表示名・アイコン | **対象外** | `{ icon, displayName }` |
+| `mileCloudSavedSnapshotHash` | dirty 判定用ハッシュ | 対象外 | 端末メタ |
+| `mileCloudLastSavedAt` | 最終クラウド保存時刻 | 対象外 | 端末メタ |
+| `mileCloudLoginLastSentAt` | ログインリンク再送クールダウン | 対象外 | 端末メタ |
+| `mileCloudLoadBackup` | クラウド読み込み直前の退避 | 対象外 | 下記バックアップ参照 |
+
+キー名に `idealIsland*` と `mile*` が混在しています。統一は影響が大きいため後回し（Data 系後続フェーズで検討）。
+
+### クラウド同期対象（`collectLocalAppData().data`）
+
+Supabase に保存する `data` の中身:
+
+- `goalsByTab` ← `idealIslandGoals`
+- `goalPlan` ← `mileGoalPlan`
+- `reflectionNotes` ← `mileReflectionNotes`
+- `slogan` ← `idealIslandSlogan`
+
+**同期対象外**（意図的に含めない）:
+
+- `mileUserProfile`（プロフィール）
+- `mileCloudSavedSnapshotHash` / `mileCloudLastSavedAt`（同期メタ）
+- `mileCloudLoginLastSentAt`（ログイン再送クールダウン）
+- `mileCloudLoadBackup`（読み込み前バックアップ）
+
+dirty 判定は上記 4 フィールドの JSON ハッシュのみ。`version` / `savedAt` の変更では dirty になりません。
+
+### 基本保存（localStorage）の内容
 
 データはブラウザの `localStorage` に保存しています。通常の操作はすべて端末内に即時反映されます。
 
-保存対象:
+アプリデータとして保持する主な内容:
 
-- タスク一覧
-- 期限
-- カテゴリ
-- 完了状態
-- `completedAt`
-- `monthlyGoalId`
-- スローガン
+- タスク一覧（期限・カテゴリ・完了状態・`completedAt`・`monthlyGoalId` など）
 - 振り返りメモ
-- 年間目標
-- 今月の目標
-- 今月目標の `icon`
+- スローガン
+- 年間目標・今月目標（`mileGoalPlan`）
 - プロフィール表示用メタ（`mileUserProfile`）
-- クラウド同期メタ（`mileCloudSavedSnapshotHash` / `mileCloudLastSavedAt`）
+- クラウド同期メタ（hash / 最終保存時刻）
 
 逆算型目標管理用のデータは `mileGoalPlan` に保存しています。
 
@@ -153,14 +193,42 @@ const mileGoalPlan = {
 ### クラウド保存（Supabase）
 
 - Supabaseログインに対応しています（メールリンク方式）。
-- ログイン後、目標・タスク・振り返り・スローガンの変更は **45秒 debounce** で自動クラウド保存されます。
+- 保存先テーブル: `user_app_data`（`app_data` に上記 `version: 1` 形式の JSON）。
+- ログイン後、同期対象 4 種の変更は **45秒 debounce** で自動クラウド保存されます。
 - 「クラウドに保存」「クラウドから読み込み」による手動操作も利用できます。
 - クラウド保存セクションに同期状態（未保存 / 保存中 / 保存済み / 失敗）を表示します。
-- 「クラウドに保存」は、この端末の `localStorage` 内容を Supabase へ送ります。
-- 「クラウドから読み込み」は、Supabase のデータをこの端末の `localStorage` へ反映します。
+- 「クラウドに保存」は、同期対象の `localStorage` 内容を Supabase へ送ります。
+- 「クラウドから読み込み」は、Supabase のデータを同期対象キーのみ `localStorage` へ反映します（プロフィールは上書きしません）。
 - 読み込み前には上書き確認ダイアログが表示されます。
 - 保存中にさらに編集された場合は、誤って「クラウド保存済み」と判定しないよう、保存開始時のスナップショットと成功後のローカル状態を比較します。
 - ログイン → 保存 → 別端末読み込みの E2E は確認済みです。
+
+### プロフィール（`mileUserProfile`）の扱い
+
+- **現在**: 端末ローカルのみ。設定タブ「プロフィール設定」で編集し、`localStorage` に保存します。
+- **クラウド同期**: **対象外**（Profile-4 時点の意図どおり）。
+- **今後**: Data-2 でクラウド同期対象にするか検討（別端末で同じ表示名・アイコンを使う需要と、既存 `app_data` との互換性を先に設計する）。
+
+### バックアップ仕様（`mileCloudLoadBackup`）
+
+- **タイミング**: 「クラウドから読み込み」確定後、`apply` の直前。
+- **退避内容**: 同期対象 4 キーの raw 文字列のみ（プロフィール・同期メタは含まない）。
+- **復元 UI**: 未実装（DevTools 等での手動復元のみ）。
+- **今後**: 復元 UI または失敗時ロールバックは **Data-2 候補**。
+
+### version 管理
+
+- クラウド payload には既に **`version: 1`** があります。
+- 読み込み時の version 検証・マイグレーションは **未実装**（設計メモのみ。実装は Data-2 候補）。
+- `version: 2` 以降を導入する場合は、既存 Supabase データとの互換方針を先に文書化してから実装します。
+
+### 今後の Data 系候補
+
+- version 検証 / マイグレーション（Data-2）
+- バックアップ復元 UI（Data-2）
+- プロフィールのクラウド同期（Data-2）
+- `idealIslandGoals` と `mileGoalPlan` の二重構造整理（影響大・別途設計）
+- `localStorage` キー名統一（`idealIsland*` → `mile*` 等、破壊的マイグレーションのため後回し）
 
 ## 現在の制限
 
@@ -168,7 +236,8 @@ const mileGoalPlan = {
 - クラウド自動保存は debounce 方式（リアルタイム同期ではない）
 - 同じブラウザ内で基本保存される
 - ブラウザのデータ削除を行うと端末内の保存内容も消える可能性あり
-- プロフィールのアイコン / 表示名は閲覧中心（変更UIは未実装）
+- プロフィールは端末ローカルのみ（別端末では自動表示または端末ごとの設定）
+- クラウド読み込み前バックアップの復元 UI はない
 
 ## ファイル構成メモ
 
@@ -188,10 +257,11 @@ const mileGoalPlan = {
 
 ## 今後の追加予定
 
-- Phase UX-1: トップ画面と基本UIの微調整
-- Phase Profile-4: プロフィール編集機能
+- Phase Data-2: 同期対象・バックアップ・version 検証の整理（実装）
+- Phase Profile-5: プロフィールアイコン候補のアップデート（絵文字の世界観整理）
 - Phase World-1: ステージ・進捗演出
-- Phase Data-1: データ構造と同期の安定化
+
+完了済み（参考）: UX-1, Profile-4, Data-1（調査・ドキュメント）
 
 ## 作業時の確認コマンド
 
