@@ -6,7 +6,7 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `3eb179b` feat: add MILE stage, badges, and streak display
+- 最新コミット: `96fd991` refactor(ui): split today add form and move streak to details
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -98,10 +98,16 @@
   - ダッシュボード直下に MILEステージカード
   - 累計MILEによるステージ表示（アイコン・ステージ名）
   - 次のステージまであと○MILE
-  - 連続達成日数（今日タブの `completedAt` から算出）
   - 条件達成バッジ（はじめの一歩 / コツコツさん / 今週いい感じ / かなり前進）
   - 今日のMILE / 今週のMILE / 累計MILE と連動
   - 新規 `localStorage` キーなし、クラウド同期対象の追加なし
+- Phase Release-2
+  - 「今日やることを追加」を `#today-add-section` として一覧の下に独立配置
+  - 連続達成日数を「詳しい進捗を見る」内へ移動（MILEステージカードから削除）
+  - MILEステージカードのコンパクト化、バッジ未獲得時の控えめ表示
+  - 下部ナビ「進捗」→「詳しい」（タップで詳しい進捗を開く）
+  - 新規 `localStorage` キーなし、クラウド同期対象の追加なし
+  - 3 HTML 同期、push 済み（`96fd991`）
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -118,19 +124,21 @@
 1. プロフィール（Hello / アイコン）
 2. ヘッダー（MILEカード）
 3. ダッシュボード
-4. MILEステージ（ダッシュボード直下）
-5. 今日やること
-6. 今月の目標
-7. 年間目標
-8. 進捗詳細
-9. 振り返りメモ
-10. プロフィール設定（下部ナビ「設定」→ 先頭にスクロール）
-11. クラウド保存
-12. スローガン
+4. MILEステージ（ダッシュボード直下・ステージとバッジ）
+5. 今日やること一覧
+6. 今日やることを追加（独立カード）
+7. 今月の目標
+8. 年間目標
+9. 進捗サマリー / 詳しい進捗（連続達成・週間・達成履歴など）
+10. 振り返りメモ
+11. プロフィール設定（下部ナビ「設定」→ 先頭にスクロール）
+12. クラウド保存
+13. スローガン
 
 ## 直近の変更内容
 
-- Phase World-2: MILEステージ・バッジ・連続達成、3 HTML 同期、push 済み（`3eb179b`）
+- Phase Release-2: 今日追加フォーム分離・連続達成を詳しい進捗へ、3 HTML 同期、push 済み（`96fd991`）
+- Phase World-2: MILEステージ・バッジ（`3eb179b`）
 - Phase World-1: MILEポイント表示・達成時トースト（`be9c25f`）
 - Phase Profile-5: プロフィールアイコン候補更新
 - Phase Data-1: データ仕様の調査・ドキュメント化（README / CONTINUE）
@@ -155,16 +163,16 @@
 - MILEポイント（今日のMILE / 今週のMILE、`completedAt` から算出）
 - タスク達成時の +1 MILE トースト
 - MILEステージカード（累計MILE・次のステージまであと○MILE）
-- 連続達成日数（MILEステージカード内）
 - 条件達成バッジ（獲得済みのみ表示）
+- 今日やること一覧と追加フォームの分離（`#today-add-section`）
+- 連続達成日数（詳しい進捗内、`getStreakProgress`）
 - 期限つきタスク
 - カテゴリ機能
 - 期限フィルター
 - カテゴリフィルター
 - 完了済みタスクの折りたたみ
-- 今週の進捗
-- 達成履歴
-- 連続達成日数
+- 今週の進捗（詳しい進捗内）
+- 達成履歴（詳しい進捗内）
 - 振り返りメモ
 - localStorage保存（端末への自動保存）
 - プロフィール表示・編集（ログイン前後、上部ヘッダー + 設定タブ）
@@ -183,10 +191,9 @@
   - `mileCloudLoadBackup` の復元 UI または失敗時ロールバック
   - プロフィール（`mileUserProfile`）のクラウド同期要否の決定と実装
   - `idealIslandGoals` と `mileGoalPlan` の二重構造整理（影響大・設計先行）
-- **Phase Release-2**: β版利用フィードバック反映
 - **Phase World-3**: バッジ追加・ステージ演出改善・達成演出の改善
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, Release-2
 
 ## 注意点
 
