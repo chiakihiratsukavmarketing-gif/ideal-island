@@ -19,6 +19,7 @@ https://ideal-island.vercel.app/
 - PWAアイコンOK
 - 別端末確認OK（ログイン → 保存 → 読み込みの E2E 確認済み）
 - Vercel公開済み
+- β版公開前総点検済み（Release-1、2026-06-04）
 
 ## 現在の画面構成
 
@@ -187,7 +188,6 @@ const mileGoalPlan = {
 
 ## 今後の追加予定
 
-- Phase Release-1: β版公開前の総点検
 - Phase UX-1: トップ画面と基本UIの微調整
 - Phase Profile-4: プロフィール編集機能
 - Phase World-1: ステージ・進捗演出

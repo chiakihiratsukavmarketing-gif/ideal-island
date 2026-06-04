@@ -6,7 +6,7 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `0af472d` feat: add cloud sync status, auto-save, and save race guard
+- 最新コミット: `86b07a0` docs: consolidate next phase roadmap
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -19,6 +19,7 @@
 - PWAアイコンOK
 - 別端末確認OK
 - Vercel公開済み
+- β版公開前総点検済み（Release-1、2026-06-04）
 
 ## ここまで完了したフェーズ
 
@@ -73,6 +74,10 @@
   - スマホ実機確認完了
 - Phase Docs-1
   - README / CONTINUE を現状に合わせて更新完了
+- Phase Release-1（完了日: 2026-06-04）
+  - β版公開前の総点検完了
+  - git / 公開URL / PWA / クラウド同期 / スマホ表示 / ドキュメント確認済み
+  - β版公開を止める致命的問題なし
 
 ## 現在の画面順
 
@@ -89,10 +94,9 @@
 
 ## 直近の変更内容
 
+- Phase Release-1: β版公開前総点検完了（2026-06-04）
+- Phase Docs-1: 次回候補フェーズの整理、現状ドキュメント更新
 - Phase Cloud-8〜10: 同期状態UI、自動保存、保存中編集の安全判定
-- Phase Cloud-6: 別端末を含むクラウド E2E 確認完了
-- Phase Beta-1: スマホ実機での主要操作確認完了
-- Phase Docs-1: ドキュメントを現状に合わせて整理
 
 ## 実装済み機能
 
@@ -130,7 +134,6 @@
 
 ## 次にやる候補
 
-- Phase Release-1: β版公開前の総点検
 - Phase UX-1: トップ画面と基本UIの微調整
 - Phase Profile-4: プロフィール編集機能
 - Phase World-1: ステージ・進捗演出
