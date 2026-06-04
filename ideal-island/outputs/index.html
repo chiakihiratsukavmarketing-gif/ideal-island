@@ -160,6 +160,62 @@
         letter-spacing: 0.42em;
       }
 
+      .user-profile {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        width: min(100%, 720px);
+        margin: 0 auto;
+        padding: 0 18px 4px;
+        text-align: center;
+      }
+
+      .user-profile-avatar {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border: 1px solid rgba(80, 208, 255, 0.18);
+        border-radius: 999px;
+        background: rgba(12, 18, 36, 0.72);
+        font-size: 1.55rem;
+        line-height: 1;
+      }
+
+      .user-profile-name {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 820;
+        color: var(--text);
+      }
+
+      .user-profile-tagline {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 650;
+      }
+
+      .user-profile[data-state="guest"] {
+        opacity: 0.78;
+      }
+
+      .user-profile[data-state="guest"] .user-profile-avatar {
+        width: 46px;
+        height: 46px;
+        font-size: 1.2rem;
+      }
+
+      .user-profile[data-state="guest"] .user-profile-name {
+        font-size: 0.92rem;
+        font-weight: 750;
+        color: var(--muted);
+      }
+
+      .user-profile[data-state="guest"] .user-profile-tagline {
+        display: none;
+      }
+
       .hero-copy {
         display: grid;
         gap: 10px;
@@ -3533,6 +3589,22 @@
         letter-spacing: 0.12em;
       }
 
+      .user-profile {
+        gap: 7px;
+        margin: 0 auto 2px;
+        padding: 0 18px 2px;
+      }
+
+      .user-profile-avatar {
+        border: 1px solid var(--line-soft);
+        background: #ffffff;
+        box-shadow: 0 8px 18px rgba(16, 25, 50, 0.06);
+      }
+
+      .user-profile[data-state="guest"] .user-profile-avatar {
+        background: #f7f8f4;
+      }
+
       .hero-copy {
         max-width: 500px;
         margin-top: 4px;
@@ -4459,6 +4531,12 @@
         <a class="cta-button" href="#goal-console">今日のタスクを確認する <span aria-hidden="true">→</span></a>
       </header>
 
+      <section class="user-profile" id="user-profile" aria-label="ユーザープロフィール" data-state="guest">
+        <div class="user-profile-avatar" id="userProfileIcon" aria-hidden="true">🌱</div>
+        <p class="user-profile-name" id="userProfileName">ゲスト</p>
+        <p class="user-profile-tagline" id="userProfileTagline" hidden>今日も一歩進めましょう</p>
+      </section>
+
       <p class="goal-flow-hint">年間目標から、今月の目標と今日の行動を整理します。</p>
 
       <section class="dashboard-card" id="dashboard-section" aria-label="ダッシュボード">
@@ -4965,6 +5043,8 @@
       const GOALS_STORAGE_KEY = "idealIslandGoals";
       const REFLECTION_STORAGE_KEY = "mileReflectionNotes";
       const GOAL_PLAN_STORAGE_KEY = "mileGoalPlan";
+      const USER_PROFILE_STORAGE_KEY = "mileUserProfile";
+      const PROFILE_ICON_OPTIONS = ["🌱", "☁️", "🏝️", "🌼", "🪴", "✨"];
       const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWVkcmtwdnJ3a3N6YmthaGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODYwMDMsImV4cCI6MjA5NjA2MjAwM30.ZTaJhkZPzd0CAqiCfMYTAib3iNSWXtT70285m5mxbOI";
       const TAB_LABELS = {
@@ -5050,6 +5130,10 @@
       const cloudLogoutButton = document.getElementById("cloudLogoutButton");
       const cloudUserEmail = document.getElementById("cloudUserEmail");
       const cloudAuthStatus = document.getElementById("cloudAuthStatus");
+      const userProfileSection = document.getElementById("user-profile");
+      const userProfileIcon = document.getElementById("userProfileIcon");
+      const userProfileName = document.getElementById("userProfileName");
+      const userProfileTagline = document.getElementById("userProfileTagline");
       const tabButtons = document.querySelectorAll(".tab-button");
       const bottomNavButtons = document.querySelectorAll(".bottom-nav-item");
       const taskFilterButtons = document.querySelectorAll(".task-filter-button");
@@ -5217,6 +5301,78 @@
 
       function getCloudRedirectUrl() {
         return window.location.origin + window.location.pathname;
+      }
+
+      function loadUserProfile() {
+        try {
+          const rawValue = localStorage.getItem(USER_PROFILE_STORAGE_KEY);
+          if (!rawValue) {
+            return { icon: "", displayName: "" };
+          }
+
+          const parsed = JSON.parse(rawValue);
+          return {
+            icon: typeof parsed?.icon === "string" ? parsed.icon : "",
+            displayName: typeof parsed?.displayName === "string" ? parsed.displayName : "",
+          };
+        } catch {
+          return { icon: "", displayName: "" };
+        }
+      }
+
+      function saveUserProfile(profile) {
+        const nextProfile = {
+          icon: typeof profile?.icon === "string" ? profile.icon : "",
+          displayName: typeof profile?.displayName === "string" ? profile.displayName : "",
+        };
+        localStorage.setItem(USER_PROFILE_STORAGE_KEY, JSON.stringify(nextProfile));
+        renderUserProfile();
+      }
+
+      function getCloudDisplayName(email) {
+        if (!email || typeof email !== "string") {
+          return "あなた";
+        }
+
+        const localPart = email.split("@")[0]?.trim();
+        if (!localPart) {
+          return "あなた";
+        }
+
+        const name = localPart.split(/[._-]/)[0]?.trim() || localPart;
+        return name || "あなた";
+      }
+
+      function getCloudUserIcon(email) {
+        if (!email || typeof email !== "string") {
+          return "🌱";
+        }
+
+        let hash = 0;
+        for (let index = 0; index < email.length; index += 1) {
+          hash = (hash + email.charCodeAt(index) * (index + 1)) % 2147483647;
+        }
+
+        return PROFILE_ICON_OPTIONS[Math.abs(hash) % PROFILE_ICON_OPTIONS.length];
+      }
+
+      function renderUserProfile() {
+        if (!userProfileSection) {
+          return;
+        }
+
+        const savedProfile = loadUserProfile();
+        const email = cloudSession?.user?.email || "";
+        const isSignedIn = Boolean(email);
+        const displayName =
+          savedProfile.displayName || (isSignedIn ? getCloudDisplayName(email) : "ゲスト");
+        const icon = savedProfile.icon || (isSignedIn ? getCloudUserIcon(email) : "🌱");
+
+        userProfileSection.dataset.state = isSignedIn ? "signed-in" : "guest";
+        userProfileIcon.textContent = icon;
+        userProfileName.textContent = displayName;
+        userProfileTagline.textContent = "今日も一歩進めましょう";
+        userProfileTagline.hidden = !isSignedIn;
       }
 
       function logCloudAuthError(context, error) {
@@ -5447,6 +5603,7 @@
         if (userEmail) {
           cloudDescription.textContent = "ログイン中です。「クラウドに保存」と「クラウドから読み込み」が使えます。";
           cloudStatusBadge.textContent = "ログイン中";
+          renderUserProfile();
           return;
         }
 
@@ -5456,6 +5613,8 @@
         if (!isConfigured) {
           setCloudAuthStatus("SUPABASE_URL と SUPABASE_ANON_KEY を差し替えるとログイン確認を使えます。");
         }
+
+        renderUserProfile();
       }
 
       async function initializeSupabaseAuth() {
@@ -7430,6 +7589,7 @@
 
       render();
       renderReflectionNotes();
+      renderUserProfile();
       initializeSupabaseAuth();
     </script>
   </body>
