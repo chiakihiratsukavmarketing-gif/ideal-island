@@ -6,8 +6,9 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `210d500` docs: sync Release-4 docs and add CLAUDE, WORK_LOG, NEXT_TASKS
-- 直近コード: `56bc682` fix(ui): refine profile cloud and greeting labels
+- 最新実装コミット: `94e70b6` feat(world-3): add mile badges and badge-earned toast
+- 直前 Docs: `31e06d7` docs: plan minimal launch phases in CONTINUE and NEXT_TASKS
+- 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -139,6 +140,12 @@
   - 新規 `localStorage` キーなし、`collectLocalAppData()` 変更なし
   - クラウド同期対象の追加なし、Supabase設定変更なし
   - 3 HTML 同期、push 済み（`56bc682`）、Vercel反映済み
+- Phase World-3 mini
+  - `MILE_BADGE_DEFS` にバッジ3件追加（今週スタート / 今日3歩 / 10MILE）
+  - 今日タブ完了時、新規バッジ獲得だけトースト出し分け（`getNewlyEarnedBadgeLabels`）
+  - **やっていない**: ステージ演出、未獲得バッジ一覧、装飾・アニメーション強化
+  - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
+  - 3 HTML 同期済み（`94e70b6`）。push 前（Docs 更新待ち）
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -168,6 +175,7 @@
 
 ## 直近の変更内容
 
+- Phase World-3 mini: バッジ3件・バッジ獲得トースト、3 HTML 同期（`94e70b6`、未 push）
 - Phase Release-4: summary「プロフィール」「クラウド保存・同期」、Hello「さん」、3 HTML 同期、push 済み（`56bc682`）
 - Phase Release-3 Docs: README / CONTINUE に Release-3 反映（`b00c35d`）
 - Phase Release-3: 配色・「今日のToDo」見出し・タスクカード視認性・下部ナビ SVG・プロフィール/クラウド折りたたみ、3 HTML 同期、push 済み（`19e7830`）
@@ -197,7 +205,8 @@
 - MILEポイント（今日のMILE / 今週のMILE、`completedAt` から算出）
 - タスク達成時の +1 MILE トースト
 - MILEステージカード（累計MILE・次のステージまであと○MILE）
-- 条件達成バッジ（獲得済みのみ表示）
+- 条件達成バッジ（獲得済みのみ表示。7件: はじめの一歩 / 今週スタート / 今日3歩 / コツコツさん / 今週いい感じ / 10MILE / かなり前進）
+- バッジ獲得時トースト（新規獲得時のみ「バッジ獲得」+ ラベル。それ以外は +1 MILE）
 - 今日やること一覧と追加フォームの分離（`#today-add-section`）
 - Release-3 UI整理
   - 今日の達成率カード・今日追加カードの淡い緑系配色
@@ -230,13 +239,7 @@
 
 優先度は上から。各フェーズは **1〜数コミット** で終える想定。実装前に `NEXT_TASKS.md` を確認。
 
-### Phase World-3 mini（1〜2コミット）
-
-- `MILE_BADGE_DEFS` にバッジを追加（`completedAt` から再計算、新規キーなし）
-- 今日タスク完了時、**新規バッジ獲得だけ**控えめトースト（既存 +1 MILE トーストの拡張で可）
-- **やらない**: ステージ演出強化、プログレスバー、ステージアップ専用演出、未獲得バッジ一覧
-
-### Phase Todo-1（1〜2コミット）
+### 次フェーズ: Phase Todo-1（1〜2コミット）
 
 - 今日のToDoを **別日に回す**（期限 `dueDate` の更新など、既存タスク構造の範囲で最小仕様）
 - 既存データを壊さない（マイグレーションなし、読み込み互換維持）
@@ -263,7 +266,7 @@
 - **Phase Data-2**: version 検証、バックアップ復元 UI、プロフィール同期、`idealIslandGoals` / `mileGoalPlan` 整理
 - **ステージ演出強化**（旧 World-3 案の装飾系）
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, Release-2, Release-3, Release-4
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Release-2, Release-3, Release-4
 
 ## 注意点
 

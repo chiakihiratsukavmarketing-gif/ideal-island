@@ -4,7 +4,16 @@
 
 ---
 
-## 2026-06（Release-3 / Release-4）
+## 2026-06（World-3 mini / Release-3 / Release-4）
+
+### World-3 mini 実装（`94e70b6`）
+
+- バッジ3件追加: 今週スタート（`weekMile >= 1`）、今日3歩（`todayMile >= 3`）、10MILE（`totalMile >= 10`）
+- 今日タブ完了時、新規バッジ獲得だけトースト出し分け（`getNewlyEarnedBadgeLabels` → `showMileToast({ badgeLabels })`）
+- 未実装（後回し）: ステージ演出、未獲得バッジ一覧、装飾・アニメーション強化
+- 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
+- 3 HTML 同期（`index.html` / `outputs/index.html` / `ideal-island/outputs/index.html`）
+- push 前（本作業で Docs 更新予定）
 
 ### Release-3 UI（`19e7830`）
 
@@ -52,11 +61,10 @@
 ## コミット履歴（直近）
 
 ```
+94e70b6 feat(world-3): add mile badges and badge-earned toast
+31e06d7 docs: plan minimal launch phases in CONTINUE and NEXT_TASKS
+210d500 docs: sync Release-4 docs and add CLAUDE, WORK_LOG, NEXT_TASKS
 56bc682 fix(ui): refine profile cloud and greeting labels
-b00c35d docs: document Release-3 UI refinements
-19e7830 refactor(ui): refine Release-3 colors and settings folds
-6f66f0b refactor(ui): soften Release-3 top layout and task styling
-96fd991 refactor(ui): split today add form and move streak to details
 ```
 
 ※ `git log` で常に最新を確認すること。
