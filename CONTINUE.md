@@ -6,8 +6,9 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新実装コミット: `94e70b6` feat(world-3): add mile badges and badge-earned toast
-- 直前 Docs: `31e06d7` docs: plan minimal launch phases in CONTINUE and NEXT_TASKS
+- 最新実装コミット: `8929ed0` feat(todo-1): add postpone-to-tomorrow for today todos
+- 直前 Docs: `06c8ad5` docs: document World-3 mini badges and badge-earned toast
+- World-3 実装: `94e70b6`、push 済み想定
 - 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
@@ -145,7 +146,15 @@
   - 今日タブ完了時、新規バッジ獲得だけトースト出し分け（`getNewlyEarnedBadgeLabels`）
   - **やっていない**: ステージ演出、未獲得バッジ一覧、装飾・アニメーション強化
   - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
-  - 3 HTML 同期済み（`94e70b6`）。push 前（Docs 更新待ち）
+  - 3 HTML 同期済み（`94e70b6`）、Docs `06c8ad5`
+- Phase Todo-1
+  - 今日タブの未完了タスクに「明日へ」ボタン（`rescheduleGoal` / `rescheduleGoalToTomorrow`）
+  - 表示: 期限なし / 今日期限 / 期限切れ。非表示: 未来日期限・完了済み
+  - `dueDate` を翌日に更新、`updatedAt` のみ。`goalsByTab.today` に残す
+  - MILE・バッジ・トースト・ダッシュボード達成率/残件は変更なし
+  - 任意日付は既存編集フォーム。スマホ 320 / 375 / 390px 確認済み
+  - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
+  - 3 HTML 同期（`8929ed0`）。Docs 更新待ち、未 push の場合あり
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -175,7 +184,8 @@
 
 ## 直近の変更内容
 
-- Phase World-3 mini: バッジ3件・バッジ獲得トースト、3 HTML 同期（`94e70b6`、未 push）
+- Phase Todo-1: 「明日へ」で `dueDate` を翌日に、3 HTML 同期（`8929ed0`、Docs 待ち）
+- Phase World-3 mini: バッジ3件・バッジ獲得トースト、3 HTML + Docs（`94e70b6` / `06c8ad5`）
 - Phase Release-4: summary「プロフィール」「クラウド保存・同期」、Hello「さん」、3 HTML 同期、push 済み（`56bc682`）
 - Phase Release-3 Docs: README / CONTINUE に Release-3 反映（`b00c35d`）
 - Phase Release-3: 配色・「今日のToDo」見出し・タスクカード視認性・下部ナビ SVG・プロフィール/クラウド折りたたみ、3 HTML 同期、push 済み（`19e7830`）
@@ -199,6 +209,7 @@
 - 今日タスク一覧で紐づく今月目標アイコン表示
 - ダッシュボードの次にやることへのアイコン表示
 - 今日タスクの追加 / 編集 / 削除
+- 今日タスクの「明日へ」（期限なし・今日・期限切れの未完了のみ。`dueDate` 翌日化）
 - 今日タスクの完了 / 未完了切り替え
 - 今日タスクと今月目標の紐づけ
 - ダッシュボード数値表示
@@ -239,13 +250,7 @@
 
 優先度は上から。各フェーズは **1〜数コミット** で終える想定。実装前に `NEXT_TASKS.md` を確認。
 
-### 次フェーズ: Phase Todo-1（1〜2コミット）
-
-- 今日のToDoを **別日に回す**（期限 `dueDate` の更新など、既存タスク構造の範囲で最小仕様）
-- 既存データを壊さない（マイグレーションなし、読み込み互換維持）
-- 併せるなら: UI（日付ピッカー or 「明日へ」ボタン）+ 保存 + 一覧再描画を同一フェーズ
-
-### Phase GoalView-1（1〜3コミット）
+### 次フェーズ: Phase GoalView-1（1〜3コミット）
 
 - **その他の月間目標を見返す**導線（今月以外・過去月の参照。表示中心で最小）
 - **年間目標にジャンル（カテゴリ）追加**（`mileGoalPlan.yearlyGoal` 拡張は要設計。クラウド同期 `goalPlan` に含まれるため慎重に）
@@ -266,7 +271,7 @@
 - **Phase Data-2**: version 検証、バックアップ復元 UI、プロフィール同期、`idealIslandGoals` / `mileGoalPlan` 整理
 - **ステージ演出強化**（旧 World-3 案の装飾系）
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Release-2, Release-3, Release-4
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, Release-2, Release-3, Release-4
 
 ## 注意点
 

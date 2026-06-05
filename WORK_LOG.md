@@ -4,7 +4,22 @@
 
 ---
 
-## 2026-06（World-3 mini / Release-3 / Release-4）
+## 2026-06（Todo-1 / World-3 mini / Release-3 / Release-4）
+
+### Todo-1 実装（`8929ed0`）
+
+- 今日タブの未完了タスクに「明日へ」ボタン（`data-action="reschedule-tomorrow"`）
+- 表示: 期限なし / 今日期限 / 期限切れ（`canRescheduleGoalToTomorrow`）。非表示: 未来日・完了済み
+- `rescheduleGoal`: `dueDate` を翌日（`addDays(getTodayKey(), 1)`）、`updatedAt` 更新のみ
+- タスクは `goalsByTab.today` に残る。MILE・バッジ・トーストは発火しない
+- ダッシュボード達成率・残り件数は変更なし。任意日付は既存編集フォーム
+- スマホ幅 320 / 375 / 390px で Playwright スモーク確認済み
+- 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
+- 3 HTML 同期。Docs 更新は本作業（未コミット）
+
+### World-3 mini Docs（`06c8ad5`）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に World-3 mini を反映
 
 ### World-3 mini 実装（`94e70b6`）
 
@@ -13,7 +28,7 @@
 - 未実装（後回し）: ステージ演出、未獲得バッジ一覧、装飾・アニメーション強化
 - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
 - 3 HTML 同期（`index.html` / `outputs/index.html` / `ideal-island/outputs/index.html`）
-- push 前（本作業で Docs 更新予定）
+- push 済み想定（`06c8ad5` Docs とセット）
 
 ### Release-3 UI（`19e7830`）
 
@@ -61,10 +76,10 @@
 ## コミット履歴（直近）
 
 ```
+8929ed0 feat(todo-1): add postpone-to-tomorrow for today todos
+06c8ad5 docs: document World-3 mini badges and badge-earned toast
 94e70b6 feat(world-3): add mile badges and badge-earned toast
 31e06d7 docs: plan minimal launch phases in CONTINUE and NEXT_TASKS
-210d500 docs: sync Release-4 docs and add CLAUDE, WORK_LOG, NEXT_TASKS
-56bc682 fix(ui): refine profile cloud and greeting labels
 ```
 
 ※ `git log` で常に最新を確認すること。
