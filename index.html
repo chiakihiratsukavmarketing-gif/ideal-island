@@ -5735,6 +5735,7 @@
                       <input id="cloudEmailInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
                     </div>
                     <div class="cloud-actions">
+                      <button class="button secondary" type="button" id="googleLoginButton">Googleでログイン</button>
                       <button class="button" type="button" id="sendLoginLinkButton">ログインリンクを送る</button>
                     </div>
                   </div>
@@ -5942,6 +5943,7 @@
       const cloudSignedOutPanel = document.getElementById("cloudSignedOutPanel");
       const cloudSignedInPanel = document.getElementById("cloudSignedInPanel");
       const cloudEmailInput = document.getElementById("cloudEmailInput");
+      const googleLoginButton = document.getElementById("googleLoginButton");
       const sendLoginLinkButton = document.getElementById("sendLoginLinkButton");
       const cloudSaveButton = document.getElementById("cloudSaveButton");
       const cloudLoadButton = document.getElementById("cloudLoadButton");
@@ -6055,6 +6057,7 @@
       saveReflectionButton.addEventListener("click", saveReflectionNote);
       saveProfileButton.addEventListener("click", saveProfileSettings);
       resetProfileButton.addEventListener("click", resetProfileSettings);
+      googleLoginButton.addEventListener("click", signInWithGoogleOAuth);
       sendLoginLinkButton.addEventListener("click", sendCloudLoginLink);
       cloudSaveButton.addEventListener("click", () => saveAppDataToCloud());
       cloudLoadButton.addEventListener("click", loadAppDataFromCloud);
@@ -6826,6 +6829,30 @@
           } else {
             resetCloudLoginSendButton();
           }
+        }
+      }
+
+      async function signInWithGoogleOAuth() {
+        if (!supabaseClient) {
+          setCloudAuthStatus("Supabase接続情報を差し替えてからGoogleログインをお試しください。", "error");
+          return;
+        }
+
+        googleLoginButton.disabled = true;
+        setCloudAuthStatus("Googleログインを開始します...");
+
+        try {
+          const { error } = await supabaseClient.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: getCloudRedirectUrl(),
+            },
+          });
+          if (error) throw error;
+        } catch (error) {
+          logCloudAuthError("signInWithGoogleOAuth failed", error);
+          setCloudAuthStatus("Googleログインを開始できませんでした。時間を置いて再度お試しください。", "error");
+          googleLoginButton.disabled = false;
         }
       }
 
