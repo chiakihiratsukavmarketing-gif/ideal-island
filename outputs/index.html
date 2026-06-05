@@ -2432,6 +2432,14 @@
         color: #8b5f5a;
       }
 
+      .goal-postpone-button {
+        min-height: 36px;
+        padding: 0 10px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        border-radius: 14px;
+      }
+
       .icon-button {
         display: inline-grid;
         width: 36px;
@@ -6913,6 +6921,10 @@
         if (action === "delete") {
           deleteGoal(goalId);
         }
+
+        if (action === "reschedule-tomorrow") {
+          rescheduleGoalToTomorrow(goalId);
+        }
       });
 
       monthlyGoalList.addEventListener("click", (event) => {
@@ -8079,6 +8091,36 @@
         render();
       }
 
+      function canRescheduleGoalToTomorrow(goal) {
+        if (activeTab !== "today") return false;
+        if (goal.done) return false;
+
+        const today = getTodayKey();
+        const dueDate = goal.dueDate || "";
+        if (!dueDate) return true;
+
+        return dueDate <= today;
+      }
+
+      function rescheduleGoal(goalId, nextDueDateKey) {
+        if (activeTab !== "today" || !nextDueDateKey) return;
+
+        const goal = goalsByTab.today.find((item) => item.id === goalId);
+        if (!goal || !canRescheduleGoalToTomorrow(goal)) return;
+
+        const now = new Date().toISOString();
+
+        goalsByTab.today = goalsByTab.today.map((item) =>
+          item.id === goalId ? { ...item, dueDate: nextDueDateKey, updatedAt: now } : item
+        );
+        saveGoals();
+        render();
+      }
+
+      function rescheduleGoalToTomorrow(goalId) {
+        rescheduleGoal(goalId, addDays(getTodayKey(), 1));
+      }
+
       function toggleGoal(goalId) {
         if (editingGoalId === goalId) {
           editingGoalId = "";
@@ -8552,6 +8594,7 @@
             )}</span>今月の目標：${escapeHtml(linkedMonthlyGoal.title)}</span>`
           : "";
         const isEditing = goal.id === editingGoalId;
+        const showPostponeButton = canRescheduleGoalToTomorrow(goal);
 
         return `
           <article class="goal-item ${goal.done ? "is-done" : ""} ${goal.dueDate ? "has-due-date" : ""} ${isEditing ? "is-editing" : ""}">
@@ -8571,6 +8614,18 @@
               </div>
             </div>
             <div class="goal-actions">
+              ${
+                showPostponeButton
+                  ? `<button
+                class="button secondary goal-postpone-button"
+                type="button"
+                data-action="reschedule-tomorrow"
+                data-id="${escapeHtml(goal.id)}"
+                aria-label="明日へ回す"
+                title="明日へ回す"
+              >明日へ</button>`
+                  : ""
+              }
               <button
                 class="button secondary goal-edit-button"
                 type="button"
