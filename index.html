@@ -782,6 +782,7 @@
       }
 
       .yearly-goal-form input,
+      .yearly-goal-form select,
       .yearly-goal-form textarea {
         width: 100%;
         border: 1.5px solid var(--line);
@@ -794,7 +795,8 @@
         outline: none;
       }
 
-      .yearly-goal-form input {
+      .yearly-goal-form input,
+      .yearly-goal-form select {
         min-height: 52px;
       }
 
@@ -804,6 +806,7 @@
       }
 
       .yearly-goal-form input:focus,
+      .yearly-goal-form select:focus,
       .yearly-goal-form textarea:focus {
         box-shadow: 0 0 0 4px rgba(184, 217, 106, 0.28);
       }
@@ -996,7 +999,8 @@
         -webkit-line-clamp: 1;
       }
 
-      .monthly-goal-meta {
+      .monthly-goal-meta,
+      .yearly-goal-meta {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
@@ -5492,6 +5496,17 @@
             />
           </div>
           <div class="field">
+            <label for="yearlyGoalCategory">ジャンル</label>
+            <select id="yearlyGoalCategory">
+              <option value="仕事">仕事</option>
+              <option value="学習">学習</option>
+              <option value="健康">健康</option>
+              <option value="家族">家族</option>
+              <option value="お金">お金</option>
+              <option value="その他" selected>その他</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="yearlyGoalMemoInput">メモ</label>
             <textarea
               id="yearlyGoalMemoInput"
@@ -5901,6 +5916,7 @@
       const yearlyGoalMemoInput = document.getElementById("yearlyGoalMemoInput");
       const yearlyGoalTargetInput = document.getElementById("yearlyGoalTargetInput");
       const yearlyGoalCurrentInput = document.getElementById("yearlyGoalCurrentInput");
+      const yearlyGoalCategory = document.getElementById("yearlyGoalCategory");
       const cancelYearlyGoalButton = document.getElementById("cancelYearlyGoalButton");
       const monthlyGoalPeriod = document.getElementById("monthlyGoalPeriod");
       const monthlyGoalCount = document.getElementById("monthlyGoalCount");
@@ -7054,6 +7070,7 @@
             id: `year-${year}`,
             title: "",
             memo: "",
+            category: "その他",
             targetValue: "",
             currentValue: "",
             createdAt: "",
@@ -7120,6 +7137,7 @@
               : fallbackId || `year-${year}-${Date.now()}`,
           title: typeof goal.title === "string" ? goal.title : "",
           memo: typeof goal.memo === "string" ? goal.memo : "",
+          category: CATEGORIES.includes(goal.category) ? goal.category : "その他",
           targetValue: normalizeNumberInput(goal.targetValue),
           currentValue: normalizeNumberInput(goal.currentValue),
           createdAt: typeof goal.createdAt === "string" ? goal.createdAt : "",
@@ -7202,6 +7220,7 @@
         yearlyGoalMemoInput.value = "";
         yearlyGoalTargetInput.value = "";
         yearlyGoalCurrentInput.value = "";
+        yearlyGoalCategory.value = "その他";
         yearlyGoalForm.classList.remove("is-collapsed");
         editYearlyGoalButton.setAttribute("aria-expanded", "true");
         editYearlyGoalButton.setAttribute("aria-label", "年間目標フォームを閉じる");
@@ -7219,6 +7238,7 @@
         yearlyGoalMemoInput.value = goal.memo;
         yearlyGoalTargetInput.value = goal.targetValue || "";
         yearlyGoalCurrentInput.value = goal.currentValue || "";
+        yearlyGoalCategory.value = goal.category;
         yearlyGoalForm.classList.remove("is-collapsed");
         editYearlyGoalButton.setAttribute("aria-expanded", "true");
         editYearlyGoalButton.setAttribute("aria-label", "年間目標フォームを閉じる");
@@ -7235,6 +7255,9 @@
         const memo = yearlyGoalMemoInput.value.trim();
         const targetValue = normalizeNumberInput(yearlyGoalTargetInput.value);
         const currentValue = normalizeNumberInput(yearlyGoalCurrentInput.value);
+        const category = CATEGORIES.includes(yearlyGoalCategory.value)
+          ? yearlyGoalCategory.value
+          : "その他";
         if (!title) {
           yearlyGoalInput.focus();
           return;
@@ -7249,6 +7272,7 @@
                     ...goal,
                     title,
                     memo,
+                    category,
                     targetValue,
                     currentValue,
                     updatedAt: now,
@@ -7261,6 +7285,7 @@
             id: `year-${new Date().getFullYear()}-${crypto.randomUUID ? crypto.randomUUID() : Date.now()}`,
             title,
             memo,
+            category,
             targetValue,
             currentValue,
             createdAt: now,
@@ -7317,6 +7342,7 @@
         yearlyGoalMemoInput.value = "";
         yearlyGoalTargetInput.value = "";
         yearlyGoalCurrentInput.value = "";
+        yearlyGoalCategory.value = "その他";
         renderYearlyGoal();
       }
 
@@ -7431,6 +7457,9 @@
                       <div class="yearly-goal-item-head">
                         <div class="goal-content">
                           <h3 class="yearly-goal-title">${escapeHtml(goal.title)}</h3>
+                          <div class="yearly-goal-meta">
+                            <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+                          </div>
                           ${goal.memo ? `<p class="yearly-goal-memo">${escapeHtml(goal.memo)}</p>` : ""}
                         </div>
                         <div class="yearly-goal-controls">
