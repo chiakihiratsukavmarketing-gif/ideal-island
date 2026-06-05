@@ -6,22 +6,40 @@
 
 ---
 
-## ローンチまでのフェーズ（実装順）
+## 次アクション（Launch-1 完了後）
 
-### Phase Launch-1（次）
+### 手動確認（P3）
 
-**目的**: ローンチ前の総合確認とドキュメント確定。
+- [ ] Supabase ログイン後のクラウド保存 / 読み込み（Magic Link → `cloudSaveButton` / `cloudLoadButton`）
+- [ ] 「ほかの月の目標」0件時の empty state 表示（任意）
 
-**スコープ**
+### Launch-2 候補（判断待ち）
 
-- [ ] スマホ幅での操作確認（追加 / 完了 / 削除 / 別日移動 / フィルター / 下部ナビ）
-- [ ] プロフィール保存・リセット、Hello「さん」
-- [ ] クラウド保存・読み込み・ログイン・同期表示
-- [ ] 月間見返し（「ほかの月の目標」）・年間ジャンル（フォーム・バッジ）
-- [ ] Vercel 本番確認 https://ideal-island.vercel.app/
-- [ ] `README.md` / `CONTINUE.md` / `NEXT_TASKS.md` をローンチ時点に更新
+- [ ] スローガン編集 UI 復帰（`.slogan-card { display: none !important; }` の見直し — Launch-1 P2）
 
-**コミット目安**: 1〜2（確認メモは `WORK_LOG.md`、コード変更がなければ Docs のみ）
+### Phase Data-2（別フェーズ）
+
+- [ ] version 検証、バックアップ復元 UI、プロフィールクラウド同期、二重構造整理
+
+---
+
+## 完了済み: Phase Launch-1（2026-06-04）
+
+**URL**: https://ideal-island.vercel.app/  
+**判定**: 合格（P0/P1なし）
+
+- [x] スマホ 320 / 375 / 390px（横スクロールなし、下部ナビ、今日のToDo、明日へ、今月/年間目標、設定 details）
+- [x] World-3 mini / Todo-1 / GoalView-1 の本番反映確認
+- [x] タスク CRUD / 目標 CRUD / プロフィール保存・リセット / 振り返りメモ
+- [x] 未ログインクラウド UI、`collectLocalAppData()` 4項目維持
+- [x] `manifest.json` / `icon-192` / `icon-512` / 初回コンソールエラーなし
+- [x] `README.md` / `CONTINUE.md` / `WORK_LOG.md` / `NEXT_TASKS.md` 更新（Docs コミット待ち）
+
+**既知課題（修正見送り）**
+
+- P2: スローガン編集 UI が CSS で非表示
+- P3: ログイン後クラウド保存/読み込みは手動QA待ち
+- P3: 「ほかの月の目標」0件 empty state は未検証
 
 ---
 
@@ -68,7 +86,6 @@
 
 - [ ] **Profile-6**: プロフィール画像アップロード
 - [ ] **年間目標アイコン**追加
-- [ ] **Phase Data-2**: version 検証、バックアップ復元、プロフィールクラウド同期、二重構造整理
 - [ ] **ステージ演出強化**（プログレスバー、ステージアップ演出、カード装飾の本格化、未獲得バッジ一覧）
 - [ ] `.settings-fold` の未使用 CSS 整理（任意）
 
@@ -76,6 +93,8 @@
 
 ## 完了済み（直近）
 
+- [x] Launch-1 本番QA（2026-06-04）— 合格（P0/P1なし）、Docs 反映（未コミット）
+- [x] GoalView-1 Docs（`c20ef74`）
 - [x] GoalView-1 Goal-1（`f6f7a0c`）— 年間ジャンル（`category`）
 - [x] GoalView-1 Monthly-1（`24ee53e`）— ほかの月の目標見返し導線
 - [x] Todo-1 実装（`8929ed0`）+ Docs（`07747bb`）

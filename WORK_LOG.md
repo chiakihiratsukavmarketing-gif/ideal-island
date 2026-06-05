@@ -4,9 +4,31 @@
 
 ---
 
-## 2026-06（GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
+## 2026-06（Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### GoalView-1 Docs（本作業・未コミット）
+### Launch-1 本番QA Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Launch-1 本番QA結果を反映
+- コード変更なし（`index.html` 3本は未変更）
+
+### Launch-1 本番QA（2026-06-04・コード変更なし）
+
+- **URL**: https://ideal-island.vercel.app/
+- **判定**: 合格（P0/P1なし）
+- **方法**: Playwright 自動検証（320 / 375 / 390px）+ manifest / icon / 本番 HTML マーカー確認
+- **確認済み**
+  - 横スクロールなし、下部ナビ、今日のToDo、明日へ、今月/年間目標、設定 details
+  - World-3 mini バッジトースト、Todo-1 明日へ、GoalView-1（ほかの月 / 年間ジャンル）の本番反映
+  - タスク CRUD、目標 CRUD、プロフィール保存/リセット、振り返りメモ
+  - 未ログインクラウド UI、`collectLocalAppData()` 4項目維持
+  - `manifest.json`、`icon-192` / `icon-512`、初回コンソールエラーなし
+- **既知課題**
+  - P2: スローガン編集 UI が CSS で非表示（`saveSlogan()` は動作）
+  - P3: ログイン後クラウド保存/読み込みは手動QA待ち
+  - P3: 「ほかの月の目標」0件 empty state は未検証
+- **次アクション**: Supabase ログイン後のクラウド手動確認。スローガン UI は Launch-2 以降
+
+### GoalView-1 Docs（`c20ef74`）
 
 - README / CONTINUE / WORK_LOG / NEXT_TASKS に GoalView-1（Monthly-1 + Goal-1）を反映
 
@@ -102,11 +124,11 @@
 ## コミット履歴（直近）
 
 ```
+c20ef74 docs: document GoalView-1 monthly review and yearly category
 f6f7a0c feat(goal-view): add yearly goal category field
 24ee53e feat(goal-view): clarify monthly goals review navigation
 07747bb docs: document Todo-1 postpone-to-tomorrow for today todos
 8929ed0 feat(todo-1): add postpone-to-tomorrow for today todos
-06c8ad5 docs: document World-3 mini badges and badge-earned toast
 ```
 
 ※ `git log` で常に最新を確認すること。
