@@ -1,58 +1,104 @@
 # MILE 次にやること
 
-優先度は上から。実装に入る前に `README.md` / `CONTINUE.md` / `CLAUDE.md` を確認。
+優先度は上から。実装前に `README.md` / `CONTINUE.md` / `CLAUDE.md` を確認。
+
+**方針**: 装飾は最小限・実用性優先・1フェーズ1〜数コミット・既存データを壊さない。
 
 ---
 
-## すぐ（Docs）
+## ローンチまでのフェーズ（実装順）
 
-- [ ] **Release-4 Docs をコミット・push**
-  - 対象: `README.md`, `CONTINUE.md`, `CLAUDE.md`, `WORK_LOG.md`, `NEXT_TASKS.md`
-  - `index.html` 3ファイルは既に `56bc682` で push 済みのため含めない
-  - メッセージ案: `docs: document Release-4 labels and add project management files`
+### Phase World-3 mini
 
----
+**目的**: ゲーム性の最小追加のみ。派手な演出は入れない。
 
-## 次の実装候補
+**スコープ**
 
-### Phase Data-2（優先候補・影響大）
+- [ ] `MILE_BADGE_DEFS` にバッジを 2〜3 件追加（`getMileStats()` の既存指標のみ）
+- [ ] 今日タスク完了時、新規バッジ獲得時だけトースト文言を出し分け（完了前後の in-memory 比較。新規 `localStorage` キーなし）
+- [ ] ステージカードの装飾・プログレスバー・ステージアップ専用演出は **やらない**
 
-設計を先に文書化してから、スコープを 1 つに絞って実装。
+**コミット目安**: 1〜2（例: `feat(world-3): add badges and badge-earned toast`）
 
-- [ ] クラウド読み込み時の `version` 検証 / マイグレーション
-- [ ] `mileCloudLoadBackup` の復元 UI または失敗時ロールバック
-- [ ] `mileUserProfile` をクラウド同期対象に含めるか決定・実装
-- [ ] `idealIslandGoals` と `mileGoalPlan` の二重構造整理（別途設計必須）
-
-**制約**: `collectLocalAppData()` 変更時は既存 Supabase データとの互換方針を先に決める。
-
-### Phase World-3
-
-- [ ] バッジ追加
-- [ ] ステージ演出・達成演出の改善
-- [ ] 可能なら `completedAt` 算出のみで完結（新規キー追加なし）
+**制約**: `collectLocalAppData()` / Supabase 変更なし。3 HTML 同期。
 
 ---
 
-## 任意・小さめ
+### Phase Todo-1
 
-- [ ] `.settings-fold` の未使用 `summary-open` / `summary-close` 用 CSS の整理（見た目に影響なければ後回し可）
-- [ ] 実利用フィードバックに基づく文言・導線の追加微調整
+**目的**: 今日のToDoを別日に回せる実用機能。
+
+**スコープ**
+
+- [ ] 今日タスクの `dueDate` を別日へ変更する最小 UI（例: 「明日へ」「日付を選ぶ」）
+- [ ] 既存 `goalsByTab` 構造を維持（破壊的マイグレーションなし）
+- [ ] フィルター・一覧・ダッシュボードが破綻しないこと
+
+**コミット目安**: 1〜2（UI + ロジックを同一フェーズでまとめてよい）
+
+**注意**: クラウド同期はタスク更新に伴う従来の同期のみ（同期対象の追加なし）。
+
+---
+
+### Phase GoalView-1
+
+**目的**: 目標の見返しと年間目標の整理。
+
+**スコープ**
+
+- [ ] その他の月間目標を見返す導線（過去月・他月の参照。最小は一覧 or 月選択）
+- [ ] 年間目標にジャンル（カテゴリ）フィールド追加 — `goalPlan` 変更のため設計・同期影響を先に確認
+- [ ] 年間目標アイコンは **本フェーズに含めなくてよい**
+
+**コミット目安**: 1〜3（見返し導線と年間ジャンルは分割可）
+
+**分割案**
+
+1. `feat(goal-view): add monthly goals review navigation`
+2. `feat(goal-view): add yearly goal category field`
+
+---
+
+### Phase Launch-1
+
+**目的**: ローンチ前の総合確認とドキュメント確定。
+
+**スコープ**
+
+- [ ] スマホ幅での操作確認（追加 / 完了 / 削除 / 別日移動 / フィルター / 下部ナビ）
+- [ ] プロフィール保存・リセット、Hello「さん」
+- [ ] クラウド保存・読み込み・ログイン・同期表示
+- [ ] Vercel 本番確認 https://ideal-island.vercel.app/
+- [ ] `README.md` / `CONTINUE.md` / `NEXT_TASKS.md` をローンチ時点に更新
+
+**コミット目安**: 1〜2（確認メモは `WORK_LOG.md`、コード変更がなければ Docs のみ）
+
+---
+
+## 後回し（ローンチ後）
+
+- [ ] **Profile-6**: プロフィール画像アップロード
+- [ ] **年間目標アイコン**追加
+- [ ] **Phase Data-2**: version 検証、バックアップ復元、プロフィールクラウド同期、二重構造整理
+- [ ] **ステージ演出強化**（プログレスバー、ステージアップ演出、カード装飾の本格化）
+- [ ] `.settings-fold` の未使用 CSS 整理（任意）
 
 ---
 
 ## 完了済み（直近）
 
-- Release-4 文言（`56bc682`）
-- Release-3 Docs（`b00c35d`）
-- Release-3 UI（`19e7830`）
-- Release-2 / World-1 / World-2 / Data-1 調査 など
+- [x] Release-4 Docs（`210d500`）
+- [x] Release-4 文言（`56bc682`）
+- [x] Release-3 Docs（`b00c35d`）
+- [x] Release-3 UI（`19e7830`）
+- [x] Release-2 / World-1 / World-2 / Data-1 調査 など
 
 ---
 
 ## 作業ルール（再掲）
 
-- 3 HTML は必ず同期
+- 3 HTML は必ず同期（`index.html` 変更時）
 - `git add .` 禁止
 - commit / push はユーザー指示時のみ
-- コミット前: `git status`、スマホ幅の目視またはスモーク（大きな UI 変更時）
+- 実装フェーズと Docs コミットは分離してよい
+- コミット前: `git status`、スマホ幅の確認（機能フェーズ時）

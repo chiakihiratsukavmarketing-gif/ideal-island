@@ -6,7 +6,8 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新コミット: `56bc682` fix(ui): refine profile cloud and greeting labels
+- 最新コミット: `210d500` docs: sync Release-4 docs and add CLAUDE, WORK_LOG, NEXT_TASKS
+- 直近コード: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -22,6 +23,15 @@
 - β版公開前総点検済み（Release-1、2026-06-04）
 - Release-3 UI・配色・ナビ・設定折りたたみ（`19e7830`、Vercel反映済み）
 - Release-4 文言整理（summary・Hello「さん」、`56bc682`、Vercel反映済み）
+- Release-4 Docs（`210d500`）
+
+## ローンチ前の方針（2026-06）
+
+- **装飾フェーズは最小限**（バッジ追加以上の大きな演出は入れない）
+- **実用性優先**（ToDoの別日移動、目標の見返し導線など）
+- **併せられる作業は併せる**（1フェーズ = 1〜数コミットで完結）
+- **データ**: 既存 `localStorage` / `collectLocalAppData()` を壊さない最小仕様から入る
+- **後回し**: プロフィール画像、年間目標アイコン、Data-2 大規模、ステージ演出強化
 
 ## ここまで完了したフェーズ
 
@@ -216,14 +226,42 @@
 - 手動クラウド読み込み
 - PWAアイコン / manifest
 
-## 次にやる候補
+## ローンチまでの残りフェーズ（最小構成）
 
-- **Phase Data-2**: 同期対象・バックアップ・version 検証の整理（実装）
-  - version 読み込み時検証 / マイグレーション
-  - `mileCloudLoadBackup` の復元 UI または失敗時ロールバック
-  - プロフィール（`mileUserProfile`）のクラウド同期要否の決定と実装
-  - `idealIslandGoals` と `mileGoalPlan` の二重構造整理（影響大・設計先行）
-- **Phase World-3**: バッジ追加・ステージ演出改善・達成演出の改善
+優先度は上から。各フェーズは **1〜数コミット** で終える想定。実装前に `NEXT_TASKS.md` を確認。
+
+### Phase World-3 mini（1〜2コミット）
+
+- `MILE_BADGE_DEFS` にバッジを追加（`completedAt` から再計算、新規キーなし）
+- 今日タスク完了時、**新規バッジ獲得だけ**控えめトースト（既存 +1 MILE トーストの拡張で可）
+- **やらない**: ステージ演出強化、プログレスバー、ステージアップ専用演出、未獲得バッジ一覧
+
+### Phase Todo-1（1〜2コミット）
+
+- 今日のToDoを **別日に回す**（期限 `dueDate` の更新など、既存タスク構造の範囲で最小仕様）
+- 既存データを壊さない（マイグレーションなし、読み込み互換維持）
+- 併せるなら: UI（日付ピッカー or 「明日へ」ボタン）+ 保存 + 一覧再描画を同一フェーズ
+
+### Phase GoalView-1（1〜3コミット）
+
+- **その他の月間目標を見返す**導線（今月以外・過去月の参照。表示中心で最小）
+- **年間目標にジャンル（カテゴリ）追加**（`mileGoalPlan.yearlyGoal` 拡張は要設計。クラウド同期 `goalPlan` に含まれるため慎重に）
+- 年間目標アイコンは **後回し可**（本フェーズに含めなくてよい）
+- 分割するなら: (1) 月間見返し導線 (2) 年間ジャンル — 各1コミット
+
+### Phase Launch-1（1〜2コミット）
+
+- スマホ操作の総合確認（追加 / 完了 / 削除 / 別日移動 / フィルター）
+- プロフィール保存・リセット、クラウド保存・読み込み・ログイン
+- Vercel 本番 https://ideal-island.vercel.app/
+- `README.md` / `CONTINUE.md` / `NEXT_TASKS.md` 更新（実装コミットと分離可）
+
+## 後回し（ローンチ後・別フェーズ）
+
+- **Profile-6**: プロフィール画像アップロード
+- **年間目標アイコン**追加
+- **Phase Data-2**: version 検証、バックアップ復元 UI、プロフィール同期、`idealIslandGoals` / `mileGoalPlan` 整理
+- **ステージ演出強化**（旧 World-3 案の装飾系）
 
 完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, Release-2, Release-3, Release-4
 
