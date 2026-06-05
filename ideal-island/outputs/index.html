@@ -5786,8 +5786,11 @@
       ];
       const MILE_BADGE_DEFS = [
         { id: "first-step", label: "はじめの一歩", check: (stats) => stats.totalMile >= 1 },
+        { id: "week-start", label: "今週スタート", check: (stats) => stats.weekMile >= 1 },
+        { id: "today-trio", label: "今日3歩", check: (stats) => stats.todayMile >= 3 },
         { id: "steady", label: "コツコツさん", check: (stats) => stats.streakDays >= 3 },
         { id: "week-good", label: "今週いい感じ", check: (stats) => stats.weekMile >= 5 },
+        { id: "mile-10", label: "10MILE", check: (stats) => stats.totalMile >= 10 },
         { id: "forward", label: "かなり前進", check: (stats) => stats.totalMile >= 30 },
       ];
       const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
@@ -8085,6 +8088,10 @@
           activeTab === "today" &&
           goalsByTab.today.some((goal) => goal.id === goalId && !goal.done);
 
+        const mileStatsBeforeCelebrate = shouldCelebrate
+          ? getMileStatsFromTodayGoals(goalsByTab.today)
+          : null;
+
         goalsByTab[activeTab] = goalsByTab[activeTab].map((goal) =>
           goal.id === goalId
             ? { ...goal, done: !goal.done, completedAt: !goal.done ? new Date().toISOString() : "" }
@@ -8094,7 +8101,12 @@
         render();
 
         if (shouldCelebrate) {
-          showMileToast();
+          const newBadgeLabels = getNewlyEarnedBadgeLabels(mileStatsBeforeCelebrate, getMileStats());
+          if (newBadgeLabels.length > 0) {
+            showMileToast({ badgeLabels: newBadgeLabels });
+          } else {
+            showMileToast();
+          }
         }
       }
 
@@ -8172,6 +8184,18 @@
         }));
       }
 
+      function getNewlyEarnedBadgeLabels(beforeStats, afterStats) {
+        const beforeIds = new Set(
+          getMileBadges(beforeStats)
+            .filter((badge) => badge.earned)
+            .map((badge) => badge.id)
+        );
+
+        return getMileBadges(afterStats)
+          .filter((badge) => badge.earned && !beforeIds.has(badge.id))
+          .map((badge) => badge.label);
+      }
+
       function getMileStage(stats) {
         const totalMile = stats.totalMile;
         let current = MILE_WORLD_STAGES[0];
@@ -8232,8 +8256,23 @@
         }
       }
 
-      function showMileToast() {
+      function showMileToast(options = {}) {
         if (!mileToast) return;
+
+        const pointsEl = mileToast.querySelector(".mile-toast-points");
+        const copyEl = mileToast.querySelector(".mile-toast-copy");
+        const badgeLabels = Array.isArray(options.badgeLabels) ? options.badgeLabels : [];
+
+        if (badgeLabels.length > 0) {
+          if (pointsEl) pointsEl.textContent = "バッジ獲得";
+          if (copyEl) {
+            copyEl.textContent =
+              badgeLabels.length === 1 ? badgeLabels[0] : badgeLabels.slice(0, 2).join("、");
+          }
+        } else {
+          if (pointsEl) pointsEl.textContent = "+1 MILE";
+          if (copyEl) copyEl.textContent = "いい一歩！";
+        }
 
         window.clearTimeout(mileToastTimer);
         mileToast.hidden = false;
