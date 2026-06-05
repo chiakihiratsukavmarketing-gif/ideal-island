@@ -6,8 +6,9 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新実装コミット: `8929ed0` feat(todo-1): add postpone-to-tomorrow for today todos
-- 直前 Docs: `06c8ad5` docs: document World-3 mini badges and badge-earned toast
+- 最新実装コミット: `f6f7a0c` feat(goal-view): add yearly goal category field
+- GoalView Monthly-1: `24ee53e` feat(goal-view): clarify monthly goals review navigation
+- 直前 Docs: `07747bb` docs: document Todo-1 postpone-to-tomorrow for today todos
 - World-3 実装: `94e70b6`、push 済み想定
 - 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
@@ -154,7 +155,13 @@
   - MILE・バッジ・トースト・ダッシュボード達成率/残件は変更なし
   - 任意日付は既存編集フォーム。スマホ 320 / 375 / 390px 確認済み
   - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
-  - 3 HTML 同期（`8929ed0`）。Docs 更新待ち、未 push の場合あり
+  - 3 HTML 同期（`8929ed0`）、Docs `07747bb`
+- Phase GoalView-1（Monthly-1 + Goal-1）
+  - Monthly-1: 「ほかの月の目標」見出し、過去月0件の空状態、既存 `#monthlyGoalArchive` の月別 details、下部ナビ「目標」→ `monthly-goal-section`
+  - Goal-1: 年間目標に `category`（表示「ジャンル」、`CATEGORIES` 流用）。`normalizeYearlyGoal()` で「その他」補完。フォーム・カードバッジ
+  - 年間目標アイコンは後回し
+  - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
+  - 3 HTML 同期（`24ee53e` / `f6f7a0c`）。Docs 更新待ち、未 push の場合あり
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -184,7 +191,8 @@
 
 ## 直近の変更内容
 
-- Phase Todo-1: 「明日へ」で `dueDate` を翌日に、3 HTML 同期（`8929ed0`、Docs 待ち）
+- Phase GoalView-1: 月間見返し導線（`24ee53e`）+ 年間ジャンル（`f6f7a0c`）、Docs 待ち
+- Phase Todo-1: 「明日へ」で `dueDate` を翌日に、3 HTML + Docs（`8929ed0` / `07747bb`）
 - Phase World-3 mini: バッジ3件・バッジ獲得トースト、3 HTML + Docs（`94e70b6` / `06c8ad5`）
 - Phase Release-4: summary「プロフィール」「クラウド保存・同期」、Hello「さん」、3 HTML 同期、push 済み（`56bc682`）
 - Phase Release-3 Docs: README / CONTINUE に Release-3 反映（`b00c35d`）
@@ -200,12 +208,14 @@
 ## 実装済み機能
 
 - 年間目標の追加 / 編集 / 削除
+- 年間目標のジャンル（`category`、表示「ジャンル」）
 - 年間目標のメモ保存
 - 年間進捗表示
 - 今月目標の追加 / 編集 / 削除
 - 今月目標のカテゴリ・メモ保存
 - 今月目標ごとの進捗表示
 - 今月目標のアイコン選択
+- ほかの月の月間目標の見返し（`#monthlyGoalArchive`）
 - 今日タスク一覧で紐づく今月目標アイコン表示
 - ダッシュボードの次にやることへのアイコン表示
 - 今日タスクの追加 / 編集 / 削除
@@ -250,14 +260,7 @@
 
 優先度は上から。各フェーズは **1〜数コミット** で終える想定。実装前に `NEXT_TASKS.md` を確認。
 
-### 次フェーズ: Phase GoalView-1（1〜3コミット）
-
-- **その他の月間目標を見返す**導線（今月以外・過去月の参照。表示中心で最小）
-- **年間目標にジャンル（カテゴリ）追加**（`mileGoalPlan.yearlyGoal` 拡張は要設計。クラウド同期 `goalPlan` に含まれるため慎重に）
-- 年間目標アイコンは **後回し可**（本フェーズに含めなくてよい）
-- 分割するなら: (1) 月間見返し導線 (2) 年間ジャンル — 各1コミット
-
-### Phase Launch-1（1〜2コミット）
+### 次フェーズ: Phase Launch-1（1〜2コミット）
 
 - スマホ操作の総合確認（追加 / 完了 / 削除 / 別日移動 / フィルター）
 - プロフィール保存・リセット、クラウド保存・読み込み・ログイン
@@ -271,7 +274,7 @@
 - **Phase Data-2**: version 検証、バックアップ復元 UI、プロフィール同期、`idealIslandGoals` / `mileGoalPlan` 整理
 - **ステージ演出強化**（旧 World-3 案の装飾系）
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, Release-2, Release-3, Release-4
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4
 
 ## 注意点
 

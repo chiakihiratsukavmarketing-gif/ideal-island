@@ -27,7 +27,8 @@ https://ideal-island.vercel.app/
 - 設定まわりの文言整理（Release-4）：summary 簡素化、Hello に「さん」
 - バッジ追加・バッジ獲得トースト（World-3 mini、2026-06）
 - 今日のToDo「明日へ」回し（Todo-1、2026-06）
-- 最新実装コミット: `8929ed0`（Todo-1）。未 push の場合は Vercel 未反映
+- 目標の見返し・年間ジャンル（GoalView-1、2026-06）
+- 最新実装コミット: `f6f7a0c`（GoalView-1）。未 push の場合は Vercel 未反映
 
 ## 現在の画面構成
 
@@ -80,6 +81,11 @@ https://ideal-island.vercel.app/
   - 任意の日付変更は既存の編集フォーム（期限 `type="date"`）で対応
   - スマホ幅 320 / 375 / 390px でレイアウト・動作確認済み
   - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし。3 HTML 同期（`8929ed0`）
+- 目標の見返し・年間ジャンル（Phase GoalView-1）
+  - **Monthly-1**（`24ee53e`）: 既存 `#monthlyGoalArchive` と `renderMonthlyGoals()` の月別 `<details>` を活用。「ほかの月の目標」見出し、過去月0件時の空状態文言。下部ナビ「目標」→ `#monthly-goal-section`（読み取り専用・月選択UIなし）
+  - **Goal-1**（`f6f7a0c`）: 年間目標に `category`（画面は「ジャンル」、既存 `CATEGORIES`）。未設定は `normalizeYearlyGoal()` で「その他」。フォーム select とカードのジャンルバッジ
+  - **後回し**: 年間目標アイコン
+  - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
 - MILEステージ・バッジ（Phase World-2）
   - ダッシュボード直下の MILEステージカード
   - 累計MILEに応じたステージ表示（アイコン・ステージ名）
@@ -107,11 +113,13 @@ https://ideal-island.vercel.app/
   - Hello 挨拶に「さん」を付与（`getGreetingDisplayName`、表示のみ）
   - 新規 `localStorage` キーなし、データ構造・クラウド同期・Supabase 変更なし
 - 年間目標の追加 / 編集 / 削除
+- 年間目標のジャンル（`category`、表示名「ジャンル」。Goal-1）
 - 年間目標のメモ保存
 - 年間進捗表示
 - 今月目標の追加 / 編集 / 削除
 - 今月目標のカテゴリ・メモ保存
 - 今月目標のアイコン選択
+- ほかの月の月間目標の見返し（`#monthlyGoalArchive`、Monthly-1）
 - 今月目標ごとの進捗表示
 - 今日タスクの追加 / 編集 / 削除
 - 今日タスクの「明日へ」（`dueDate` を翌日へ。Todo-1）
@@ -228,6 +236,7 @@ const mileGoalPlan = {
     id: "year-2026",
     title: "",
     memo: "",
+    category: "その他",
     createdAt: "",
     updatedAt: ""
   },
@@ -405,13 +414,12 @@ const mileGoalPlan = {
 
 ## 今後の追加予定
 
-- Phase GoalView-1: 他月の月間目標見返し、年間目標ジャンル
 - Phase Launch-1: ローンチ前総合確認・ドキュメント確定
 - Phase Data-2: 同期対象・バックアップ・version 検証の整理（実装）
 
 後回し: ステージ演出強化、未獲得バッジ一覧、Profile-6 画像、年間目標アイコン
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, Release-2, Release-3, Release-4
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4
 
 ## 作業時の確認コマンド
 

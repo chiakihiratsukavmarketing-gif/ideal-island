@@ -4,7 +4,33 @@
 
 ---
 
-## 2026-06（Todo-1 / World-3 mini / Release-3 / Release-4）
+## 2026-06（GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
+
+### GoalView-1 Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に GoalView-1（Monthly-1 + Goal-1）を反映
+
+### GoalView Goal-1 実装（`f6f7a0c`）
+
+- 年間目標に `category`（UI「ジャンル」、既存 `CATEGORIES`）
+- `normalizeYearlyGoal()` で未設定時「その他」
+- 年間フォーム select、カードにジャンルバッジ
+- 年間アイコンは未実装
+- 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
+- 3 HTML 同期
+
+### GoalView Monthly-1 実装（`24ee53e`）
+
+- 「ほかの月の目標」見出し、過去月0件の空状態文言
+- 既存 `#monthlyGoalArchive` の月別 `<details>` を活用（新規一覧UIなし）
+- 下部ナビ「目標」→ `monthly-goal-section`
+- 読み取り専用、月選択なし
+- 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
+- 3 HTML 同期。未 push の場合あり
+
+### Todo-1 Docs（`07747bb`）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Todo-1 を反映
 
 ### Todo-1 実装（`8929ed0`）
 
@@ -15,7 +41,7 @@
 - ダッシュボード達成率・残り件数は変更なし。任意日付は既存編集フォーム
 - スマホ幅 320 / 375 / 390px で Playwright スモーク確認済み
 - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
-- 3 HTML 同期。Docs 更新は本作業（未コミット）
+- 3 HTML 同期
 
 ### World-3 mini Docs（`06c8ad5`）
 
@@ -76,10 +102,11 @@
 ## コミット履歴（直近）
 
 ```
+f6f7a0c feat(goal-view): add yearly goal category field
+24ee53e feat(goal-view): clarify monthly goals review navigation
+07747bb docs: document Todo-1 postpone-to-tomorrow for today todos
 8929ed0 feat(todo-1): add postpone-to-tomorrow for today todos
 06c8ad5 docs: document World-3 mini badges and badge-earned toast
-94e70b6 feat(world-3): add mile badges and badge-earned toast
-31e06d7 docs: plan minimal launch phases in CONTINUE and NEXT_TASKS
 ```
 
 ※ `git log` で常に最新を確認すること。

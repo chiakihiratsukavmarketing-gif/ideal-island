@@ -8,26 +8,7 @@
 
 ## ローンチまでのフェーズ（実装順）
 
-### Phase GoalView-1（次）
-
-**目的**: 目標の見返しと年間目標の整理。
-
-**スコープ**
-
-- [ ] その他の月間目標を見返す導線（過去月・他月の参照。最小は一覧 or 月選択）
-- [ ] 年間目標にジャンル（カテゴリ）フィールド追加 — `goalPlan` 変更のため設計・同期影響を先に確認
-- [ ] 年間目標アイコンは **本フェーズに含めなくてよい**
-
-**コミット目安**: 1〜3（見返し導線と年間ジャンルは分割可）
-
-**分割案**
-
-1. `feat(goal-view): add monthly goals review navigation`
-2. `feat(goal-view): add yearly goal category field`
-
----
-
-### Phase Launch-1
+### Phase Launch-1（次）
 
 **目的**: ローンチ前の総合確認とドキュメント確定。
 
@@ -36,10 +17,31 @@
 - [ ] スマホ幅での操作確認（追加 / 完了 / 削除 / 別日移動 / フィルター / 下部ナビ）
 - [ ] プロフィール保存・リセット、Hello「さん」
 - [ ] クラウド保存・読み込み・ログイン・同期表示
+- [ ] 月間見返し（「ほかの月の目標」）・年間ジャンル（フォーム・バッジ）
 - [ ] Vercel 本番確認 https://ideal-island.vercel.app/
 - [ ] `README.md` / `CONTINUE.md` / `NEXT_TASKS.md` をローンチ時点に更新
 
 **コミット目安**: 1〜2（確認メモは `WORK_LOG.md`、コード変更がなければ Docs のみ）
+
+---
+
+## 完了済みフェーズ詳細: GoalView-1
+
+### Monthly-1（`24ee53e`）
+
+- 既存 `#monthlyGoalArchive` と `renderMonthlyGoals()` の月別 `<details>` を活用
+- 「ほかの月の目標」見出し、過去月0件時の空状態文言
+- 下部ナビ「目標」→ `#monthly-goal-section`
+- 読み取り専用、月選択UIなし
+- 新規 `localStorage` キーなし。`collectLocalAppData()` / Supabase 変更なし。3 HTML 同期
+
+### Goal-1（`f6f7a0c`）
+
+- 年間目標に `category`（画面表示「ジャンル」、既存 `CATEGORIES`）
+- `normalizeYearlyGoal()` で未設定時「その他」
+- 年間フォームのジャンル select、カードにジャンルバッジ
+- 年間目標アイコンは後回し
+- 新規 `localStorage` キーなし。`collectLocalAppData()` / Supabase 変更なし。3 HTML 同期
 
 ---
 
@@ -74,14 +76,13 @@
 
 ## 完了済み（直近）
 
-- [x] Todo-1 実装（`8929ed0`）— 「明日へ」で dueDate 翌日化。Docs は本作業で更新予定
+- [x] GoalView-1 Goal-1（`f6f7a0c`）— 年間ジャンル（`category`）
+- [x] GoalView-1 Monthly-1（`24ee53e`）— ほかの月の目標見返し導線
+- [x] Todo-1 実装（`8929ed0`）+ Docs（`07747bb`）
 - [x] World-3 mini Docs（`06c8ad5`）
-- [x] World-3 mini 実装（`94e70b6`）— バッジ3件、バッジ獲得トースト。ステージ演出・未獲得一覧・装飾強化は未実装
+- [x] World-3 mini 実装（`94e70b6`）
 - [x] Release-4 Docs（`210d500`）
 - [x] Release-4 文言（`56bc682`）
-- [x] Release-3 Docs（`b00c35d`）
-- [x] Release-3 UI（`19e7830`）
-- [x] Release-2 / World-1 / World-2 / Data-1 調査 など
 
 ---
 
