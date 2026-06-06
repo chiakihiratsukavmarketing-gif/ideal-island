@@ -6,7 +6,40 @@
 
 ## 2026-06（Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### Data-2 Core 本番QA Docs（本作業・未コミット）
+### Data-2 Core 実アカウントE2E QA Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Data-2 Core 実アカウントE2E QA結果を反映
+- コード変更なし（`index.html` 3本は未変更）
+
+### Data-2 Core 実アカウントE2E QA（2026-06-06・コード変更なし）
+
+- **URL**: https://ideal-island.vercel.app/
+- **本番反映**: `5ffb027`（P2 文言含む）
+- **判定**: **未完了 / 保留**（P0/P1なし）
+- **理由**: Google / Magic Link の実ログイン認証が必要で、自動QAでは完了不可
+- **自動確認 OK**
+  - `5ffb027` 本番反映（プロフィール説明文修正済み）
+  - 「クラウド同期対象外」文言なし
+  - Data-2 Core JS マーカー（`autoLoadCloudDataForUser` 等）
+  - `collectLocalAppData().version === 2`
+  - 初回ロードの致命的コンソールエラーなし
+- **実ログイン E2E 未確認**
+  - Google ログイン後 auto-load
+  - Magic Link ログイン後 auto-load
+  - プロフィール変更 → クラウド保存 → 再ログイン復元
+  - A→B アカウント切替
+  - A の端末データが B へ自動保存されないこと
+  - 空クラウド新規アカウントで空画面
+  - ログイン後の手動クラウド保存/読み込み
+- **次アクション**: ユーザー本人が Google アカウントで手動 E2E 確認 → Docs 更新 → Monthly-2
+
+### Data-2 Core P2 修正（`5ffb027`）
+
+- **コミット**: `5ffb027` fix(ui): update profile settings copy for Data-2 cloud sync
+- プロフィール設定説明文を v2 クラウド同期に合わせて更新（「クラウド同期対象外」→ ログイン中はクラウド同期対象）
+- 3 HTML 同期。push 済み・本番反映済み
+
+### Data-2 Core 本番QA Docs（`2acbd70`）
 
 - README / CONTINUE / WORK_LOG / NEXT_TASKS に Data-2 Core 本番QA結果を反映
 - コード変更なし（`index.html` 3本は未変更）
@@ -14,7 +47,7 @@
 ### Data-2 Core 本番QA（2026-06-06・コード変更なし）
 
 - **URL**: https://ideal-island.vercel.app/
-- **本番反映**: `9c11037` / `9d10a2a`（HTML コードマーカーで Data-2 Core 確認）
+- **本番反映**: `9c11037` / `9d10a2a` / `5ffb027`（HTML コードマーカーで Data-2 Core 確認）
 - **判定**: 部分合格（P0/P1なし）
 - **確認済み**
   - `collectLocalAppData().version === 2`
@@ -22,13 +55,13 @@
   - `autoLoadCloudDataForUser` / auto-save guard / 空クラウド backup 分岐が本番 JS に存在
   - Google / Magic Link ボタン表示
   - 初回ロードの致命的コンソールエラーなし
-- **既知課題**
-  - **P2**: プロフィール設定説明文が「クラウド同期対象外」のまま
-  - **P3**: Google / Magic Link ログイン後 auto-load E2E 未実施
-  - **P3**: A→B アカウント切替 E2E 未実施
-  - **P3**: プロフィール同期 E2E 未実施
-  - **P3**: 空クラウド新規アカウントの空画面 E2E 未実施
-- **次アクション**: プロフィール説明文修正 → 実アカウント E2E → Monthly-2
+  - **P2（プロフィール説明文）**: `5ffb027` で修正済み
+- **既知課題（P3・実ログイン E2E 未実施）**
+  - Google / Magic Link ログイン後 auto-load E2E 未実施
+  - A→B アカウント切替 E2E 未実施
+  - プロフィール同期 E2E 未実施
+  - 空クラウド新規アカウントの空画面 E2E 未実施
+- **次アクション**: ユーザー本人が Google アカウントで手動 E2E 確認 → Docs 更新 → Monthly-2
 
 ### Data-2 Core Docs（`9d10a2a`）
 

@@ -6,7 +6,8 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新 Docs コミット: `9d10a2a` docs: record Data-2 Core implementation and local QA results
+- 最新 Docs コミット: `2acbd70` docs: record Data-2 Core production QA partial pass
+- Data-2 Core P2 修正: `5ffb027` fix(ui): update profile settings copy for Data-2 cloud sync（push 済み・本番反映済み）
 - Data-2 Core 実装: `9c11037` feat(data-2): auto-load cloud data on login and sync profile v2（push 済み・本番反映済み）
 - Cloud-Login-1 実装: `c75f7de` feat(cloud-login): add Google OAuth login button（push 済み・本番反映済み）
 - GoalView-1 実装: `24ee53e`（Monthly-1）/ `f6f7a0c`（Goal-1）、本番反映済み
@@ -14,7 +15,8 @@
 - Launch-1 本番QA: 2026-06-04 実施、合格（P0/P1なし）
 - Cloud-Login-1 本番QA: 2026-06-05 実施、部分合格（OAuth開始まで OK、ログイン後 E2E は手動未完了）
 - Data-2 Core ローカルQA: 実施済み（Playwright + コードレビュー）
-- Data-2 Core 本番QA: 2026-06-06 実施、部分合格（P0/P1なし）。本番 `9c11037` / `9d10a2a` 反映確認。ログイン E2E は P3 未実施
+- Data-2 Core 本番QA: 2026-06-06 実施、部分合格（P0/P1なし）。本番 `9c11037` / `9d10a2a` / `5ffb027` 反映確認
+- Data-2 Core 実アカウントE2E QA: 2026-06-06 実施、**未完了 / 保留**（Google / Magic Link 実ログイン要。自動QAでは完了不可）
 - 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
@@ -47,8 +49,14 @@
   - `collectLocalAppData().version === 2`、`data.userProfile` 確認済み
   - `autoLoadCloudDataForUser` / auto-save guard / 空クラウド backup 分岐が本番 JS に存在
   - Google / Magic Link ボタン表示、初回ロード致命的コンソールエラーなし
-  - P2: プロフィール設定説明文が「クラウド同期対象外」のまま
-  - P3: Google / Magic Link ログイン後 auto-load E2E、A→B 切替、プロフィール同期、空クラウド空画面 E2E は未実施
+  - P2（プロフィール説明文）→ **`5ffb027` で修正済み**
+  - P3: 実ログイン E2E 未実施
+  - Docs `2acbd70`
+- Data-2 Core 実アカウントE2E QA（2026-06-06）
+  - 判定: **未完了 / 保留**（P0/P1なし）
+  - 理由: Google / Magic Link の実ログイン認証が必要で、自動QAでは完了不可
+  - 自動確認 OK: `5ffb027` 反映、プロフィール説明文修正済み、「クラウド同期対象外」なし、Data-2 JS マーカー、`version === 2`、初回コンソール OK
+  - 未確認: Google / Magic Link auto-load、プロフィール保存→再ログイン、A→B 切替、空クラウド空画面、手動保存/読み込み
   - Docs 反映は本作業（未コミット）
 
 ## ローンチ前の方針（2026-06）
@@ -205,8 +213,10 @@
   - v1 クラウドデータ（`userProfile` なし）も読み込み可。手動読み込み時はプロフィール非破壊
   - `backupLocalAppData()` に `mileUserProfile` 追加
   - Supabase テーブル変更なし。3 HTML 同期済み
-  - ローカル QA 済み（`9c11037`）。Docs `9d10a2a`
-  - 本番QA（2026-06-06）: 部分合格（P0/P1なし）。P2: プロフィール説明文。P3: ログイン E2E 未実施
+  - ローカル QA 済み（`9c11037`）。Docs `9d10a2a` / `2acbd70`
+  - P2 修正（`5ffb027`）: プロフィール説明文を v2 同期に合わせて更新
+  - 本番QA（2026-06-06）: 部分合格（P0/P1なし）
+  - 実アカウントE2E QA（2026-06-06）: 未完了 / 保留（手動 Google E2E 待ち）
 
 ## Phase Data-1 調査メモ（2026-06）
 
@@ -236,7 +246,7 @@
 ## 直近の変更内容
 
 - Phase Cloud-Login-1: Google OAuth ボタン（`c75f7de`）、本番QA 部分合格、Docs `cfa585e`
-- Phase Data-2 Core: ログイン auto-load・profile v2（`9c11037`）、Docs `9d10a2a`、本番QA 部分合格（2026-06-06）
+- Phase Data-2 Core: ログイン auto-load・profile v2（`9c11037`）、P2 文言（`5ffb027`）、Docs `9d10a2a` / `2acbd70`、本番QA 部分合格、実アカウントE2E 保留
 - Phase Launch-1: 本番QA合格（2026-06-04）、Docs `c37a177`
 - Phase GoalView-1: 月間見返し導線（`24ee53e`）+ 年間ジャンル（`f6f7a0c`）、Docs `c20ef74`
 - Phase Todo-1: 「明日へ」で `dueDate` を翌日に、3 HTML + Docs（`8929ed0` / `07747bb`）
@@ -308,9 +318,9 @@
 
 ## ローンチ後の次アクション
 
-1. **プロフィール説明文の修正**（P2:「クラウド同期対象外」→ v2 同期に合わせる）
-2. **実アカウントで Data-2 Core E2E 確認**（Google / Magic Link auto-load、A→B 切替、プロフィール同期、空クラウド空画面、手動保存/読み込み）
-3. **Monthly-2** に進む（E2E 確認後）
+1. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
+2. **確認結果を Docs 更新**
+3. **問題なければ Monthly-2 へ進む**
 - スローガン UI 復帰は Launch-2 以降に判断（Launch-1 P2）
 - Data-2 後続: バックアップ復元 UI、端末データ取り込み UI（`NEXT_TASKS.md` 参照）
 
@@ -321,7 +331,7 @@
 - **Phase Data-2 後続**: バックアップ復元 UI、端末データ取り込み UI、`idealIslandGoals` / `mileGoalPlan` 整理
 - **ステージ演出強化**（旧 World-3 案の装飾系）
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）, **Data-2 Core**（`9c11037`・本番QA部分合格）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み）
 
 ## 注意点
 
