@@ -8,22 +8,15 @@
 
 ## 次アクション
 
-### Data-2 Core 本番 QA（未実施）
-
-- [ ] Google ログイン後、そのアカウントのクラウドデータが自動表示される
-- [ ] Magic Link ログイン後、同様に auto-load
-- [ ] A→B アカウント切替で B のデータが表示される（A の端末データが B へ自動保存されない）
-- [ ] クラウド空の新規アカウントで空画面（backup 後）
-- [ ] プロフィール名・アイコンがクラウド同期される
-- [ ] 手動「クラウドに保存」「クラウドから読み込み」が従来どおり動く
-
-### 手動確認（Cloud-Login-1 残り）
-
-- [ ] 実 Google アカウントでログイン完了
-- [ ] ログイン後: バッジ「ログイン中」、`cloudSignedInPanel`、保存/読み込みボタン
-- [ ] ToDo 追加 →「クラウドに保存」→ 成功表示
-- [ ] 「クラウドから読み込み」→ confirm → データ保持（年間ジャンル含む）
-- [ ] v1 クラウドデータ読み込みでエラーにならないこと
+1. **プロフィール説明文の修正**（P2: 「クラウド同期対象外」→ Data-2 Core v2 同期に合わせる）
+2. **実アカウントで Data-2 Core E2E 確認**
+   - [ ] Google ログイン後、そのアカウントのクラウドデータが自動表示される
+   - [ ] Magic Link ログイン後、同様に auto-load
+   - [ ] A→B アカウント切替で B のデータが表示される（A の端末データが B へ自動保存されない）
+   - [ ] クラウド空の新規アカウントで空画面（backup 後）
+   - [ ] プロフィール名・アイコンがクラウド同期される
+   - [ ] 手動「クラウドに保存」「クラウドから読み込み」が従来どおり動く
+3. **Monthly-2** に進む（上記 E2E 確認後）
 
 ### その他（任意 / 後回し）
 
@@ -33,11 +26,36 @@
 
 ---
 
-## 完了済み: Phase Data-2 Core（`9c11037`・ローカル・未 push）
+## 完了済み: Data-2 Core 本番QA（2026-06-06）
+
+**URL**: https://ideal-island.vercel.app/  
+**本番反映**: `9c11037` / `9d10a2a`  
+**判定**: 部分合格（P0/P1なし）
+
+- [x] 本番 HTML に Data-2 Core コードマーカー存在（`version: 2`, `autoLoadCloudDataForUser` 等）
+- [x] `collectLocalAppData().version === 2`
+- [x] `collectLocalAppData().data.userProfile` あり
+- [x] `autoLoadCloudDataForUser` / auto-save guard / 空クラウド backup 分岐が本番 JS に存在
+- [x] Google / Magic Link ボタン表示
+- [x] 初回ロードの致命的コンソールエラーなし
+- [ ] Google ログイン後 auto-load E2E（P3・未実施）
+- [ ] Magic Link ログイン後 auto-load E2E（P3・未実施）
+- [ ] A→B アカウント切替 E2E（P3・未実施）
+- [ ] プロフィール同期 E2E（P3・未実施）
+- [ ] 空クラウド新規アカウントの空画面 E2E（P3・未実施）
+
+**既知課題**
+
+- **P2**: プロフィール設定の説明文が「クラウド同期対象外」のまま（Data-2 Core 実装と不一致）
+
+---
+
+## 完了済み: Phase Data-2 Core（`9c11037`・push 済み）
 
 **実装コミット**: `9c11037` feat(data-2): auto-load cloud data on login and sync profile v2  
-**ローカル QA**: 実施済み（Playwright + コードレビュー）  
-**本番 E2E**: 未実施（上記「Data-2 Core 本番 QA」参照）
+**Docs**: `9d10a2a`  
+**ローカル QA**: 実施済み  
+**本番 QA**: 部分合格（2026-06-06）。ログイン E2E は P3 未実施
 
 - [x] `app_data.version: 2`
 - [x] `collectLocalAppData().data.userProfile` 追加（`mileUserProfile`）
@@ -49,7 +67,8 @@
 - [x] `backupLocalAppData()` に `mileUserProfile` 追加
 - [x] Supabase テーブル変更なし
 - [x] 3 HTML 同期済み
-- [ ] 本番 Google / Magic Link / A→B 切替 E2E
+- [x] 本番QA（2026-06-06）: 部分合格（P0/P1なし）。静的/Runtime 確認 OK
+- [ ] 本番 Google / Magic Link / A→B 切替 E2E（P3）
 
 **未実装（Data-2 後続）**
 
@@ -151,7 +170,9 @@
 
 ## 完了済み（直近）
 
-- [x] Data-2 Core 実装（`9c11037`）— ローカル QA 済み、Docs 反映（本作業・未コミット）
+- [x] Data-2 Core 本番QA Docs 反映（本作業・未コミット）
+- [x] Data-2 Core 本番QA（2026-06-06）— 部分合格（P0/P1なし）
+- [x] Data-2 Core 実装（`9c11037`）+ Docs（`9d10a2a`）— push 済み
 - [x] Cloud-Login-1 本番QA Docs（`cfa585e`）
 - [x] Cloud-Login-1 本番QA（2026-06-05）— 部分合格
 - [x] Cloud-Login-1 実装（`c75f7de`）— Google OAuth ボタン

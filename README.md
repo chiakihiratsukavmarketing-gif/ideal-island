@@ -31,9 +31,10 @@ https://ideal-island.vercel.app/
 - Launch-1 本番QA済み（2026-06-04、合格・P0/P1なし）
 - Google OAuth ログイン追加（Cloud-Login-1、`c75f7de`、本番反映済み）
 - Cloud-Login-1 本番QA済み（2026-06-05、部分合格）
-- **Data-2 Core 実装済み**（`9c11037`、ローカル・未 push）: ログイン auto-load、profile v2、auto-save ガード
-- 最新 Docs コミット: `cfa585e`（Cloud-Login-1 QA docs）。Data-2 Core Docs は本作業（未コミット）
-- 本番 https://ideal-island.vercel.app/（Data-2 Core は未デプロイ）
+- **Data-2 Core 実装済み**（`9c11037`、push 済み・本番反映済み）: ログイン auto-load、profile v2、auto-save ガード
+- **Data-2 Core 本番QA済み**（2026-06-06、部分合格・P0/P1なし）
+- 最新 Docs コミット: `9d10a2a`（Data-2 Core 実装 docs）。本番QA docs は本作業（未コミット）
+- 本番 https://ideal-island.vercel.app/
 
 ## 現在の画面構成
 
@@ -279,7 +280,7 @@ const mileGoalPlan = {
 - **クラウドデータが空**の新規アカウント: 端末データを自動アップロードせず、`backupLocalAppData()` 後に空画面を表示します。
 - 読み込み前には上書き確認ダイアログが表示されます（手動読み込み時）。
 - 保存中にさらに編集された場合は、誤って「クラウド保存済み」と判定しないよう、保存開始時のスナップショットと成功後のローカル状態を比較します。
-- ログイン → 保存 → 別端末読み込みの E2E は Cloud-6 時点で確認済み。Data-2 Core 本番 E2E（auto-load / A→B 切替）は未実施。
+- ログイン → 保存 → 別端末読み込みの E2E は Cloud-6 時点で確認済み。Data-2 Core 本番 E2E（ログイン auto-load / A→B 切替等）は P3 未実施。
 
 ### プロフィール（`mileUserProfile`）の扱い
 
@@ -414,11 +415,11 @@ const mileGoalPlan = {
   - **P3**: 「ほかの月の目標」0件時の empty state は未検証
 - **次アクション**: Supabase ログイン後のクラウド保存/読み込み手動確認。スローガン UI 復帰は Launch-2 以降に判断
 
-## Data-2 Core（`9c11037`）
+## Data-2 Core（`9c11037` / `9d10a2a`）
 
-- **実装コミット**: `9c11037` feat(data-2): auto-load cloud data on login and sync profile v2（ローカル・未 push）
+- **実装コミット**: `9c11037` feat(data-2): auto-load cloud data on login and sync profile v2（push 済み・本番反映済み）
+- **Docs**: `9d10a2a` docs: record Data-2 Core implementation and local QA results
 - **ローカル QA**: 実施済み（Playwright + コードレビュー）
-- **本番 E2E**: 未実施（Google / Magic Link / A→B アカウント切替）
 
 **実装内容**
 
@@ -434,6 +435,25 @@ const mileGoalPlan = {
 **未実装（Data-2 後続）**
 
 - 端末データ取り込み UI、バックアップ復元 UI、ゲストデータ復元 UI
+
+## Data-2 Core 本番QA（2026-06-06）
+
+- **URL**: https://ideal-island.vercel.app/
+- **本番反映**: `9c11037` / `9d10a2a`（HTML コードマーカーで Data-2 Core 確認）
+- **判定**: 部分合格（P0/P1なし）
+- **確認済み**
+  - `collectLocalAppData().version === 2`
+  - `collectLocalAppData().data.userProfile` あり
+  - `autoLoadCloudDataForUser` / auto-save guard / 空クラウド backup 分岐が本番 JS に存在
+  - Google / Magic Link ボタン表示
+  - 初回ロードの致命的コンソールエラーなし
+- **既知課題**
+  - **P2**: プロフィール設定の説明文が「クラウド同期対象外」のまま（Data-2 Core 実装と不一致）
+  - **P3**: Google / Magic Link ログイン後 auto-load E2E 未実施
+  - **P3**: A→B アカウント切替 E2E 未実施
+  - **P3**: プロフィール同期 E2E 未実施
+  - **P3**: 空クラウド新規アカウントの空画面 E2E 未実施
+- **次アクション**: プロフィール説明文修正 → 実アカウント E2E → Monthly-2
 
 ## Cloud-Login-1 本番QA（2026-06-05）
 
@@ -456,7 +476,7 @@ const mileGoalPlan = {
   - **Data-2 Core 以降**: ログイン後 auto-load。空クラウドは backup 後に空画面
   - 手動「クラウドから読み込み」は confirm 後に上書き（従来どおり）
   - プロフィールは **Data-2 Core 以降クラウド同期対象**（v2 `userProfile`）
-- **次アクション**: Data-2 Core 本番 E2E。Cloud-Login-1 残りの手動保存/読み込み確認
+- **次アクション**: プロフィール説明文修正（P2）。実アカウント E2E は Data-2 Core 本番QA 参照
 
 ## 現在の制限
 
@@ -465,7 +485,8 @@ const mileGoalPlan = {
 - 同じブラウザ内で基本保存される
 - ブラウザのデータ削除を行うと端末内の保存内容も消える可能性あり
 - クラウド読み込み前バックアップの復元 UI はない
-- Data-2 Core 本番 E2E（Google / Magic Link / A→B 切替）は未実施
+- Data-2 Core 本番 E2E（Google / Magic Link auto-load / A→B 切替 / プロフィール同期 / 空クラウド空画面）は P3 未実施
+- プロフィール設定 UI 文言が「クラウド同期対象外」のまま（P2）
 - 端末データをクラウドへ取り込む確認 UI は未実装
 
 ## ファイル構成メモ
@@ -486,13 +507,15 @@ const mileGoalPlan = {
 
 ## 今後の追加予定
 
-- Data-2 Core 本番 QA（Google / Magic Link / A→B 切替）
+1. プロフィール説明文の修正（P2）
+2. 実アカウントで Data-2 Core E2E 確認
+3. **Monthly-2**
 - Data-2 後続: バックアップ復元 UI、端末データ取り込み UI
-- Launch-2 候補: スローガン編集 UI 復帰、Cloud-Login-1 手動QA結果の反映
+- Launch-2 候補: スローガン編集 UI 復帰
 
 後回し: ステージ演出強化、未獲得バッジ一覧、Profile-6 画像、年間目標アイコン
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037`）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `9d10a2a`・本番QA部分合格）
 
 ## 作業時の確認コマンド
 

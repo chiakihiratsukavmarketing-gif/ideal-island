@@ -6,9 +6,33 @@
 
 ## 2026-06（Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### Data-2 Core Docs（本作業・未コミット）
+### Data-2 Core 本番QA Docs（本作業・未コミット）
 
-- README / CONTINUE / WORK_LOG / NEXT_TASKS に Data-2 Core 実装・QA結果を反映
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Data-2 Core 本番QA結果を反映
+- コード変更なし（`index.html` 3本は未変更）
+
+### Data-2 Core 本番QA（2026-06-06・コード変更なし）
+
+- **URL**: https://ideal-island.vercel.app/
+- **本番反映**: `9c11037` / `9d10a2a`（HTML コードマーカーで Data-2 Core 確認）
+- **判定**: 部分合格（P0/P1なし）
+- **確認済み**
+  - `collectLocalAppData().version === 2`
+  - `collectLocalAppData().data.userProfile` あり
+  - `autoLoadCloudDataForUser` / auto-save guard / 空クラウド backup 分岐が本番 JS に存在
+  - Google / Magic Link ボタン表示
+  - 初回ロードの致命的コンソールエラーなし
+- **既知課題**
+  - **P2**: プロフィール設定説明文が「クラウド同期対象外」のまま
+  - **P3**: Google / Magic Link ログイン後 auto-load E2E 未実施
+  - **P3**: A→B アカウント切替 E2E 未実施
+  - **P3**: プロフィール同期 E2E 未実施
+  - **P3**: 空クラウド新規アカウントの空画面 E2E 未実施
+- **次アクション**: プロフィール説明文修正 → 実アカウント E2E → Monthly-2
+
+### Data-2 Core Docs（`9d10a2a`）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Data-2 Core 実装・ローカル QA 結果を反映
 - コード変更なし（`index.html` 3本は未変更）
 
 ### Data-2 Core 実装（`9c11037`）
@@ -172,11 +196,11 @@
 ## コミット履歴（直近）
 
 ```
+9d10a2a docs: record Data-2 Core implementation and local QA results
 9c11037 feat(data-2): auto-load cloud data on login and sync profile v2
 cfa585e docs: record Cloud-Login-1 production QA partial pass
 c75f7de feat(cloud-login): add Google OAuth login button
 c37a177 docs: complete Launch-1 production QA and launch readiness
-c20ef74 docs: document GoalView-1 monthly review and yearly category
 ```
 
 ※ `git log` で常に最新を確認すること。
