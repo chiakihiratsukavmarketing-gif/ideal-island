@@ -5902,6 +5902,10 @@
       let cloudAutoSaveTimer = null;
       let cloudSyncRefreshTimer = null;
       let cloudApplyInProgress = false;
+      let cloudAutoLoadInProgress = false;
+      let cloudAutoLoadComplete = false;
+      let cloudAutoLoadPromise = null;
+      let lastCloudUserId = null;
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -6319,6 +6323,7 @@
           : PROFILE_ICON_OPTIONS[0];
 
         saveUserProfile({ displayName, icon });
+        markCloudDataDirty();
         showProfileSettingsStatus("保存しました");
       }
 
@@ -6326,6 +6331,7 @@
         localStorage.removeItem(USER_PROFILE_STORAGE_KEY);
         renderUserProfile();
         syncProfileSettingsForm();
+        markCloudDataDirty();
         showProfileSettingsStatus("自動表示に戻しました");
       }
 
@@ -6405,7 +6411,7 @@
 
       function collectLocalAppData() {
         return {
-          version: 1,
+          version: 2,
           appName: "MILE",
           savedAt: new Date().toISOString(),
           data: {
@@ -6413,6 +6419,7 @@
             goalPlan: readStoredJson(GOAL_PLAN_STORAGE_KEY, goalPlan),
             reflectionNotes: readStoredJson(REFLECTION_STORAGE_KEY, reflectionNotes),
             slogan: localStorage.getItem(SLOGAN_STORAGE_KEY) || slogan || DEFAULT_SLOGAN,
+            userProfile: loadUserProfile(),
           },
         };
       }
@@ -6486,7 +6493,15 @@
       }
 
       function scheduleCloudAutoSave() {
-        if (!getCloudUser() || cloudApplyInProgress || !isCloudDataDirty()) return;
+        if (
+          !getCloudUser() ||
+          cloudApplyInProgress ||
+          cloudAutoLoadInProgress ||
+          !cloudAutoLoadComplete ||
+          !isCloudDataDirty()
+        ) {
+          return;
+        }
 
         clearCloudAutoSaveTimer();
         cloudAutoSaveTimer = setTimeout(() => {
@@ -6508,7 +6523,7 @@
 
         updateCloudSyncStatusUI();
 
-        if (getCloudUser()) {
+        if (getCloudUser() && cloudAutoLoadComplete && !cloudAutoLoadInProgress) {
           scheduleCloudAutoSave();
         }
       }
@@ -6549,6 +6564,7 @@
             [GOAL_PLAN_STORAGE_KEY]: localStorage.getItem(GOAL_PLAN_STORAGE_KEY),
             [REFLECTION_STORAGE_KEY]: localStorage.getItem(REFLECTION_STORAGE_KEY),
             [SLOGAN_STORAGE_KEY]: localStorage.getItem(SLOGAN_STORAGE_KEY),
+            [USER_PROFILE_STORAGE_KEY]: localStorage.getItem(USER_PROFILE_STORAGE_KEY),
           },
         };
 
@@ -6556,7 +6572,23 @@
         return backup;
       }
 
-      function applyCloudAppDataToLocal(appData) {
+      function applyEmptyAppDataToLocal() {
+        applyCloudAppDataToLocal(
+          {
+            version: 2,
+            data: {
+              goalsByTab: initialGoals,
+              goalPlan: createEmptyGoalPlan(),
+              reflectionNotes: {},
+              slogan: DEFAULT_SLOGAN,
+              userProfile: { displayName: "", icon: "" },
+            },
+          },
+          { clearProfileIfMissing: true }
+        );
+      }
+
+      function applyCloudAppDataToLocal(appData, options = {}) {
         const nextData = appData?.data;
         if (!nextData || typeof nextData !== "object" || Array.isArray(nextData)) {
           throw new Error("Invalid cloud app data.");
@@ -6579,6 +6611,18 @@
 
           if ("slogan" in nextData) {
             localStorage.setItem(SLOGAN_STORAGE_KEY, String(nextData.slogan || DEFAULT_SLOGAN));
+          }
+
+          if ("userProfile" in nextData) {
+            const profile = nextData.userProfile;
+            if (profile && typeof profile === "object" && !Array.isArray(profile)) {
+              saveUserProfile({
+                displayName: typeof profile.displayName === "string" ? profile.displayName : "",
+                icon: typeof profile.icon === "string" ? profile.icon : "",
+              });
+            }
+          } else if (options.clearProfileIfMissing) {
+            saveUserProfile({ displayName: "", icon: "" });
           }
 
           goalsByTab = loadGoals();
@@ -6605,6 +6649,10 @@
           if (!auto) {
             setCloudStatusMessage("ログイン後にクラウド保存を使えます。", "error");
           }
+          return false;
+        }
+
+        if (auto && (cloudAutoLoadInProgress || !cloudAutoLoadComplete)) {
           return false;
         }
 
@@ -6729,6 +6777,89 @@
         }
       }
 
+      async function autoLoadCloudDataForUser(user) {
+        if (!supabaseClient || !user?.id) {
+          cloudAutoLoadComplete = true;
+          return;
+        }
+
+        cloudAutoLoadInProgress = true;
+        cloudAutoLoadComplete = false;
+        clearCloudAutoSaveTimer();
+
+        try {
+          const { data, error } = await supabaseClient
+            .from("user_app_data")
+            .select("app_data, updated_at")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (error) throw error;
+
+          if (data?.app_data) {
+            applyCloudAppDataToLocal(data.app_data, { clearProfileIfMissing: true });
+          } else {
+            backupLocalAppData();
+            applyEmptyAppDataToLocal();
+          }
+
+          cloudAutoLoadComplete = true;
+          renderCloudAuth();
+        } catch (error) {
+          console.warn("Cloud auto-load failed.", error);
+          cloudAutoLoadComplete = false;
+          setCloudAuthStatus("クラウドデータの自動読み込みに失敗しました。時間を置いて再度お試しください。", "error");
+          renderCloudAuth();
+        } finally {
+          cloudAutoLoadInProgress = false;
+        }
+      }
+
+      async function handleCloudAuthSession(session) {
+        const newUserId = session?.user?.id || null;
+        const previousUserId = lastCloudUserId;
+
+        cloudSession = session;
+
+        if (!newUserId) {
+          lastCloudUserId = null;
+          cloudAutoLoadComplete = false;
+          cloudAutoLoadInProgress = false;
+          cloudAutoLoadPromise = null;
+          clearCloudAutoSaveTimer();
+          renderCloudAuth();
+          return;
+        }
+
+        const needsAutoLoad = previousUserId !== newUserId;
+
+        lastCloudUserId = newUserId;
+
+        if (needsAutoLoad) {
+          cloudAutoLoadComplete = false;
+          clearCloudAutoSaveTimer();
+        }
+
+        renderCloudAuth();
+
+        if (!needsAutoLoad) {
+          return;
+        }
+
+        if (cloudAutoLoadPromise) {
+          await cloudAutoLoadPromise;
+          return;
+        }
+
+        cloudAutoLoadPromise = autoLoadCloudDataForUser(session.user);
+
+        try {
+          await cloudAutoLoadPromise;
+        } finally {
+          cloudAutoLoadPromise = null;
+        }
+      }
+
       function renderCloudAuth() {
         const isConfigured = isSupabaseConfigured();
         const userEmail = cloudSession?.user?.email || "";
@@ -6745,9 +6876,6 @@
           syncProfileSettingsForm();
           startCloudSyncStatusRefresh();
           updateCloudSyncStatusUI();
-          if (isCloudDataDirty()) {
-            scheduleCloudAutoSave();
-          }
           return;
         }
 
@@ -6772,12 +6900,12 @@
         try {
           const { data, error } = await supabaseClient.auth.getSession();
           if (error) throw error;
-          cloudSession = data?.session || null;
-          renderCloudAuth();
+          await handleCloudAuthSession(data?.session || null);
 
           supabaseClient.auth.onAuthStateChange((_event, session) => {
-            cloudSession = session;
-            renderCloudAuth();
+            handleCloudAuthSession(session).catch((authError) => {
+              console.warn("Cloud auth session handling failed.", authError);
+            });
           });
         } catch (error) {
           setCloudAuthStatus("ログイン状態を確認できませんでした。時間を置いて再度お試しください。", "error");
@@ -6951,8 +7079,7 @@
 
       async function signOutCloud() {
         if (!supabaseClient) {
-          cloudSession = null;
-          renderCloudAuth();
+          await handleCloudAuthSession(null);
           return;
         }
 
@@ -6962,8 +7089,7 @@
         try {
           const { error } = await supabaseClient.auth.signOut();
           if (error) throw error;
-          cloudSession = null;
-          renderCloudAuth();
+          await handleCloudAuthSession(null);
           setCloudAuthStatus("ログアウトしました。");
         } catch (error) {
           setCloudAuthStatus("ログアウトできませんでした。時間を置いて再度お試しください。", "error");
