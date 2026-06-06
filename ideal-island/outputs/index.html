@@ -2575,6 +2575,64 @@
         font-size: 0.76rem;
       }
 
+      .monthly-goal-month-picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 10px 0 12px;
+      }
+
+      .monthly-goal-month-chip {
+        min-width: 44px;
+        min-height: 36px;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--text);
+        font: inherit;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 6px 10px;
+      }
+
+      .monthly-goal-month-chip.is-current {
+        border-color: #8fd6a8;
+      }
+
+      .monthly-goal-month-chip.is-selected {
+        background: #e8f7ee;
+        border-color: #6fbf8b;
+        color: #1f5d37;
+      }
+
+      .monthly-goal-month-chip.is-current.is-selected {
+        background: #dff5e8;
+        border-color: var(--green);
+      }
+
+      .monthly-goal-period-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 4px;
+      }
+
+      .monthly-goal-period-label {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.92rem;
+        font-weight: 700;
+      }
+
+      .monthly-goal-period-hint {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.5;
+      }
+
       .monthly-goal-archive-block {
         display: grid;
         gap: 8px;
@@ -5388,21 +5446,29 @@
         </form>
       </section>
 
-<section class="monthly-goal-card" id="monthly-goal-section" aria-label="今月の目標">
+<section class="monthly-goal-card" id="monthly-goal-section" aria-label="月間目標">
         <div class="monthly-goal-head">
           <div>
-            <p class="form-eyebrow" id="monthlyGoalPeriod">今月の目標</p>
-            <h2 class="section-title ui-heading-hidden" aria-hidden="true">今月取り組むこと</h2>
-            <p class="monthly-goal-count" id="monthlyGoalCount">0件の目標</p>
+            <p class="form-eyebrow" id="monthlyGoalYearTitle">月間目標</p>
+            <h2 class="section-title ui-heading-hidden" aria-hidden="true">月間目標</h2>
           </div>
           <button class="monthly-add-button" type="button" id="toggleMonthlyGoalFormButton" aria-expanded="false">
             ＋ 追加
           </button>
         </div>
 
+        <div class="monthly-goal-month-picker" id="monthlyGoalMonthPicker" role="tablist" aria-label="月を選択"></div>
+        <div class="monthly-goal-period-head">
+          <p class="monthly-goal-period-label" id="monthlyGoalPeriod">今月の目標</p>
+          <p class="monthly-goal-count" id="monthlyGoalCount">0件の目標</p>
+        </div>
+        <p class="monthly-goal-period-hint" id="monthlyGoalPeriodHint" hidden>
+          今月ではありません。先の月の計画や過去月の見返しに使えます。
+        </p>
+
         <form class="monthly-goal-form is-collapsed" id="monthlyGoalForm">
           <div class="field">
-            <label for="monthlyGoalInput">今月の目標タイトル</label>
+            <label for="monthlyGoalInput" id="monthlyGoalInputLabel">月間目標タイトル</label>
             <input
               id="monthlyGoalInput"
               type="text"
@@ -5459,8 +5525,8 @@
         </form>
 
         <div class="monthly-goal-list" id="monthlyGoalList"></div>
-        <div class="monthly-goal-archive-block">
-          <h3 class="monthly-goal-archive-heading">ほかの月の目標</h3>
+        <div class="monthly-goal-archive-block" id="monthlyGoalPastYearsBlock" hidden>
+          <h3 class="monthly-goal-archive-heading">過去年の目標</h3>
           <div class="monthly-goal-archive" id="monthlyGoalArchive"></div>
         </div>
       </section>
@@ -5891,6 +5957,7 @@
       let selectedProfileIcon = "";
       let editingYearlyGoalId = "";
       let editingMonthlyGoalId = "";
+      let selectedMonthKey = "";
       let editingGoalId = "";
       let isCompletedTasksOpen = false;
       let supabaseClient = createSupabaseClient();
@@ -5923,10 +5990,14 @@
       const yearlyGoalCurrentInput = document.getElementById("yearlyGoalCurrentInput");
       const yearlyGoalCategory = document.getElementById("yearlyGoalCategory");
       const cancelYearlyGoalButton = document.getElementById("cancelYearlyGoalButton");
+      const monthlyGoalYearTitle = document.getElementById("monthlyGoalYearTitle");
+      const monthlyGoalMonthPicker = document.getElementById("monthlyGoalMonthPicker");
       const monthlyGoalPeriod = document.getElementById("monthlyGoalPeriod");
+      const monthlyGoalPeriodHint = document.getElementById("monthlyGoalPeriodHint");
       const monthlyGoalCount = document.getElementById("monthlyGoalCount");
       const toggleMonthlyGoalFormButton = document.getElementById("toggleMonthlyGoalFormButton");
       const monthlyGoalForm = document.getElementById("monthlyGoalForm");
+      const monthlyGoalInputLabel = document.getElementById("monthlyGoalInputLabel");
       const monthlyGoalInput = document.getElementById("monthlyGoalInput");
       const monthlyGoalCategory = document.getElementById("monthlyGoalCategory");
       const monthlyGoalIcon = document.getElementById("monthlyGoalIcon");
@@ -5935,6 +6006,7 @@
       const monthlyGoalMemoInput = document.getElementById("monthlyGoalMemoInput");
       const cancelMonthlyGoalButton = document.getElementById("cancelMonthlyGoalButton");
       const monthlyGoalList = document.getElementById("monthlyGoalList");
+      const monthlyGoalPastYearsBlock = document.getElementById("monthlyGoalPastYearsBlock");
       const monthlyGoalArchive = document.getElementById("monthlyGoalArchive");
       const reflectionDate = document.getElementById("reflectionDate");
       const reflectionNote = document.getElementById("reflectionNote");
@@ -6058,6 +6130,18 @@
         monthlyGoalIcon.value = getDefaultIconForCategory(monthlyGoalCategory.value);
       });
       monthlyGoalList.addEventListener("submit", saveMonthlyGoalEdit);
+      monthlyGoalMonthPicker.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-month-key]");
+        if (!button) return;
+
+        const monthKey = button.dataset.monthKey;
+        if (!monthKey || monthKey === selectedMonthKey) return;
+
+        selectedMonthKey = monthKey;
+        editingMonthlyGoalId = "";
+        closeMonthlyGoalForm();
+        render();
+      });
       saveReflectionButton.addEventListener("click", saveReflectionNote);
       saveProfileButton.addEventListener("click", saveProfileSettings);
       resetProfileButton.addEventListener("click", resetProfileSettings);
@@ -6631,6 +6715,7 @@
           slogan = loadSlogan();
           editingYearlyGoalId = "";
           editingMonthlyGoalId = "";
+          selectedMonthKey = getCurrentMonthKey();
           editingGoalId = "";
           isGoalFormOpen = false;
           render();
@@ -7547,6 +7632,73 @@
         return `${year}-${month}`;
       }
 
+      function getCalendarYear() {
+        return new Date().getFullYear();
+      }
+
+      function buildMonthKey(year, monthNumber) {
+        return `${year}-${String(monthNumber).padStart(2, "0")}`;
+      }
+
+      function getCurrentYearMonthKeys() {
+        const year = getCalendarYear();
+        return Array.from({ length: 12 }, (_, index) => buildMonthKey(year, index + 1));
+      }
+
+      function isCurrentYearMonthKey(monthKey) {
+        return typeof monthKey === "string" && monthKey.startsWith(`${getCalendarYear()}-`);
+      }
+
+      function normalizeSelectedMonthKey() {
+        if (!selectedMonthKey || !isCurrentYearMonthKey(selectedMonthKey)) {
+          selectedMonthKey = getCurrentMonthKey();
+        }
+      }
+
+      function getMonthlyGoalsForMonth(monthKey) {
+        return goalPlan.monthlyGoals.filter((goal) => goal.month === monthKey);
+      }
+
+      function getPastYearMonthlyGoalGroups() {
+        const currentYear = String(getCalendarYear());
+        return goalPlan.monthlyGoals
+          .filter((goal) => {
+            const [year] = String(goal.month || "").split("-");
+            return year && year < currentYear;
+          })
+          .reduce((groups, goal) => {
+            groups[goal.month] = groups[goal.month] || [];
+            groups[goal.month].push(goal);
+            return groups;
+          }, {});
+      }
+
+      function getSelectedMonthPeriodLabel(monthKey) {
+        return monthKey === getCurrentMonthKey() ? "今月の目標" : formatMonthLabel(monthKey);
+      }
+
+      function getMonthlyGoalEmptyState(monthKey) {
+        if (monthKey === getCurrentMonthKey()) {
+          return {
+            title: "今月の目標を設定しましょう",
+            text: "今月取り組むことを決めます。",
+          };
+        }
+
+        const [year, month] = monthKey.split("-");
+        if (year && month) {
+          return {
+            title: `${year}年${Number(month)}月の目標を設定しましょう`,
+            text: "先の月の計画や過去月の見返しに使えます。",
+          };
+        }
+
+        return {
+          title: "月間目標を設定しましょう",
+          text: "先の月の計画や過去月の見返しに使えます。",
+        };
+      }
+
       function formatMonthLabel(monthKey) {
         const [year, month] = monthKey.split("-");
         if (!year || !month) return "今月の目標";
@@ -7790,7 +7942,7 @@
         }
 
         const now = new Date().toISOString();
-        const month = getCurrentMonthKey();
+        const month = selectedMonthKey || getCurrentMonthKey();
         const goal = {
           id: `month-${month}-${crypto.randomUUID ? crypto.randomUUID() : Date.now()}`,
           yearGoalId: goalPlan.yearlyGoal.id,
@@ -7819,7 +7971,8 @@
         const goal = goalPlan.monthlyGoals.find((item) => item.id === goalId);
         if (!goal) return;
 
-        const shouldDelete = window.confirm ? window.confirm("この今月の目標を削除しますか？") : true;
+        const monthLabel = getSelectedMonthPeriodLabel(goal.month);
+        const shouldDelete = window.confirm ? window.confirm(`この${monthLabel}を削除しますか？`) : true;
         if (!shouldDelete) return;
 
         if (editingMonthlyGoalId === goalId) {
@@ -7971,12 +8124,85 @@
         `;
       }
 
-      function renderMonthlyGoals() {
-        const currentMonth = getCurrentMonthKey();
-        const goals = getCurrentMonthlyGoals();
+      function renderReadOnlyMonthlyGoalItem(goal) {
+        const progress = getMonthlyGoalProgress(goal.id);
+        const progressState = getProgressState(progress.percent);
+        const iconTone = getMonthlyGoalIconTone(progress.percent);
+        const progressText =
+          progress.total === 0 ? "紐づいたタスクなし" : `${progress.done} / ${progress.total} 完了`;
 
-        monthlyGoalPeriod.textContent = formatMonthLabel(currentMonth);
+        return `
+          <article class="monthly-goal-item">
+            <div class="monthly-goal-item-head">
+              <span class="monthly-goal-icon is-${iconTone}" aria-hidden="true">${escapeHtml(goal.icon)}</span>
+              <div class="monthly-goal-item-body">
+                <h3 class="monthly-goal-title">${escapeHtml(goal.title)}</h3>
+                <div class="monthly-goal-meta">
+                  <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+                  <span class="progress-state-pill is-${progressState}">${getProgressStateLabel(progress.percent)}</span>
+                </div>
+              </div>
+            </div>
+            ${goal.memo ? `<p class="monthly-goal-memo">${escapeHtml(goal.memo)}</p>` : ""}
+            <div class="monthly-goal-progress is-${progressState}" aria-label="${escapeHtml(goal.title)}の進捗">
+              <div class="monthly-goal-progress-head">
+                <p class="monthly-goal-progress-note">${escapeHtml(progressText)}</p>
+                <span class="monthly-goal-progress-rate">${progress.percent}%</span>
+              </div>
+              <div class="monthly-goal-progress-bar" aria-hidden="true">
+                <div class="monthly-goal-progress-fill" style="width: ${progress.barPercent}%"></div>
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderMonthlyGoals() {
+        normalizeSelectedMonthKey();
+
+        const currentMonth = getCurrentMonthKey();
+        const calendarYear = getCalendarYear();
+        const goals = getMonthlyGoalsForMonth(selectedMonthKey);
+        const emptyState = getMonthlyGoalEmptyState(selectedMonthKey);
+        const monthlyGoalSection = document.getElementById("monthly-goal-section");
+
+        if (monthlyGoalSection) {
+          monthlyGoalSection.setAttribute("aria-label", `月間目標（${calendarYear}年）`);
+        }
+
+        monthlyGoalYearTitle.textContent = `月間目標（${calendarYear}年）`;
+        monthlyGoalPeriod.textContent = getSelectedMonthPeriodLabel(selectedMonthKey);
         monthlyGoalCount.textContent = `${goals.length}件の目標`;
+        monthlyGoalPeriodHint.hidden = selectedMonthKey === currentMonth;
+        monthlyGoalInputLabel.textContent =
+          selectedMonthKey === currentMonth ? "今月の目標タイトル" : `${formatMonthLabel(selectedMonthKey)}タイトル`;
+
+        monthlyGoalMonthPicker.innerHTML = getCurrentYearMonthKeys()
+          .map((monthKey) => {
+            const monthNumber = Number(monthKey.split("-")[1]);
+            const goalCount = getMonthlyGoalsForMonth(monthKey).length;
+            const classNames = [
+              "monthly-goal-month-chip",
+              monthKey === currentMonth ? "is-current" : "",
+              monthKey === selectedMonthKey ? "is-selected" : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+            const countLabel = goalCount > 0 ? ` · ${goalCount}件` : "";
+
+            return `
+              <button
+                type="button"
+                class="${classNames}"
+                data-month-key="${escapeHtml(monthKey)}"
+                role="tab"
+                aria-selected="${monthKey === selectedMonthKey ? "true" : "false"}"
+                aria-label="${monthNumber}月${countLabel}"
+              >${monthNumber}月</button>
+            `;
+          })
+          .join("");
+
         monthlyGoalList.innerHTML = goals.length
           ? goals
               .map((goal) => {
@@ -7993,6 +8219,8 @@
                     : `<p class="goal-number-progress-text">現在値 ${escapeHtml(goal.currentValue || "0")} / 目標値 ${escapeHtml(
                         goal.targetValue || "0"
                       )}</p>`;
+                const editTitleLabel =
+                  selectedMonthKey === currentMonth ? "今月の目標タイトル" : `${formatMonthLabel(selectedMonthKey)}タイトル`;
 
                 return `
                   <article class="monthly-goal-item${isEditing ? " is-editing" : ""}">
@@ -8029,7 +8257,7 @@
                       isEditing
                         ? `<form class="monthly-goal-edit-form" data-id="${escapeHtml(goal.id)}">
                             <div class="field">
-                              <label for="monthly-edit-title-${escapeHtml(goal.id)}">今月の目標タイトル</label>
+                              <label for="monthly-edit-title-${escapeHtml(goal.id)}">${escapeHtml(editTitleLabel)}</label>
                               <input
                                 id="monthly-edit-title-${escapeHtml(goal.id)}"
                                 type="text"
@@ -8111,68 +8339,30 @@
               })
               .join("")
           : `<div class="monthly-goal-empty">
-              <p class="empty-title">今月の目標を設定しましょう</p>
-              <p class="empty-text">今月取り組むことを決めます。</p>
+              <p class="empty-title">${escapeHtml(emptyState.title)}</p>
+              <p class="empty-text">${escapeHtml(emptyState.text)}</p>
             </div>`;
 
-        const historyGroups = goalPlan.monthlyGoals
-          .filter((goal) => goal.month !== currentMonth)
-          .reduce((groups, goal) => {
-            groups[goal.month] = groups[goal.month] || [];
-            groups[goal.month].push(goal);
-            return groups;
-          }, {});
-
-        const historyMonths = Object.keys(historyGroups).sort((a, b) => b.localeCompare(a));
-        monthlyGoalArchive.innerHTML = historyMonths.length
-          ? historyMonths
+        const pastYearGroups = getPastYearMonthlyGoalGroups();
+        const pastYearMonths = Object.keys(pastYearGroups).sort((a, b) => b.localeCompare(a));
+        monthlyGoalPastYearsBlock.hidden = pastYearMonths.length === 0;
+        monthlyGoalArchive.innerHTML = pastYearMonths.length
+          ? pastYearMonths
               .map(
                 (month) => `
                   <details class="monthly-history">
                     <summary class="history-month-summary">
                       <span>${escapeHtml(formatMonthLabel(month))}</span>
-                      <span>${historyGroups[month].length}件</span>
+                      <span>${pastYearGroups[month].length}件</span>
                     </summary>
                     <div class="monthly-history-list">
-                      ${historyGroups[month]
-                        .map((goal) => {
-                          const progress = getMonthlyGoalProgress(goal.id);
-                          const progressState = getProgressState(progress.percent);
-                          const iconTone = getMonthlyGoalIconTone(progress.percent);
-                          return `
-                            <article class="monthly-goal-item">
-                              <div class="monthly-goal-item-head">
-                                <span class="monthly-goal-icon is-${iconTone}" aria-hidden="true">${escapeHtml(goal.icon)}</span>
-                                <div class="monthly-goal-item-body">
-                                  <h3 class="monthly-goal-title">${escapeHtml(goal.title)}</h3>
-                                  <div class="monthly-goal-meta">
-                                    <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
-                                    <span class="progress-state-pill is-${progressState}">${getProgressStateLabel(progress.percent)}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="monthly-goal-progress is-${progressState}" aria-label="${escapeHtml(goal.title)}の進捗">
-                                <div class="monthly-goal-progress-head">
-                                  <p class="monthly-goal-progress-note">${progress.total === 0 ? "紐づいたタスクなし" : `${progress.done} / ${progress.total} 完了`}</p>
-                                  <span class="monthly-goal-progress-rate">${progress.percent}%</span>
-                                </div>
-                                <div class="monthly-goal-progress-bar" aria-hidden="true">
-                                  <div class="monthly-goal-progress-fill" style="width: ${progress.barPercent}%"></div>
-                                </div>
-                              </div>
-                            </article>
-                          `;
-                        })
-                        .join("")}
+                      ${pastYearGroups[month].map((goal) => renderReadOnlyMonthlyGoalItem(goal)).join("")}
                     </div>
                   </details>
                 `
               )
               .join("")
-          : `<div class="monthly-goal-archive-empty">
-              <p class="empty-title">ほかの月の目標はまだありません</p>
-              <p class="empty-text">月が変わると、以前の月間目標をここで見返せます。</p>
-            </div>`;
+          : "";
       }
 
       function renderGoalMonthlyOptions() {
@@ -9253,6 +9443,7 @@
           .replaceAll("'", "&#039;");
       }
 
+      selectedMonthKey = getCurrentMonthKey();
       render();
       renderReflectionNotes();
       initializeProfileSettingsUI();
