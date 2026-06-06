@@ -8878,6 +8878,21 @@
         return `${year}-${month}-${day}`;
       }
 
+      function isDashboardTodayTask(goal, todayKey = getTodayKey()) {
+        if (goal.done) {
+          return getDateKeyFromValue(goal.completedAt) === todayKey;
+        }
+
+        const dueDate = goal.dueDate || "";
+        if (dueDate && dueDate > todayKey) return false;
+
+        return true;
+      }
+
+      function getDashboardTodayGoals(goals = goalsByTab.today || []) {
+        return goals.filter((goal) => isDashboardTodayTask(goal));
+      }
+
       function addDays(dateKey, days) {
         const date = new Date(`${dateKey}T00:00:00`);
         date.setDate(date.getDate() + days);
@@ -9252,7 +9267,7 @@
       }
 
       function renderStats() {
-        const todayProgress = getProgress(goalsByTab.today);
+        const todayProgress = getProgress(getDashboardTodayGoals());
         const allGoals = Object.values(goalsByTab).flat();
         const allProgress = getProgress(allGoals);
         const undone = allProgress.total - allProgress.done;
@@ -9268,7 +9283,7 @@
       function getStageStatus() {
         const allGoals = Object.values(goalsByTab).flat();
         const allProgress = getProgress(allGoals);
-        const todayProgress = getProgress(goalsByTab.today);
+        const todayProgress = getProgress(getDashboardTodayGoals());
 
         const stage1 = allProgress.total === 0 ? "not-started" : "in-progress";
         const stage2 =
@@ -9326,12 +9341,12 @@
       }
 
       function renderDashboard() {
-        const todayGoals = goalsByTab.today || [];
-        const todayProgress = getProgress(todayGoals);
+        const dashboardGoals = getDashboardTodayGoals();
+        const todayProgress = getProgress(dashboardGoals);
         const remainingCount = Math.max(todayProgress.total - todayProgress.done, 0);
         const monthPercent = getDashboardMonthProgress();
         const yearPercent = getDashboardYearProgress();
-        const nextGoal = sortGoals(todayGoals).find((goal) => !goal.done);
+        const nextGoal = sortGoals(dashboardGoals).find((goal) => !goal.done);
         const nextDueMeta = nextGoal ? getDueMeta(nextGoal) : null;
 
         dashboardTodayPercent.textContent = `${todayProgress.percent}%`;
@@ -9362,7 +9377,7 @@
           title = linkedMonthlyGoal ? `${linkedMonthlyGoal.icon} ${nextGoal.title}` : nextGoal.title;
           meta = metaItems.length ? metaItems.join(" / ") : "このタスクから進める。";
           cardStatus = "active";
-        } else if (todayGoals.length > 0) {
+        } else if (dashboardGoals.length > 0) {
           status = "完了";
           title = "今日のタスクはすべて完了しています";
           meta = "お疲れ様でした！";
