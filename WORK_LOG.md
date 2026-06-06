@@ -4,9 +4,27 @@
 
 ---
 
-## 2026-06（Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
+## 2026-06（Monthly-2 Core / Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### Data-2 Core 実アカウントE2E QA Docs（本作業・未コミット）
+### Monthly-2 Core Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Monthly-2 Core 実装・ローカル QA 結果を反映
+- コード変更なし（`index.html` 3本は未変更）
+
+### Monthly-2 Core 実装（`1d8b91c`）
+
+- **コミット**: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 前）
+- **月チップ**: 当年 1〜12 月（`#monthlyGoalMonthPicker`）。デフォルト選択は今月（`selectedMonthKey`）
+- **選択月 CRUD**: 選択月の `monthlyGoals` をメインリストに表示。未来月・過去月も追加・編集・削除可
+- **`addMonthlyGoal()`**: 追加先を `getCurrentMonthKey()` 固定から `selectedMonthKey` に変更
+- **UI 統合**: 当年の「ほかの月の目標」アーカイブを月チップ UI に統合。カード見出しを「月間目標（YYYY年）」に
+- **過去年**: `year < 当年` の `monthlyGoals` がある場合のみ「過去年の目標」を read-only 表示
+- **据え置き**: ダッシュボード「今月 %」は今月目標のみ。タスク `monthlyGoalId` select も今月のみ。年間進捗は全月平均
+- **データ / 同期**: `monthlyGoals` 構造変更なし。`app_data.version: 2` のまま。`collectLocalAppData()` / Supabase テーブル変更なし
+- **新規 `localStorage` キーなし**。3 HTML 同期済み
+- **ローカル QA**: Playwright **14/14 合格**
+
+### Data-2 Core 実アカウントE2E QA Docs（`7a667f4`）
 
 - README / CONTINUE / WORK_LOG / NEXT_TASKS に Data-2 Core 実アカウントE2E QA結果を反映
 - コード変更なし（`index.html` 3本は未変更）

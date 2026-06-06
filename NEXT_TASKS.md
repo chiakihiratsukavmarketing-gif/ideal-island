@@ -8,21 +8,35 @@
 
 ## 次アクション
 
-1. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
+1. **Monthly-2 Core を push して本番反映確認**（`1d8b91c`）
+2. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
    - [ ] Google ログイン後、そのアカウントのクラウドデータが自動表示される
    - [ ] Magic Link ログイン後、同様に auto-load
    - [ ] プロフィール変更 → クラウド保存 → 再ログイン後に復元
    - [ ] A→B アカウント切替で B のデータが表示される（A の端末データが B へ自動保存されない）
    - [ ] クラウド空の新規アカウントで空画面（backup 後）
    - [ ] 手動「クラウドに保存」「クラウドから読み込み」が従来どおり動く
-2. **確認結果を Docs 更新**
-3. **問題なければ Monthly-2 へ進む**
+3. **確認結果を Docs 更新**
 
 ### その他（任意 / 後回し）
 
-- [ ] 「ほかの月の目標」0件時の empty state 表示（Launch-1 P3）
+- [ ] **Monthly-3**: 過去年の編集 UI、年切替 UI
 - [ ] スローガン編集 UI 復帰（Launch-1 P2）
 - [ ] Data-2 後続: バックアップ復元 UI、端末データ取り込み UI
+
+---
+
+## 完了済み: Monthly-2 Core（`1d8b91c`）
+
+- 当年 1〜12 月の月チップ（`#monthlyGoalMonthPicker`）。デフォルト選択は今月（`selectedMonthKey`）
+- 選択月の月間目標を追加・編集・削除（未来月・過去月も可）
+- `addMonthlyGoal()` の追加先を `selectedMonthKey` に変更
+- 当年の「ほかの月の目標」アーカイブを月チップ UI に統合
+- 過去年の月間目標は存在時のみ read-only 表示
+- 据え置き: ダッシュボード「今月 %」・タスク紐づけ select は今月目標のみ
+- `monthlyGoals` 構造変更なし。`app_data` v2。`collectLocalAppData()` / Supabase 変更なし
+- ローカル Playwright QA 14/14。3 HTML 同期済み
+- Docs 反映は本作業（未コミット）
 
 ---
 
@@ -161,7 +175,7 @@
 - 既存 `#monthlyGoalArchive` と `renderMonthlyGoals()` の月別 `<details>` を活用
 - 「ほかの月の目標」見出し、過去月0件時の空状態文言
 - 下部ナビ「目標」→ `#monthly-goal-section`
-- 読み取り専用、月選択UIなし
+- 当時は読み取り専用、月選択UIなし（**Monthly-2 Core で月チップ CRUD に発展**）
 - 新規 `localStorage` キーなし。`collectLocalAppData()` / Supabase 変更なし。3 HTML 同期
 
 ### Goal-1（`f6f7a0c`）
@@ -204,7 +218,9 @@
 
 ## 完了済み（直近）
 
-- [x] Data-2 Core 実アカウントE2E QA Docs 反映（本作業・未コミット）
+- [x] Monthly-2 Core Docs 反映（本作業・未コミット）
+- [x] Monthly-2 Core 実装（`1d8b91c`）— 当年 12 ヶ月チップ・選択月 CRUD・Playwright QA 14/14
+- [x] Data-2 Core 実アカウントE2E QA Docs（`7a667f4`）
 - [x] Data-2 Core 実アカウントE2E QA（2026-06-06）— 未完了 / 保留（P0/P1なし）
 - [x] Data-2 Core P2 修正（`5ffb027`）— push 済み
 - [x] Data-2 Core 本番QA Docs（`2acbd70`）

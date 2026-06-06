@@ -35,7 +35,8 @@ https://ideal-island.vercel.app/
 - **Data-2 Core P2 修正済み**（`5ffb027`、push 済み・本番反映済み）: プロフィール説明文を v2 クラウド同期に合わせて更新
 - **Data-2 Core 本番QA済み**（2026-06-06、部分合格・P0/P1なし）
 - **Data-2 Core 実アカウントE2E QA**（2026-06-06）: **未完了 / 保留**（Google / Magic Link 実ログイン要。自動QAでは完了不可）
-- 最新 Docs コミット: `2acbd70`（Data-2 Core 本番QA docs）。実アカウントE2E QA docs は本作業（未コミット）
+- **Monthly-2 Core 実装済み**（`1d8b91c`、push 前）: 当年 1〜12 月の月チップ、選択月の月間目標 CRUD、過去年 read-only
+- 最新 Docs コミット: `7a667f4`（Data-2 Core 実アカウントE2E QA docs）。Monthly-2 Core docs は本作業（未コミット）
 - 本番 https://ideal-island.vercel.app/
 
 ## 現在の画面構成
@@ -90,10 +91,19 @@ https://ideal-island.vercel.app/
   - スマホ幅 320 / 375 / 390px でレイアウト・動作確認済み
   - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし。3 HTML 同期（`8929ed0`）
 - 目標の見返し・年間ジャンル（Phase GoalView-1）
-  - **Monthly-1**（`24ee53e`）: 既存 `#monthlyGoalArchive` と `renderMonthlyGoals()` の月別 `<details>` を活用。「ほかの月の目標」見出し、過去月0件時の空状態文言。下部ナビ「目標」→ `#monthly-goal-section`（読み取り専用・月選択UIなし）
+  - **Monthly-1**（`24ee53e`）: 既存 `#monthlyGoalArchive` と `renderMonthlyGoals()` の月別 `<details>` を活用。「ほかの月の目標」見出し、過去月0件時の空状態文言。下部ナビ「目標」→ `#monthly-goal-section`（当時は読み取り専用・月選択UIなし）
   - **Goal-1**（`f6f7a0c`）: 年間目標に `category`（画面は「ジャンル」、既存 `CATEGORIES`）。未設定は `normalizeYearlyGoal()` で「その他」。フォーム select とカードのジャンルバッジ
   - **後回し**: 年間目標アイコン
   - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
+- 月間目標の年間計画 UI（Phase Monthly-2 Core）
+  - **Monthly-2 Core**（`1d8b91c`）: 当年 1〜12 月の月チップ（`#monthlyGoalMonthPicker`）。デフォルト選択は今月（`selectedMonthKey`）
+  - 選択月の `monthlyGoals` をメインリストに表示。追加・編集・削除可能（未来月・過去月も可）
+  - `addMonthlyGoal()` の追加先を `selectedMonthKey` に変更（従来は常に今月）
+  - 当年の「ほかの月の目標」アーカイブは月チップ UI に統合
+  - 過去年の月間目標は、存在する場合のみ「過去年の目標」として read-only 表示
+  - **据え置き**: ダッシュボード「今月 %」は今月目標のみ。タスク紐づけ select も今月目標のみ
+  - `monthlyGoals` データ構造変更なし。`app_data` version 2 のまま。`collectLocalAppData()` / Supabase テーブル変更なし
+  - ローカル QA: Playwright 14/14 合格。3 HTML 同期済み
 - MILEステージ・バッジ（Phase World-2）
   - ダッシュボード直下の MILEステージカード
   - 累計MILEに応じたステージ表示（アイコン・ステージ名）
@@ -124,11 +134,11 @@ https://ideal-island.vercel.app/
 - 年間目標のジャンル（`category`、表示名「ジャンル」。Goal-1）
 - 年間目標のメモ保存
 - 年間進捗表示
-- 今月目標の追加 / 編集 / 削除
-- 今月目標のカテゴリ・メモ保存
-- 今月目標のアイコン選択
-- ほかの月の月間目標の見返し（`#monthlyGoalArchive`、Monthly-1）
-- 今月目標ごとの進捗表示
+- 月間目標の追加 / 編集 / 削除（当年 1〜12 月。Monthly-2 Core。デフォルトは今月）
+- 月間目標のカテゴリ・メモ保存
+- 月間目標のアイコン選択
+- 過去年の月間目標の見返し（存在時のみ read-only。Monthly-2 Core）
+- 月間目標ごとの進捗表示
 - 今日タスクの追加 / 編集 / 削除
 - 今日タスクの「明日へ」（`dueDate` を翌日へ。Todo-1）
 - 今日タスクの完了 / 未完了切り替え
@@ -503,6 +513,40 @@ const mileGoalPlan = {
   - プロフィールは **Data-2 Core 以降クラウド同期対象**（v2 `userProfile`）
 - **次アクション**: 実アカウント E2E は Data-2 Core 実アカウントE2E QA 参照（手動 Google E2E 待ち）
 
+## Monthly-2 Core（`1d8b91c`）
+
+- **実装コミット**: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 前）
+- **Docs**: 本作業（未コミット）
+
+**実装内容**
+
+- 月間目標カードを「月間目標（YYYY年）」に変更。当年 1〜12 月の月チップ（`#monthlyGoalMonthPicker`）
+- デフォルト選択は今月（`selectedMonthKey`）。今月チップは `is-current`、選択中は `is-selected`
+- 選択月の `monthlyGoals` をメインリストに CRUD（未来月・過去月も可）
+- `addMonthlyGoal()` の `month` を `selectedMonthKey` に変更
+- 当年の「ほかの月の目標」アーカイブは月チップ UI に統合
+- 過去年（`year < 当年`）の `monthlyGoals` がある場合のみ「過去年の目標」を read-only 表示
+
+**据え置き**
+
+- ダッシュボード「今月 %」は `getCurrentMonthlyGoals()` のまま
+- タスク追加・編集の `monthlyGoalId` select は今月目標のみ
+- 年間進捗は全月の月間目標平均のまま
+
+**データ / 同期**
+
+- `monthlyGoals` スキーマ変更なし（`month: "YYYY-MM"`）
+- `app_data.version: 2` のまま。`collectLocalAppData()` / Supabase テーブル変更なし
+- 新規 `localStorage` キーなし。3 HTML 同期済み
+
+**QA**
+
+- ローカル Playwright QA: **14/14 合格**
+
+**未実装（Monthly-3 以降）**
+
+- 過去年の編集 UI、年切替 UI
+
 ## 現在の制限
 
 - クラウド機能はログイン後のみ利用可能
@@ -531,15 +575,16 @@ const mileGoalPlan = {
 
 ## 今後の追加予定
 
-1. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
-2. **確認結果を Docs 更新**
-3. **問題なければ Monthly-2 へ進む**
+1. **Monthly-2 Core 本番反映確認**（`1d8b91c` push 後）
+2. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
+3. **確認結果を Docs 更新**
+- **Monthly-3 以降**: 過去年の編集 UI、年切替 UI
 - Data-2 後続: バックアップ復元 UI、端末データ取り込み UI
 - Launch-2 候補: スローガン編集 UI 復帰
 
 後回し: ステージ演出強化、未獲得バッジ一覧、Profile-6 画像、年間目標アイコン
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み・実アカウントE2E保留）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み・実アカウントE2E保留）, **Monthly-2 Core**（`1d8b91c`・ローカルQA 14/14）
 
 ## 作業時の確認コマンド
 
