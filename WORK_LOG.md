@@ -4,12 +4,40 @@
 
 ---
 
-## 2026-06（Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
+## 2026-06（Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### Launch-1 本番QA Docs（本作業・未コミット）
+### Cloud-Login-1 本番QA Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Cloud-Login-1 本番QA結果を反映
+- コード変更なし（`index.html` 3本は未変更）
+
+### Cloud-Login-1 本番QA（2026-06-05・コード変更なし）
+
+- **本番反映**: `c75f7de` feat(cloud-login): add Google OAuth login button
+- **URL**: https://ideal-island.vercel.app/
+- **判定**: 部分合格
+- **確認済み**
+  - 「Googleでログイン」ボタン表示、Magic Link 残存
+  - Google OAuth へ遷移（`accounts.google.com`）
+  - `collectLocalAppData()` 4項目維持
+  - `applyCloudAppDataToLocal()` プロフィール非対象
+  - 初回ロードの致命的コンソールエラーなし
+- **手動未完了**: Google ログイン完了後のクラウド保存/読み込み E2E
+- **既知仕様**
+  - 同じブラウザで別アカウント切替でも localStorage 端末データは残る
+  - クラウド保存は `user.id` ごと。読み込み時のみ同期4キー上書き。プロフィールは同期対象外
+- **次アクション**: 実 Google アカウントで保存/読み込み手動確認。別アカウント注意文は検討
+
+### Cloud-Login-1 実装（`c75f7de`）
+
+- 未ログインパネルに「Googleでログイン」ボタン（`signInWithOAuth` provider: google）
+- Magic Link は残す。`redirectTo`: `getCloudRedirectUrl()`
+- クラウド保存/読み込み・`collectLocalAppData()`・`applyCloudAppDataToLocal()` 未変更
+- 新規 `localStorage` キーなし。3 HTML 同期。push 済み
+
+### Launch-1 本番QA Docs（`c37a177`）
 
 - README / CONTINUE / WORK_LOG / NEXT_TASKS に Launch-1 本番QA結果を反映
-- コード変更なし（`index.html` 3本は未変更）
 
 ### Launch-1 本番QA（2026-06-04・コード変更なし）
 
@@ -124,11 +152,11 @@
 ## コミット履歴（直近）
 
 ```
+c75f7de feat(cloud-login): add Google OAuth login button
+c37a177 docs: complete Launch-1 production QA and launch readiness
 c20ef74 docs: document GoalView-1 monthly review and yearly category
 f6f7a0c feat(goal-view): add yearly goal category field
 24ee53e feat(goal-view): clarify monthly goals review navigation
-07747bb docs: document Todo-1 postpone-to-tomorrow for today todos
-8929ed0 feat(todo-1): add postpone-to-tomorrow for today todos
 ```
 
 ※ `git log` で常に最新を確認すること。

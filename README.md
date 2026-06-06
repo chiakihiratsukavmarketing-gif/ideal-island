@@ -29,7 +29,9 @@ https://ideal-island.vercel.app/
 - 今日のToDo「明日へ」回し（Todo-1、2026-06）
 - 目標の見返し・年間ジャンル（GoalView-1、2026-06）
 - Launch-1 本番QA済み（2026-06-04、合格・P0/P1なし）
-- 最新 Docs コミット: `c20ef74`（GoalView-1 docs）。本番 https://ideal-island.vercel.app/ に World-3 mini / Todo-1 / GoalView-1 反映済み
+- Google OAuth ログイン追加（Cloud-Login-1、`c75f7de`、本番反映済み）
+- Cloud-Login-1 本番QA済み（2026-06-05、部分合格）
+- 最新 Docs コミット: `c37a177`（Launch-1 QA docs）。本番 https://ideal-island.vercel.app/
 
 ## 現在の画面構成
 
@@ -142,7 +144,7 @@ https://ideal-island.vercel.app/
 - 振り返りメモ
 - 直近3件のメモ表示
 - スローガン編集（ロジックは動作。編集 UI は CSS で非表示 — Launch-1 QA P2 既知課題）
-- Supabaseログイン（メールリンク）
+- Supabaseログイン（Google OAuth + メールリンク）
 - ログインリンク再送クールダウン（60秒）
 - クラウド同期状態表示
   - 端末に保存済み
@@ -261,7 +263,7 @@ const mileGoalPlan = {
 
 ### クラウド保存（Supabase）
 
-- Supabaseログインに対応しています（メールリンク方式）。
+- Supabaseログインに対応しています（Google OAuth + メールリンク方式）。
 - 保存先テーブル: `user_app_data`（`app_data` に上記 `version: 1` 形式の JSON）。
 - ログイン後、同期対象 4 種の変更は **45秒 debounce** で自動クラウド保存されます。
 - 「クラウドに保存」「クラウドから読み込み」による手動操作も利用できます。
@@ -403,6 +405,29 @@ const mileGoalPlan = {
   - **P3**: 「ほかの月の目標」0件時の empty state は未検証
 - **次アクション**: Supabase ログイン後のクラウド保存/読み込み手動確認。スローガン UI 復帰は Launch-2 以降に判断
 
+## Cloud-Login-1 本番QA（2026-06-05）
+
+- **本番反映**: `c75f7de` feat(cloud-login): add Google OAuth login button
+- **URL**: https://ideal-island.vercel.app/
+- **判定**: 部分合格
+- **確認済み**
+  - 「Googleでログイン」ボタン表示
+  - Magic Link（メール入力 + 「ログインリンクを送る」）残存
+  - Google OAuth へ遷移（`accounts.google.com`）
+  - `collectLocalAppData()` 4項目維持（`goalsByTab`, `goalPlan`, `reflectionNotes`, `slogan`）
+  - `applyCloudAppDataToLocal()` はプロフィール（`mileUserProfile`）非対象
+  - 初回ロードの致命的コンソールエラーなし
+- **手動未完了**
+  - Google ログイン完了後のクラウド保存 / 読み込み E2E
+  - 年間目標ジャンル保持（読み込み後）
+  - プロフィール非上書き（読み込み後実機）
+- **既知仕様**
+  - 同じブラウザで別アカウントに切り替えても `localStorage` の端末データは残る（ログアウトでは同期4キーを消さない）
+  - クラウド保存はログインアカウントごとの `user.id` に保存される（`user_app_data`）
+  - 「クラウドから読み込み」実行時のみ、同期4キーが上書きされる
+  - プロフィールはクラウド同期対象外
+- **次アクション**: 実 Google アカウントでログイン完了後、クラウド保存/読み込みを手動確認。必要なら別アカウントログイン時の注意文追加を検討
+
 ## 現在の制限
 
 - クラウド機能はログイン後のみ利用可能
@@ -410,6 +435,7 @@ const mileGoalPlan = {
 - 同じブラウザ内で基本保存される
 - ブラウザのデータ削除を行うと端末内の保存内容も消える可能性あり
 - プロフィールは端末ローカルのみ（別端末では自動表示または端末ごとの設定）
+- 別アカウントに切り替えても端末の同期4キーは自動では消えない（「クラウドから読み込み」で上書き）
 - クラウド読み込み前バックアップの復元 UI はない
 
 ## ファイル構成メモ
@@ -431,11 +457,11 @@ const mileGoalPlan = {
 ## 今後の追加予定
 
 - Phase Data-2: 同期対象・バックアップ・version 検証の整理（実装）
-- Launch-2 候補: スローガン編集 UI 復帰、ログイン後クラウド手動QAの結果反映
+- Launch-2 候補: スローガン編集 UI 復帰、Google ログイン後クラウド E2E 手動QAの結果反映、別アカウントログイン時の注意文
 
 後回し: ステージ演出強化、未獲得バッジ一覧、Profile-6 画像、年間目標アイコン
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格）
 
 ## 作業時の確認コマンド
 

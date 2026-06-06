@@ -6,20 +6,45 @@
 
 ---
 
-## 次アクション（Launch-1 完了後）
+## 次アクション
 
-### 手動確認（P3）
+### 手動確認（Cloud-Login-1 残り）
 
-- [ ] Supabase ログイン後のクラウド保存 / 読み込み（Magic Link → `cloudSaveButton` / `cloudLoadButton`）
-- [ ] 「ほかの月の目標」0件時の empty state 表示（任意）
+- [ ] 実 Google アカウントでログイン完了
+- [ ] ログイン後: バッジ「ログイン中」、`cloudSignedInPanel`、保存/読み込みボタン
+- [ ] ToDo 追加 →「クラウドに保存」→ 成功表示
+- [ ] 「クラウドから読み込み」→ confirm → データ保持（年間ジャンル含む）
+- [ ] プロフィールがクラウド読み込みで上書きされないこと
+- [ ] 必要なら、別アカウントログイン時の注意文追加を検討
 
-### Launch-2 候補（判断待ち）
+### その他（任意 / 後回し）
 
-- [ ] スローガン編集 UI 復帰（`.slogan-card { display: none !important; }` の見直し — Launch-1 P2）
+- [ ] 「ほかの月の目標」0件時の empty state 表示（Launch-1 P3）
+- [ ] スローガン編集 UI 復帰（Launch-1 P2）
+- [ ] Phase Data-2: version 検証、バックアップ復元 UI、プロフィールクラウド同期
 
-### Phase Data-2（別フェーズ）
+---
 
-- [ ] version 検証、バックアップ復元 UI、プロフィールクラウド同期、二重構造整理
+## 完了済み: Cloud-Login-1（2026-06-05）
+
+**本番反映**: `c75f7de`  
+**URL**: https://ideal-island.vercel.app/  
+**判定**: 部分合格
+
+- [x] 「Googleでログイン」ボタン表示
+- [x] Magic Link 残存
+- [x] Google OAuth へ遷移
+- [x] `collectLocalAppData()` 4項目維持
+- [x] `applyCloudAppDataToLocal()` プロフィール非対象
+- [x] 初回ロードの致命的コンソールエラーなし
+- [ ] Google ログイン完了後の保存/読み込み E2E（手動未完了）
+
+**既知仕様**
+
+- 同じブラウザで別アカウントに切り替えても `localStorage` の端末データは残る
+- クラウド保存はログインアカウントごとの `user.id` に保存される
+- 「クラウドから読み込み」時のみ、同期4キーが上書きされる
+- プロフィールはクラウド同期対象外
 
 ---
 
@@ -33,12 +58,11 @@
 - [x] タスク CRUD / 目標 CRUD / プロフィール保存・リセット / 振り返りメモ
 - [x] 未ログインクラウド UI、`collectLocalAppData()` 4項目維持
 - [x] `manifest.json` / `icon-192` / `icon-512` / 初回コンソールエラーなし
-- [x] `README.md` / `CONTINUE.md` / `WORK_LOG.md` / `NEXT_TASKS.md` 更新（Docs コミット待ち）
+- [x] Docs 更新（`c37a177`）
 
 **既知課題（修正見送り）**
 
 - P2: スローガン編集 UI が CSS で非表示
-- P3: ログイン後クラウド保存/読み込みは手動QA待ち
 - P3: 「ほかの月の目標」0件 empty state は未検証
 
 ---
@@ -93,7 +117,9 @@
 
 ## 完了済み（直近）
 
-- [x] Launch-1 本番QA（2026-06-04）— 合格（P0/P1なし）、Docs 反映（未コミット）
+- [x] Cloud-Login-1 本番QA（2026-06-05）— 部分合格、Docs 反映（未コミット）
+- [x] Cloud-Login-1 実装（`c75f7de`）— Google OAuth ボタン
+- [x] Launch-1 本番QA Docs（`c37a177`）
 - [x] GoalView-1 Docs（`c20ef74`）
 - [x] GoalView-1 Goal-1（`f6f7a0c`）— 年間ジャンル（`category`）
 - [x] GoalView-1 Monthly-1（`24ee53e`）— ほかの月の目標見返し導線

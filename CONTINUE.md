@@ -6,10 +6,12 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新 Docs コミット: `c20ef74` docs: document GoalView-1 monthly review and yearly category
-- GoalView-1 実装: `24ee53e`（Monthly-1）/ `f6f7a0c`（Goal-1）、push 済み・本番反映済み
+- 最新 Docs コミット: `c37a177` docs: complete Launch-1 production QA and launch readiness
+- Cloud-Login-1 実装: `c75f7de` feat(cloud-login): add Google OAuth login button（push 済み・本番反映済み）
+- GoalView-1 実装: `24ee53e`（Monthly-1）/ `f6f7a0c`（Goal-1）、本番反映済み
 - Todo-1: `8929ed0`、World-3 mini: `94e70b6`、本番反映済み
 - Launch-1 本番QA: 2026-06-04 実施、合格（P0/P1なし）
+- Cloud-Login-1 本番QA: 2026-06-05 実施、部分合格（OAuth開始まで OK、ログイン後 E2E は手動未完了）
 - 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
@@ -31,6 +33,11 @@
   - https://ideal-island.vercel.app/ で Playwright 自動確認 + 静的アセット確認
   - スマホ 320 / 375 / 390px、直近機能、CRUD、未ログインクラウド UI、PWA
   - P0/P1 なし。P2: スローガン UI 非表示。P3: ログイン後クラウド手動QA待ち、月間 empty 未検証
+- Cloud-Login-1 本番QA（2026-06-05）
+  - 本番 `c75f7de`：Googleでログイン表示、Magic Link 残存、OAuth→Google 遷移 OK
+  - `collectLocalAppData()` 4項目、`applyCloudAppDataToLocal()` プロフィール非対象、コンソール OK
+  - 手動未完了: Google ログイン完了後の保存/読み込み E2E
+  - 既知仕様: 別アカウント切替でも localStorage 端末データは残る（読み込み時のみ上書き）
 
 ## ローンチ前の方針（2026-06）
 
@@ -170,6 +177,12 @@
   - URL: https://ideal-island.vercel.app/、判定: 合格（P0/P1なし）
   - `collectLocalAppData()` 4項目維持。manifest / icon / コンソール OK
   - 既知: P2 スローガン UI 非表示、P3 ログイン後クラウド手動QA、P3 月間0件 empty
+  - Docs `c37a177`
+- Phase Cloud-Login-1
+  - 未ログインパネルに「Googleでログイン」ボタン（`signInWithOAuth`、Magic Link は残す）
+  - クラウド保存/読み込み・`collectLocalAppData()`・`applyCloudAppDataToLocal()` は未変更
+  - 新規 `localStorage` キーなし。3 HTML 同期（`c75f7de`）、push 済み・本番反映済み
+  - 本番QA（2026-06-05）: 部分合格。OAuth 開始まで OK。ログイン後 E2E は手動未完了
   - Docs 反映は本作業（未コミット）
 
 ## Phase Data-1 調査メモ（2026-06）
@@ -200,7 +213,8 @@
 
 ## 直近の変更内容
 
-- Phase Launch-1: 本番QA合格（2026-06-04）、Docs 反映（本作業・未コミット）
+- Phase Cloud-Login-1: Google OAuth ボタン（`c75f7de`）、本番QA 部分合格、Docs 反映（本作業・未コミット）
+- Phase Launch-1: 本番QA合格（2026-06-04）、Docs `c37a177`
 - Phase GoalView-1: 月間見返し導線（`24ee53e`）+ 年間ジャンル（`f6f7a0c`）、Docs `c20ef74`
 - Phase Todo-1: 「明日へ」で `dueDate` を翌日に、3 HTML + Docs（`8929ed0` / `07747bb`）
 - Phase World-3 mini: バッジ3件・バッジ獲得トースト、3 HTML + Docs（`94e70b6` / `06c8ad5`）
@@ -258,7 +272,7 @@
 - 振り返りメモ
 - localStorage保存（端末への自動保存）
 - プロフィール表示・編集（ログイン前後、上部ヘッダー + 設定内の折りたたみプロフィール設定）
-- Supabaseログイン（メールリンク）
+- Supabaseログイン（Google OAuth + メールリンク）
 - ログインリンク再送クールダウン
 - クラウド同期状態表示
 - クラウド自動保存（45秒 debounce）
@@ -268,7 +282,8 @@
 
 ## ローンチ後の次アクション
 
-- Supabase ログイン後のクラウド保存 / 読み込み手動確認（Launch-1 P3）
+- 実 Google アカウントでログイン完了後、クラウド保存 / 読み込みを手動確認（Cloud-Login-1）
+- 必要なら、別アカウントログイン時の注意文追加を検討
 - スローガン UI 復帰は Launch-2 以降に判断（Launch-1 P2）
 - Phase Data-2 は別途（`NEXT_TASKS.md` 参照）
 
@@ -279,7 +294,7 @@
 - **Phase Data-2**: version 検証、バックアップ復元 UI、プロフィール同期、`idealIslandGoals` / `mileGoalPlan` 整理
 - **ステージ演出強化**（旧 World-3 案の装飾系）
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）
 
 ## 注意点
 
