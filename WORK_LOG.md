@@ -6,14 +6,40 @@
 
 ## 2026-06（Todo-2 Core / Monthly-2 Core / Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### Todo-2 Core Docs（本作業・未コミット）
+### Todo-2 Core 本番QA Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Todo-2 Core 本番QA 結果を反映
+- コード変更なし（`index.html` 3本は未変更）
+
+### Todo-2 Core 本番QA（2026-06-06・コード変更なし）
+
+- **URL**: https://ideal-island.vercel.app/
+- **本番反映**: `985c60a`（実装）/ `23370b8`（Docs）
+- **判定**: **合格**（15/15 OK）
+- **P0/P1/P2/P3**: なし
+- **確認内容**:
+  - 未完了3件 → 残り3 / 0%。1件完了 → 1/3 / 33%
+  - 2件「明日へ」後 → 1/1 / 100% / 残り0
+  - all フィルターに明日へタスク残存、今日フィルターでは非表示
+  - 未来期限未完了は分母外、期限切れ未完了は分母内
+  - 今日対象0件でもエラーなし
+  - 「次にやること」が明日以降未完了を拾わない
+  - MILE / バッジ / 達成履歴 / streak は「明日へ」前後で不変
+  - ダッシュボードと詳しい進捗の今日 % 一致
+  - `collectLocalAppData().version === 2` 維持
+  - 320 / 375 / 390px レイアウト OK
+  - 初回ロードの致命的コンソールエラーなし
+- **QA用スクリプト**: `work/todo-2-prod-qa.mjs`（実行後削除済み）
+- **次アクション**: Data-2 Core 実アカウント手動 E2E（Google / Magic Link）
+
+### Todo-2 Core Docs（`23370b8`）
 
 - README / CONTINUE / WORK_LOG / NEXT_TASKS に Todo-2 Core 実装・ローカル QA 結果を反映
 - コード変更なし（`index.html` 3本は未変更）
 
 ### Todo-2 Core 実装（`985c60a`）
 
-- **コミット**: `985c60a` feat(todo-2): exclude postponed tasks from today dashboard scope（push 前）
+- **コミット**: `985c60a` feat(todo-2): exclude postponed tasks from today dashboard scope（push 済み・本番反映済み）
 - **`isDashboardTodayTask` / `getDashboardTodayGoals`**: 今日の達成率・残り・完了の対象を定義
 - **今日の対象**: 未完了・期限なし / 未完了・`dueDate <= 今日` / 完了・`completedAt` が今日
 - **今日の対象外**: 未完了・`dueDate > 今日`（「明日へ」後を含む）/ 完了・`completedAt` が今日以外

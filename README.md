@@ -36,8 +36,9 @@ https://ideal-island.vercel.app/
 - **Data-2 Core 本番QA済み**（2026-06-06、部分合格・P0/P1なし）
 - **Data-2 Core 実アカウントE2E QA**（2026-06-06）: **未完了 / 保留**（Google / Magic Link 実ログイン要。自動QAでは完了不可）
 - **Monthly-2 Core 実装済み**（`1d8b91c` / Docs `3dfd177`、push 済み）: 当年 1〜12 月の月チップ、選択月の月間目標 CRUD、過去年 read-only
-- **Todo-2 Core 実装済み**（`985c60a`、push 前）: 「明日へ」/ 未来期限タスクを今日ダッシュボード分母から除外
-- 最新 Docs コミット: `3dfd177`（Monthly-2 Core docs）。Todo-2 Core docs は本作業（未コミット）
+- **Todo-2 Core 実装済み**（`985c60a` / Docs `23370b8`、push 済み・本番反映済み）: 「明日へ」/ 未来期限タスクを今日ダッシュボード分母から除外
+- **Todo-2 Core 本番QA済み**（2026-06-06、合格・15/15 OK・P0/P1/P2/P3 なし）
+- 最新 Docs コミット: `23370b8`（Todo-2 Core docs）。本番QA docs は本作業（未コミット）
 - 本番 https://ideal-island.vercel.app/
 
 ## 現在の画面構成
@@ -556,10 +557,10 @@ const mileGoalPlan = {
 
 - 過去年の編集 UI、年切替 UI
 
-## Todo-2 Core（`985c60a`）
+## Todo-2 Core（`985c60a` / Docs `23370b8`）
 
-- **実装コミット**: `985c60a` feat(todo-2): exclude postponed tasks from today dashboard scope（push 前）
-- **Docs**: 本作業（未コミット）
+- **実装コミット**: `985c60a` feat(todo-2): exclude postponed tasks from today dashboard scope（push 済み・本番反映済み）
+- **Docs**: `23370b8` docs: record Todo-2 Core today dashboard scope filtering
 
 **実装内容**
 
@@ -578,6 +579,28 @@ const mileGoalPlan = {
 **QA**
 
 - ローカル Playwright QA: **14/14 合格**
+- 本番 QA（2026-06-06）: **合格**（15/15 OK、P0/P1/P2/P3 なし）。本番 `985c60a` / `23370b8` 反映確認
+
+## Todo-2 Core 本番QA（2026-06-06）
+
+- **URL**: https://ideal-island.vercel.app/
+- **本番反映**: `985c60a`（実装）/ `23370b8`（Docs）
+- **判定**: **合格**（15/15 OK）
+- **P0/P1/P2/P3**: なし
+- **確認内容**:
+  - 未完了3件 → 残り3 / 0%。1件完了 → 1/3 / 33%
+  - 2件「明日へ」後 → 1/1 / 100% / 残り0
+  - all フィルターに明日へタスク残存、今日フィルターでは非表示
+  - 未来期限未完了は分母外、期限切れ未完了は分母内
+  - 今日対象0件でもエラーなし
+  - 「次にやること」が明日以降未完了を拾わない
+  - MILE / バッジ / 達成履歴 / streak は「明日へ」前後で不変
+  - ダッシュボードと詳しい進捗の今日 % 一致
+  - `collectLocalAppData().version === 2` 維持
+  - 320 / 375 / 390px レイアウト OK
+  - 初回ロードの致命的コンソールエラーなし
+- **QA用スクリプト**: `work/todo-2-prod-qa.mjs`（実行後削除済み）
+- **次アクション**: Data-2 Core 実アカウント手動 E2E（Google / Magic Link）
 
 ## 現在の制限
 
@@ -607,16 +630,15 @@ const mileGoalPlan = {
 
 ## 今後の追加予定
 
-1. **Todo-2 Core を push して本番反映確認**（`985c60a`）
-2. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
-3. **確認結果を Docs 更新**
+1. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
+2. **確認結果を Docs 更新**
 - **Monthly-3 以降**: 過去年の編集 UI、年切替 UI
 - Data-2 後続: バックアップ復元 UI、端末データ取り込み UI
 - Launch-2 候補: スローガン編集 UI 復帰
 
 後回し: ステージ演出強化、未獲得バッジ一覧、Profile-6 画像、年間目標アイコン
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み・実アカウントE2E保留）, **Monthly-2 Core**（`1d8b91c` / Docs `3dfd177`・ローカルQA 14/14）, **Todo-2 Core**（`985c60a`・ローカルQA 14/14）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み・実アカウントE2E保留）, **Monthly-2 Core**（`1d8b91c` / Docs `3dfd177`・ローカルQA 14/14）, **Todo-2 Core**（`985c60a` / Docs `23370b8`・本番QA合格 15/15）
 
 ## 作業時の確認コマンド
 

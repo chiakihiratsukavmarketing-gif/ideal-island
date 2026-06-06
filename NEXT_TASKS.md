@@ -8,15 +8,14 @@
 
 ## 次アクション
 
-1. **Todo-2 Core を push して本番反映確認**（`985c60a`）
-2. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
+1. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
    - [ ] Google ログイン後、そのアカウントのクラウドデータが自動表示される
    - [ ] Magic Link ログイン後、同様に auto-load
    - [ ] プロフィール変更 → クラウド保存 → 再ログイン後に復元
    - [ ] A→B アカウント切替で B のデータが表示される（A の端末データが B へ自動保存されない）
    - [ ] クラウド空の新規アカウントで空画面（backup 後）
    - [ ] 手動「クラウドに保存」「クラウドから読み込み」が従来どおり動く
-3. **確認結果を Docs 更新**
+2. **確認結果を Docs 更新**
 
 ### その他（任意 / 後回し）
 
@@ -26,7 +25,7 @@
 
 ---
 
-## 完了済み: Todo-2 Core（`985c60a`）
+## 完了済み: Todo-2 Core（`985c60a` / Docs `23370b8`）
 
 - `isDashboardTodayTask` / `getDashboardTodayGoals` で今日の達成率・残り・完了を算出
 - 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外
@@ -35,7 +34,29 @@
 - 据え置き: MILE / バッジ / 履歴 / streak、今日タブ一覧、保存構造
 - `collectLocalAppData()` / `app_data` v2 / Supabase 変更なし
 - ローカル Playwright QA 14/14。3 HTML 同期済み
-- Docs 反映は本作業（未コミット）
+- Docs `23370b8` 反映済み
+- 本番QA（2026-06-06）: **合格**（15/15 OK・P0/P1/P2/P3 なし）。本番 `985c60a` / `23370b8` 反映確認
+- 本番QA Docs 反映は本作業（未コミット）
+
+---
+
+## 完了済み: Todo-2 Core 本番QA（2026-06-06）
+
+- **URL**: https://ideal-island.vercel.app/
+- **判定**: **合格**（15/15 OK）
+- **P0/P1/P2/P3**: なし
+- 未完了3件 → 残り3 / 0%。1件完了 → 1/3 / 33%
+- 2件「明日へ」後 → 1/1 / 100% / 残り0
+- all フィルターに明日へタスク残存、今日フィルターでは非表示
+- 未来期限未完了は分母外、期限切れ未完了は分母内
+- 今日対象0件でもエラーなし
+- 「次にやること」が明日以降未完了を拾わない
+- MILE / バッジ / 達成履歴 / streak は「明日へ」前後で不変
+- ダッシュボードと詳しい進捗の今日 % 一致
+- `collectLocalAppData().version === 2` 維持
+- 320 / 375 / 390px レイアウト OK
+- 初回ロードの致命的コンソールエラーなし
+- QA用スクリプト `work/todo-2-prod-qa.mjs` は削除済み
 
 ---
 
@@ -201,7 +222,7 @@
 
 ---
 
-## 完了済みフェーズ詳細: Todo-2 Core（`985c60a`）
+## 完了済みフェーズ詳細: Todo-2 Core（`985c60a` / Docs `23370b8`）
 
 - `isDashboardTodayTask` / `getDashboardTodayGoals` 追加
 - 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外
@@ -210,6 +231,7 @@
 - MILE / バッジ / 履歴 / streak / 今日タブ一覧は据え置き
 - 保存構造・`collectLocalAppData()` / Supabase 変更なし
 - ローカル Playwright QA 14/14。3 HTML 同期済み
+- 本番QA（2026-06-06）: **合格**（15/15 OK・P0/P1/P2/P3 なし）
 
 ---
 
@@ -243,7 +265,9 @@
 
 ## 完了済み（直近）
 
-- [x] Todo-2 Core Docs 反映（本作業・未コミット）
+- [x] Todo-2 Core 本番QA Docs 反映（本作業・未コミット）
+- [x] Todo-2 Core 本番QA（2026-06-06）— 合格（15/15 OK・P0/P1/P2/P3 なし）
+- [x] Todo-2 Core Docs（`23370b8`）
 - [x] Todo-2 Core 実装（`985c60a`）— 今日ダッシュボード対象定義・Playwright QA 14/14
 - [x] Monthly-2 Core Docs（`3dfd177`）
 - [x] Monthly-2 Core 実装（`1d8b91c`）— 当年 12 ヶ月チップ・選択月 CRUD・Playwright QA 14/14
