@@ -6,8 +6,9 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新 Docs コミット: `7a667f4` docs: record Data-2 Core real-account E2E QA on hold
-- Monthly-2 Core 実装: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 前）
+- 最新 Docs コミット: `3dfd177` docs: record Monthly-2 Core year-wide month selector implementation
+- Monthly-2 Core 実装: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 済み）
+- Todo-2 Core 実装: `985c60a` feat(todo-2): exclude postponed tasks from today dashboard scope（push 前）
 - Data-2 Core P2 修正: `5ffb027` fix(ui): update profile settings copy for Data-2 cloud sync（push 済み・本番反映済み）
 - Data-2 Core 実装: `9c11037` feat(data-2): auto-load cloud data on login and sync profile v2（push 済み・本番反映済み）
 - Cloud-Login-1 実装: `c75f7de` feat(cloud-login): add Google OAuth login button（push 済み・本番反映済み）
@@ -19,6 +20,7 @@
 - Data-2 Core 本番QA: 2026-06-06 実施、部分合格（P0/P1なし）。本番 `9c11037` / `9d10a2a` / `5ffb027` 反映確認
 - Data-2 Core 実アカウントE2E QA: 2026-06-06 実施、**未完了 / 保留**（Google / Magic Link 実ログイン要。自動QAでは完了不可）
 - Monthly-2 Core ローカルQA: 実施済み（Playwright 14/14 合格）
+- Todo-2 Core ローカルQA: 実施済み（Playwright 14/14 合格）
 - 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
@@ -60,14 +62,20 @@
   - 自動確認 OK: `5ffb027` 反映、プロフィール説明文修正済み、「クラウド同期対象外」なし、Data-2 JS マーカー、`version === 2`、初回コンソール OK
   - 未確認: Google / Magic Link auto-load、プロフィール保存→再ログイン、A→B 切替、空クラウド空画面、手動保存/読み込み
   - Docs 反映は `7a667f4`
-- Monthly-2 Core（`1d8b91c`、push 前）
+- Monthly-2 Core（`1d8b91c`、push 済み）
   - 当年 1〜12 月の月チップ（`#monthlyGoalMonthPicker`）。デフォルト選択は今月（`selectedMonthKey`）
   - 選択月の月間目標を追加・編集・削除（未来月・過去月も可）。`addMonthlyGoal()` の追加先を `selectedMonthKey` に変更
   - 当年の「ほかの月の目標」アーカイブは月チップ UI に統合
   - 過去年の月間目標は存在時のみ「過去年の目標」として read-only
   - 据え置き: ダッシュボード「今月 %」・タスク紐づけ select は今月目標のみ
   - `monthlyGoals` 構造変更なし。`app_data` v2 / `collectLocalAppData()` / Supabase 変更なし
-  - ローカル QA 14/14。3 HTML 同期済み。Docs 反映は本作業（未コミット）
+  - ローカル QA 14/14。3 HTML 同期済み。Docs 反映は `3dfd177`
+- Todo-2 Core（`985c60a`、push 前）
+  - `isDashboardTodayTask` / `getDashboardTodayGoals` で今日の達成率・残り・完了を算出
+  - 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外。今日完了（`completedAt` 今日）のみ完了カウント
+  - ダッシュボード / 詳しい進捗 / stage2 / 「次にやること」を同一定義に統一
+  - 据え置き: MILE / バッジ / 履歴 / streak、今日タブ一覧、保存構造
+  - `collectLocalAppData()` / Supabase 変更なし。ローカル QA 14/14。Docs 反映は本作業（未コミット）
 
 ## ローンチ前の方針（2026-06）
 
@@ -193,10 +201,18 @@
   - 今日タブの未完了タスクに「明日へ」ボタン（`rescheduleGoal` / `rescheduleGoalToTomorrow`）
   - 表示: 期限なし / 今日期限 / 期限切れ。非表示: 未来日期限・完了済み
   - `dueDate` を翌日に更新、`updatedAt` のみ。`goalsByTab.today` に残す
-  - MILE・バッジ・トースト・ダッシュボード達成率/残件は変更なし
+  - MILE・バッジ・トーストは変更なし（Todo-1 時点。ダッシュボード分母は Todo-2 Core で調整）
   - 任意日付は既存編集フォーム。スマホ 320 / 375 / 390px 確認済み
   - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし
   - 3 HTML 同期（`8929ed0`）、Docs `07747bb`
+- Phase Todo-2 Core（`985c60a`、push 前）
+  - `isDashboardTodayTask` / `getDashboardTodayGoals` 追加
+  - 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外
+  - 今日完了（`completedAt` 今日）のみ完了としてカウント
+  - `renderDashboard` / `renderStats` / `getStageStatus` stage2 / 「次にやること」を統一
+  - MILE / バッジ / 履歴 / streak / 今日タブ一覧は据え置き
+  - 保存構造・`collectLocalAppData()` / Supabase 変更なし。Playwright QA 14/14
+  - 3 HTML 同期済み。Docs 反映は本作業（未コミット）
 - Phase GoalView-1（Monthly-1 + Goal-1）
   - Monthly-1: 「ほかの月の目標」見出し、過去月0件の空状態、既存 `#monthlyGoalArchive` の月別 details、下部ナビ「目標」→ `monthly-goal-section`
   - Goal-1: 年間目標に `category`（表示「ジャンル」、`CATEGORIES` 流用）。`normalizeYearlyGoal()` で「その他」補完。フォーム・カードバッジ
@@ -227,11 +243,19 @@
   - P2 修正（`5ffb027`）: プロフィール説明文を v2 同期に合わせて更新
   - 本番QA（2026-06-06）: 部分合格（P0/P1なし）
   - 実アカウントE2E QA（2026-06-06）: 未完了 / 保留（手動 Google E2E 待ち）
-- Phase Monthly-2 Core（`1d8b91c`、push 前）
+- Phase Monthly-2 Core（`1d8b91c`、push 済み）
   - 当年 1〜12 月の月チップ。`selectedMonthKey` で選択月 CRUD
   - `addMonthlyGoal()` → `selectedMonthKey`。当年アーカイブを月チップに統合
   - 過去年 read-only（存在時のみ）。ダッシュボード / タスク紐づけは今月固定
   - データ構造・`collectLocalAppData()`・Supabase 変更なし。Playwright QA 14/14
+  - 3 HTML 同期済み。Docs 反映は `3dfd177`
+- Phase Todo-2 Core（`985c60a`、push 前）
+  - `isDashboardTodayTask` / `getDashboardTodayGoals` で今日の達成率・残り・完了を算出
+  - 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外
+  - 今日完了（`completedAt` 今日）のみ完了カウント
+  - ダッシュボード / 詳しい進捗 / stage2 / 「次にやること」を同一定義に統一
+  - 据え置き: MILE / バッジ / 履歴 / streak、今日タブ一覧、保存構造
+  - `collectLocalAppData()` / Supabase 変更なし。Playwright QA 14/14
   - 3 HTML 同期済み。Docs 反映は本作業（未コミット）
 
 ## Phase Data-1 調査メモ（2026-06）
@@ -263,7 +287,8 @@
 
 - Phase Cloud-Login-1: Google OAuth ボタン（`c75f7de`）、本番QA 部分合格、Docs `cfa585e`
 - Phase Data-2 Core: ログイン auto-load・profile v2（`9c11037`）、P2 文言（`5ffb027`）、Docs `9d10a2a` / `2acbd70` / `7a667f4`、本番QA 部分合格、実アカウントE2E 保留
-- Phase Monthly-2 Core: 当年 12 ヶ月チップ・選択月 CRUD（`1d8b91c`）、ローカル QA 14/14
+- Phase Monthly-2 Core: 当年 12 ヶ月チップ・選択月 CRUD（`1d8b91c` / Docs `3dfd177`）、ローカル QA 14/14
+- Phase Todo-2 Core: 今日ダッシュボード対象定義（`985c60a`）、ローカル QA 14/14
 - Phase Launch-1: 本番QA合格（2026-06-04）、Docs `c37a177`
 - Phase GoalView-1: 月間見返し導線（`24ee53e`）+ 年間ジャンル（`f6f7a0c`）、Docs `c20ef74`
 - Phase Todo-1: 「明日へ」で `dueDate` を翌日に、3 HTML + Docs（`8929ed0` / `07747bb`）
@@ -335,7 +360,7 @@
 
 ## ローンチ後の次アクション
 
-1. **Monthly-2 Core を push して本番反映確認**（`1d8b91c`）
+1. **Todo-2 Core を push して本番反映確認**（`985c60a`）
 2. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
 3. **確認結果を Docs 更新**
 - **Monthly-3 以降**: 過去年の編集 UI、年切替 UI
@@ -350,7 +375,7 @@
 - **Phase Monthly-3 以降**: 過去年の編集 UI、年切替 UI
 - **ステージ演出強化**（旧 World-3 案の装飾系）
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み）, **Monthly-2 Core**（`1d8b91c`・ローカルQA 14/14）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み）, **Monthly-2 Core**（`1d8b91c` / Docs `3dfd177`）, **Todo-2 Core**（`985c60a`・ローカルQA 14/14）
 
 ## 注意点
 

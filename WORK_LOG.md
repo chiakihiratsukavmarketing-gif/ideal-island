@@ -4,16 +4,33 @@
 
 ---
 
-## 2026-06（Monthly-2 Core / Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
+## 2026-06（Todo-2 Core / Monthly-2 Core / Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### Monthly-2 Core Docs（本作業・未コミット）
+### Todo-2 Core Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Todo-2 Core 実装・ローカル QA 結果を反映
+- コード変更なし（`index.html` 3本は未変更）
+
+### Todo-2 Core 実装（`985c60a`）
+
+- **コミット**: `985c60a` feat(todo-2): exclude postponed tasks from today dashboard scope（push 前）
+- **`isDashboardTodayTask` / `getDashboardTodayGoals`**: 今日の達成率・残り・完了の対象を定義
+- **今日の対象**: 未完了・期限なし / 未完了・`dueDate <= 今日` / 完了・`completedAt` が今日
+- **今日の対象外**: 未完了・`dueDate > 今日`（「明日へ」後を含む）/ 完了・`completedAt` が今日以外
+- **統一**: `renderDashboard()` / `renderStats()` / `getStageStatus()` stage2 / 「次にやること」
+- **据え置き**: MILE / バッジ / 達成履歴 / streak、今日タブ一覧、保存構造
+- **`collectLocalAppData()` / `app_data.version: 2` / Supabase 変更なし**
+- **新規 `localStorage` キーなし**。3 HTML 同期済み
+- **ローカル QA**: Playwright **14/14 合格**
+
+### Monthly-2 Core Docs（`3dfd177`）
 
 - README / CONTINUE / WORK_LOG / NEXT_TASKS に Monthly-2 Core 実装・ローカル QA 結果を反映
 - コード変更なし（`index.html` 3本は未変更）
 
 ### Monthly-2 Core 実装（`1d8b91c`）
 
-- **コミット**: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 前）
+- **コミット**: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 済み）
 - **月チップ**: 当年 1〜12 月（`#monthlyGoalMonthPicker`）。デフォルト選択は今月（`selectedMonthKey`）
 - **選択月 CRUD**: 選択月の `monthlyGoals` をメインリストに表示。未来月・過去月も追加・編集・削除可
 - **`addMonthlyGoal()`**: 追加先を `getCurrentMonthKey()` 固定から `selectedMonthKey` に変更

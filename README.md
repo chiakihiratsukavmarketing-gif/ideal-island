@@ -35,8 +35,9 @@ https://ideal-island.vercel.app/
 - **Data-2 Core P2 修正済み**（`5ffb027`、push 済み・本番反映済み）: プロフィール説明文を v2 クラウド同期に合わせて更新
 - **Data-2 Core 本番QA済み**（2026-06-06、部分合格・P0/P1なし）
 - **Data-2 Core 実アカウントE2E QA**（2026-06-06）: **未完了 / 保留**（Google / Magic Link 実ログイン要。自動QAでは完了不可）
-- **Monthly-2 Core 実装済み**（`1d8b91c`、push 前）: 当年 1〜12 月の月チップ、選択月の月間目標 CRUD、過去年 read-only
-- 最新 Docs コミット: `7a667f4`（Data-2 Core 実アカウントE2E QA docs）。Monthly-2 Core docs は本作業（未コミット）
+- **Monthly-2 Core 実装済み**（`1d8b91c` / Docs `3dfd177`、push 済み）: 当年 1〜12 月の月チップ、選択月の月間目標 CRUD、過去年 read-only
+- **Todo-2 Core 実装済み**（`985c60a`、push 前）: 「明日へ」/ 未来期限タスクを今日ダッシュボード分母から除外
+- 最新 Docs コミット: `3dfd177`（Monthly-2 Core docs）。Todo-2 Core docs は本作業（未コミット）
 - 本番 https://ideal-island.vercel.app/
 
 ## 現在の画面構成
@@ -86,10 +87,18 @@ https://ideal-island.vercel.app/
   - 今日タブの未完了タスクに **「明日へ」** ボタン（編集フォーム不要で `dueDate` を翌日に更新）
   - 表示対象: 期限なし / 今日期限 / 期限切れ。未来日期限・完了済みには非表示
   - 更新は `dueDate` と `updatedAt` のみ。タスクは `goalsByTab.today` に残る
-  - `done` / `completedAt` / MILE / バッジ / トーストには影響なし。ダッシュボードの達成率・残り件数は変更なし
+  - `done` / `completedAt` / MILE / バッジ / トーストには影響なし（Todo-1 時点。ダッシュボード分母は **Todo-2 Core** で調整）
   - 任意の日付変更は既存の編集フォーム（期限 `type="date"`）で対応
   - スマホ幅 320 / 375 / 390px でレイアウト・動作確認済み
   - 新規 `localStorage` キーなし、`collectLocalAppData()`・Supabase 変更なし。3 HTML 同期（`8929ed0`）
+- 今日ダッシュボードの「今日対象」定義（Phase Todo-2 Core）
+  - **Todo-2 Core**（`985c60a`）: `isDashboardTodayTask` / `getDashboardTodayGoals` で今日の達成率・残り・完了を算出
+  - **今日の対象**: 未完了・期限なし / 未完了・`dueDate <= 今日` / 完了・`completedAt` が今日
+  - **今日の対象外**: 未完了・`dueDate > 今日`（「明日へ」後を含む）/ 完了・`completedAt` が今日以外
+  - ダッシュボード / 詳しい進捗（`renderStats`）/ MILEステージ stage2（`getStageStatus`）を同一定義に統一
+  - 「次にやること」も `getDashboardTodayGoals()` の未完了から選択（明日以降を拾わない）
+  - **据え置き**: MILE / バッジ / 達成履歴 / streak、今日タブ一覧表示、保存構造
+  - `collectLocalAppData()` / `app_data` v2 / Supabase 変更なし。ローカル QA: Playwright **14/14 合格**。3 HTML 同期済み
 - 目標の見返し・年間ジャンル（Phase GoalView-1）
   - **Monthly-1**（`24ee53e`）: 既存 `#monthlyGoalArchive` と `renderMonthlyGoals()` の月別 `<details>` を活用。「ほかの月の目標」見出し、過去月0件時の空状態文言。下部ナビ「目標」→ `#monthly-goal-section`（当時は読み取り専用・月選択UIなし）
   - **Goal-1**（`f6f7a0c`）: 年間目標に `category`（画面は「ジャンル」、既存 `CATEGORIES`）。未設定は `normalizeYearlyGoal()` で「その他」。フォーム select とカードのジャンルバッジ
@@ -180,7 +189,7 @@ https://ideal-island.vercel.app/
 2. 年間目標から逆算して、今月の目標を追加します。
 3. 今日やることを追加します。
 4. 必要に応じて、今日のタスクを今月の目標に紐づけます。
-5. タスクを完了すると、今日・今月・年間の進捗に反映されます。今日タブで完了すると +1 MILE のトースト（または新規バッジ獲得時は「バッジ獲得」トースト）が表示され、ダッシュボードの MILE 数・ステージ・バッジも更新されます。今日のToDoを明日に回す場合は、タスクカードの「明日へ」を使います（「今日」期限フィルターからは消えますが、タスクは今日タブの一覧に残ります）。
+5. タスクを完了すると、今日・今月・年間の進捗に反映されます。今日タブで完了すると +1 MILE のトースト（または新規バッジ獲得時は「バッジ獲得」トースト）が表示され、ダッシュボードの MILE 数・ステージ・バッジも更新されます。今日のToDoを明日に回す場合は、タスクカードの「明日へ」を使います（「今日」期限フィルターからは消えますが、タスクは今日タブの一覧に残ります。**Todo-2 Core 以降**、明日へした未完了タスクは今日のダッシュボード達成率・残りの分母から外れます）。
 6. 連続達成日数や週間進捗は、下部ナビの「詳しい」から「詳しい進捗を見る」を開いて確認します。
 7. その日の気づきは、振り返りメモに残せます。
 8. 別端末でも使う場合は、下部ナビの「設定」から「プロフィール」を開き、その下の「クラウド保存・同期」を展開してログインします。ログイン成功後（Google / Magic Link 共通）はそのアカウントのクラウドデータが自動読み込みされます。ログイン中は変更が約45秒後に自動でクラウド保存されます（auto-load 完了後）。必要に応じて「クラウドに保存」「クラウドから読み込み」も使えます。
@@ -513,10 +522,10 @@ const mileGoalPlan = {
   - プロフィールは **Data-2 Core 以降クラウド同期対象**（v2 `userProfile`）
 - **次アクション**: 実アカウント E2E は Data-2 Core 実アカウントE2E QA 参照（手動 Google E2E 待ち）
 
-## Monthly-2 Core（`1d8b91c`）
+## Monthly-2 Core（`1d8b91c` / Docs `3dfd177`）
 
-- **実装コミット**: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 前）
-- **Docs**: 本作業（未コミット）
+- **実装コミット**: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 済み）
+- **Docs**: `3dfd177` docs: record Monthly-2 Core year-wide month selector implementation
 
 **実装内容**
 
@@ -547,6 +556,29 @@ const mileGoalPlan = {
 
 - 過去年の編集 UI、年切替 UI
 
+## Todo-2 Core（`985c60a`）
+
+- **実装コミット**: `985c60a` feat(todo-2): exclude postponed tasks from today dashboard scope（push 前）
+- **Docs**: 本作業（未コミット）
+
+**実装内容**
+
+- `isDashboardTodayTask(goal)` / `getDashboardTodayGoals()` を追加
+- 「明日へ」した未完了タスク（`dueDate > 今日`）を今日ダッシュボード分母から除外
+- 手動で未来期限を付けた未完了タスクも同様に除外
+- 今日完了（`completedAt` が今日）のみ完了としてカウント。今日以外の完了は分母外
+- `renderDashboard()` / `renderStats()` / `getStageStatus()` stage2 / 「次にやること」を同一定義に統一
+
+**据え置き**
+
+- `rescheduleGoalToTomorrow`、MILE / バッジ / 達成履歴 / streak
+- 今日タブ一覧（`renderGoals` / `filterGoals`）
+- 保存構造。`collectLocalAppData()` / `app_data.version: 2` / Supabase 変更なし
+
+**QA**
+
+- ローカル Playwright QA: **14/14 合格**
+
 ## 現在の制限
 
 - クラウド機能はログイン後のみ利用可能
@@ -575,7 +607,7 @@ const mileGoalPlan = {
 
 ## 今後の追加予定
 
-1. **Monthly-2 Core 本番反映確認**（`1d8b91c` push 後）
+1. **Todo-2 Core を push して本番反映確認**（`985c60a`）
 2. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
 3. **確認結果を Docs 更新**
 - **Monthly-3 以降**: 過去年の編集 UI、年切替 UI
@@ -584,7 +616,7 @@ const mileGoalPlan = {
 
 後回し: ステージ演出強化、未獲得バッジ一覧、Profile-6 画像、年間目標アイコン
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み・実アカウントE2E保留）, **Monthly-2 Core**（`1d8b91c`・ローカルQA 14/14）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み・実アカウントE2E保留）, **Monthly-2 Core**（`1d8b91c` / Docs `3dfd177`・ローカルQA 14/14）, **Todo-2 Core**（`985c60a`・ローカルQA 14/14）
 
 ## 作業時の確認コマンド
 

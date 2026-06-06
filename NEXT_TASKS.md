@@ -8,7 +8,7 @@
 
 ## 次アクション
 
-1. **Monthly-2 Core を push して本番反映確認**（`1d8b91c`）
+1. **Todo-2 Core を push して本番反映確認**（`985c60a`）
 2. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
    - [ ] Google ログイン後、そのアカウントのクラウドデータが自動表示される
    - [ ] Magic Link ログイン後、同様に auto-load
@@ -26,7 +26,20 @@
 
 ---
 
-## 完了済み: Monthly-2 Core（`1d8b91c`）
+## 完了済み: Todo-2 Core（`985c60a`）
+
+- `isDashboardTodayTask` / `getDashboardTodayGoals` で今日の達成率・残り・完了を算出
+- 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外
+- 今日完了（`completedAt` 今日）のみ完了としてカウント
+- ダッシュボード / 詳しい進捗 / stage2 / 「次にやること」を同一定義に統一
+- 据え置き: MILE / バッジ / 履歴 / streak、今日タブ一覧、保存構造
+- `collectLocalAppData()` / `app_data` v2 / Supabase 変更なし
+- ローカル Playwright QA 14/14。3 HTML 同期済み
+- Docs 反映は本作業（未コミット）
+
+---
+
+## 完了済み: Monthly-2 Core（`1d8b91c` / Docs `3dfd177`）
 
 - 当年 1〜12 月の月チップ（`#monthlyGoalMonthPicker`）。デフォルト選択は今月（`selectedMonthKey`）
 - 選択月の月間目標を追加・編集・削除（未来月・過去月も可）
@@ -36,7 +49,7 @@
 - 据え置き: ダッシュボード「今月 %」・タスク紐づけ select は今月目標のみ
 - `monthlyGoals` 構造変更なし。`app_data` v2。`collectLocalAppData()` / Supabase 変更なし
 - ローカル Playwright QA 14/14。3 HTML 同期済み
-- Docs 反映は本作業（未コミット）
+- Docs `3dfd177` 反映済み
 
 ---
 
@@ -188,6 +201,18 @@
 
 ---
 
+## 完了済みフェーズ詳細: Todo-2 Core（`985c60a`）
+
+- `isDashboardTodayTask` / `getDashboardTodayGoals` 追加
+- 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外
+- 今日完了（`completedAt` 今日）のみ完了カウント
+- `renderDashboard` / `renderStats` / `getStageStatus` stage2 / 「次にやること」を統一
+- MILE / バッジ / 履歴 / streak / 今日タブ一覧は据え置き
+- 保存構造・`collectLocalAppData()` / Supabase 変更なし
+- ローカル Playwright QA 14/14。3 HTML 同期済み
+
+---
+
 ## 完了済みフェーズ詳細: Todo-1（`8929ed0`）
 
 - 「明日へ」ボタン: 今日タブ・未完了・（期限なし / 今日 / 期限切れ）のみ
@@ -218,7 +243,9 @@
 
 ## 完了済み（直近）
 
-- [x] Monthly-2 Core Docs 反映（本作業・未コミット）
+- [x] Todo-2 Core Docs 反映（本作業・未コミット）
+- [x] Todo-2 Core 実装（`985c60a`）— 今日ダッシュボード対象定義・Playwright QA 14/14
+- [x] Monthly-2 Core Docs（`3dfd177`）
 - [x] Monthly-2 Core 実装（`1d8b91c`）— 当年 12 ヶ月チップ・選択月 CRUD・Playwright QA 14/14
 - [x] Data-2 Core 実アカウントE2E QA Docs（`7a667f4`）
 - [x] Data-2 Core 実アカウントE2E QA（2026-06-06）— 未完了 / 保留（P0/P1なし）
