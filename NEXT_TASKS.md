@@ -8,20 +8,54 @@
 
 ## 次アクション
 
+### Data-2 Core 本番 QA（未実施）
+
+- [ ] Google ログイン後、そのアカウントのクラウドデータが自動表示される
+- [ ] Magic Link ログイン後、同様に auto-load
+- [ ] A→B アカウント切替で B のデータが表示される（A の端末データが B へ自動保存されない）
+- [ ] クラウド空の新規アカウントで空画面（backup 後）
+- [ ] プロフィール名・アイコンがクラウド同期される
+- [ ] 手動「クラウドに保存」「クラウドから読み込み」が従来どおり動く
+
 ### 手動確認（Cloud-Login-1 残り）
 
 - [ ] 実 Google アカウントでログイン完了
 - [ ] ログイン後: バッジ「ログイン中」、`cloudSignedInPanel`、保存/読み込みボタン
 - [ ] ToDo 追加 →「クラウドに保存」→ 成功表示
 - [ ] 「クラウドから読み込み」→ confirm → データ保持（年間ジャンル含む）
-- [ ] プロフィールがクラウド読み込みで上書きされないこと
-- [ ] 必要なら、別アカウントログイン時の注意文追加を検討
+- [ ] v1 クラウドデータ読み込みでエラーにならないこと
 
 ### その他（任意 / 後回し）
 
 - [ ] 「ほかの月の目標」0件時の empty state 表示（Launch-1 P3）
 - [ ] スローガン編集 UI 復帰（Launch-1 P2）
-- [ ] Phase Data-2: version 検証、バックアップ復元 UI、プロフィールクラウド同期
+- [ ] Data-2 後続: バックアップ復元 UI、端末データ取り込み UI
+
+---
+
+## 完了済み: Phase Data-2 Core（`9c11037`・ローカル・未 push）
+
+**実装コミット**: `9c11037` feat(data-2): auto-load cloud data on login and sync profile v2  
+**ローカル QA**: 実施済み（Playwright + コードレビュー）  
+**本番 E2E**: 未実施（上記「Data-2 Core 本番 QA」参照）
+
+- [x] `app_data.version: 2`
+- [x] `collectLocalAppData().data.userProfile` 追加（`mileUserProfile`）
+- [x] プロフィール名・アイコンのクラウド同期
+- [x] Google / Magic Link 共通でログイン後 `user.id` のクラウドデータ auto-load
+- [x] ログイン直後 auto-save 抑止（端末データが別アカウントへ自動保存されない）
+- [x] クラウド空の新規アカウント: `backupLocalAppData()` 後に空画面
+- [x] v1 クラウドデータ（`userProfile` なし）読み込み可
+- [x] `backupLocalAppData()` に `mileUserProfile` 追加
+- [x] Supabase テーブル変更なし
+- [x] 3 HTML 同期済み
+- [ ] 本番 Google / Magic Link / A→B 切替 E2E
+
+**未実装（Data-2 後続）**
+
+- 端末データをクラウドへ取り込む確認 UI
+- バックアップ復元 UI
+- ゲストデータ復元 UI
 
 ---
 
@@ -39,12 +73,12 @@
 - [x] 初回ロードの致命的コンソールエラーなし
 - [ ] Google ログイン完了後の保存/読み込み E2E（手動未完了）
 
-**既知仕様**
+**既知仕様（Cloud-Login-1 時点・Data-2 Core で一部更新）**
 
-- 同じブラウザで別アカウントに切り替えても `localStorage` の端末データは残る
 - クラウド保存はログインアカウントごとの `user.id` に保存される
-- 「クラウドから読み込み」時のみ、同期4キーが上書きされる
-- プロフィールはクラウド同期対象外
+- **Data-2 Core 以降**: ログイン後 auto-load。空クラウドは backup 後に空画面。A→B 切替も B を auto-load
+- 手動「クラウドから読み込み」は confirm 後に上書き（従来どおり）
+- プロフィールは **Data-2 Core 以降クラウド同期対象**（v2 `userProfile`）
 
 ---
 
@@ -117,7 +151,9 @@
 
 ## 完了済み（直近）
 
-- [x] Cloud-Login-1 本番QA（2026-06-05）— 部分合格、Docs 反映（未コミット）
+- [x] Data-2 Core 実装（`9c11037`）— ローカル QA 済み、Docs 反映（本作業・未コミット）
+- [x] Cloud-Login-1 本番QA Docs（`cfa585e`）
+- [x] Cloud-Login-1 本番QA（2026-06-05）— 部分合格
 - [x] Cloud-Login-1 実装（`c75f7de`）— Google OAuth ボタン
 - [x] Launch-1 本番QA Docs（`c37a177`）
 - [x] GoalView-1 Docs（`c20ef74`）

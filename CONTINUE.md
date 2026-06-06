@@ -6,12 +6,14 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新 Docs コミット: `c37a177` docs: complete Launch-1 production QA and launch readiness
+- 最新 Docs コミット: `cfa585e` docs: record Cloud-Login-1 production QA partial pass
+- Data-2 Core 実装: `9c11037` feat(data-2): auto-load cloud data on login and sync profile v2（ローカル・未 push）
 - Cloud-Login-1 実装: `c75f7de` feat(cloud-login): add Google OAuth login button（push 済み・本番反映済み）
 - GoalView-1 実装: `24ee53e`（Monthly-1）/ `f6f7a0c`（Goal-1）、本番反映済み
 - Todo-1: `8929ed0`、World-3 mini: `94e70b6`、本番反映済み
 - Launch-1 本番QA: 2026-06-04 実施、合格（P0/P1なし）
 - Cloud-Login-1 本番QA: 2026-06-05 実施、部分合格（OAuth開始まで OK、ログイン後 E2E は手動未完了）
+- Data-2 Core ローカルQA: 実施済み（Playwright + コードレビュー）。本番 Google / Magic Link / A→B 切替 E2E は未実施
 - 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
@@ -19,7 +21,8 @@
 ### 動作確認済み
 
 - 端末保存は自動（`localStorage`）
-- ログイン中はクラウド自動保存（45秒 debounce）
+- ログイン中はクラウド自動保存（45秒 debounce）。**ログイン直後は auto-load 完了まで auto-save しない**（Data-2 Core）
+- ログイン成功後（Google / Magic Link 共通）、`user.id` のクラウドデータを自動読み込み（Data-2 Core）
 - 保存状態表示あり
 - スマホ表示OK
 - PWAアイコンOK
@@ -37,7 +40,7 @@
   - 本番 `c75f7de`：Googleでログイン表示、Magic Link 残存、OAuth→Google 遷移 OK
   - `collectLocalAppData()` 4項目、`applyCloudAppDataToLocal()` プロフィール非対象、コンソール OK
   - 手動未完了: Google ログイン完了後の保存/読み込み E2E
-  - 既知仕様: 別アカウント切替でも localStorage 端末データは残る（読み込み時のみ上書き）
+  - **Data-2 Core 以降**: ログイン後 auto-load・プロフィール同期・空クラウド時 backup 後の空画面。本番 E2E は後続 QA
 
 ## ローンチ前の方針（2026-06）
 
@@ -45,7 +48,7 @@
 - **実用性優先**（ToDoの別日移動、目標の見返し導線など）
 - **併せられる作業は併せる**（1フェーズ = 1〜数コミットで完結）
 - **データ**: 既存 `localStorage` / `collectLocalAppData()` を壊さない最小仕様から入る
-- **後回し**: プロフィール画像、年間目標アイコン、Data-2 大規模、ステージ演出強化
+- **後回し**: プロフィール画像、年間目標アイコン、バックアップ復元 UI、端末データ取り込み UI、ステージ演出強化
 
 ## ここまで完了したフェーズ
 
@@ -108,7 +111,7 @@
   - トップ余白・モバイル hero の微調整完了
 - Phase Profile-4
   - プロフィール設定 UI（表示名・アイコン）完了
-  - `mileUserProfile` はクラウド同期対象外のまま
+  - ~~`mileUserProfile` はクラウド同期対象外のまま~~ → **Data-2 Core でクラウド同期対象に**
 - Phase Data-1（調査完了、コード変更なし）
   - `localStorage` キー・クラウド同期対象・バックアップ・version・プロフィール方針を整理
   - README / CONTINUE に仕様を反映
@@ -180,18 +183,28 @@
   - Docs `c37a177`
 - Phase Cloud-Login-1
   - 未ログインパネルに「Googleでログイン」ボタン（`signInWithOAuth`、Magic Link は残す）
-  - クラウド保存/読み込み・`collectLocalAppData()`・`applyCloudAppDataToLocal()` は未変更
+  - クラウド保存/読み込み・`collectLocalAppData()`・`applyCloudAppDataToLocal()` は未変更（当時）
   - 新規 `localStorage` キーなし。3 HTML 同期（`c75f7de`）、push 済み・本番反映済み
   - 本番QA（2026-06-05）: 部分合格。OAuth 開始まで OK。ログイン後 E2E は手動未完了
+  - Docs `cfa585e`
+- Phase Data-2 Core（`9c11037`、ローカル・未 push）
+  - `app_data.version: 2`、`collectLocalAppData().data.userProfile` 追加（`mileUserProfile`）
+  - プロフィール名・アイコンをクラウド同期対象化。`saveProfileSettings` / `resetProfileSettings` で dirty
+  - Google / Magic Link 共通: ログイン後 `user.id` のクラウドデータを自動読み込み（`handleCloudAuthSession` / `autoLoadCloudDataForUser`）
+  - ログイン直後の auto-save 抑止（auto-load 完了まで `scheduleCloudAutoSave` 停止）
+  - クラウド空の新規アカウント: `backupLocalAppData()` 後に空画面（端末データの自動アップロードなし）
+  - v1 クラウドデータ（`userProfile` なし）も読み込み可。手動読み込み時はプロフィール非破壊
+  - `backupLocalAppData()` に `mileUserProfile` 追加
+  - Supabase テーブル変更なし。3 HTML 同期済み
+  - ローカル QA 済み。本番 Google / Magic Link / A→B 切替 E2E は未実施（後続 QA）
   - Docs 反映は本作業（未コミット）
 
 ## Phase Data-1 調査メモ（2026-06）
 
-- **コード変更**: なし（`index.html` は未変更）
-- **クラウド同期対象**: `goalsByTab`, `goalPlan`, `reflectionNotes`, `slogan`（`appData.version: 1`）
-- **同期対象外**: `mileUserProfile`, 同期メタ, ログイン再送クールダウン, `mileCloudLoadBackup`
-- **プロフィール同期**: 今回は対象外のまま → **Data-2 候補**
-- **バックアップ**: 読み込み前に同期対象 4 キーのみ退避。復元 UI は未実装 → **Data-2 候補**
+- **コード変更**: なし（Data-1 時点。Data-2 Core で v2 / profile 同期を実装済み）
+- **クラウド同期対象（Data-2 Core 以降）**: `goalsByTab`, `goalPlan`, `reflectionNotes`, `slogan`, **`userProfile`**（`appData.version: 2`）
+- **同期対象外**: 同期メタ, ログイン再送クールダウン, `mileCloudLoadBackup`
+- **バックアップ**: 手動読み込み前 + 空クラウド auto-load 前に退避（5キー + `mileUserProfile`）。復元 UI は未実装 → **Data-2 後続候補**
 - **自動保存（Cloud-8〜10）**: dirty / hash / 45秒 debounce / 保存中レース対策は妥当と評価
 - **プロフィールアイコン候補**: Profile-5 で更新済み（画像アイコンは別フェーズ）
 
@@ -213,7 +226,8 @@
 
 ## 直近の変更内容
 
-- Phase Cloud-Login-1: Google OAuth ボタン（`c75f7de`）、本番QA 部分合格、Docs 反映（本作業・未コミット）
+- Phase Cloud-Login-1: Google OAuth ボタン（`c75f7de`）、本番QA 部分合格、Docs `cfa585e`
+- Phase Data-2 Core: ログイン auto-load・profile v2（`9c11037`）、Docs 反映（本作業・未コミット）
 - Phase Launch-1: 本番QA合格（2026-06-04）、Docs `c37a177`
 - Phase GoalView-1: 月間見返し導線（`24ee53e`）+ 年間ジャンル（`f6f7a0c`）、Docs `c20ef74`
 - Phase Todo-1: 「明日へ」で `dueDate` を翌日に、3 HTML + Docs（`8929ed0` / `07747bb`）
@@ -273,6 +287,9 @@
 - localStorage保存（端末への自動保存）
 - プロフィール表示・編集（ログイン前後、上部ヘッダー + 設定内の折りたたみプロフィール設定）
 - Supabaseログイン（Google OAuth + メールリンク）
+- ログイン後クラウド自動読み込み（Google / Magic Link 共通、`user.id` 基準）
+- ログイン直後 auto-save ガード（auto-load 完了まで抑止）
+- プロフィール（表示名・アイコン）のクラウド同期（Data-2 Core / v2）
 - ログインリンク再送クールダウン
 - クラウド同期状態表示
 - クラウド自動保存（45秒 debounce）
@@ -282,25 +299,25 @@
 
 ## ローンチ後の次アクション
 
-- 実 Google アカウントでログイン完了後、クラウド保存 / 読み込みを手動確認（Cloud-Login-1）
-- 必要なら、別アカウントログイン時の注意文追加を検討
+- Data-2 Core 本番 QA: Google / Magic Link ログイン後 auto-load、A→B アカウント切替（未実施）
+- 実 Google アカウントでログイン完了後、クラウド保存 / 読み込みを手動確認（Cloud-Login-1 残り）
 - スローガン UI 復帰は Launch-2 以降に判断（Launch-1 P2）
-- Phase Data-2 は別途（`NEXT_TASKS.md` 参照）
+- Data-2 後続: バックアップ復元 UI、端末データ取り込み UI（`NEXT_TASKS.md` 参照）
 
 ## 後回し（ローンチ後・別フェーズ）
 
 - **Profile-6**: プロフィール画像アップロード
 - **年間目標アイコン**追加
-- **Phase Data-2**: version 検証、バックアップ復元 UI、プロフィール同期、`idealIslandGoals` / `mileGoalPlan` 整理
+- **Phase Data-2 後続**: バックアップ復元 UI、端末データ取り込み UI、`idealIslandGoals` / `mileGoalPlan` 整理
 - **ステージ演出強化**（旧 World-3 案の装飾系）
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）, **Data-2 Core**（`9c11037`）
 
 ## 注意点
 
 - 3つのHTMLを同期する運用
-- `localStorage` 構造は Data-1 時点で文書化済み。破壊的変更は Data-2 以降で設計してから
-- プロフィール（`mileUserProfile`）はクラウド同期対象外。Data-2 まで含めない
+- `localStorage` 構造は Data-1 時点で文書化済み。Data-2 Core で `app_data` v2 + `userProfile` 同期を追加（Supabase テーブル変更なし）
+- プロフィール（`mileUserProfile`）は **Data-2 Core 以降クラウド同期対象**（`collectLocalAppData().data.userProfile`）
 - `localStorage` キー名統一（`idealIsland*` → `mile*`）は影響が大きいため後回し
 - コミット前にJavaScript構文チェック
 - コミット前にスマホ横スクロール確認
@@ -309,7 +326,7 @@
 - Vercel公開に使われる想定ファイルはプロジェクト直下の `index.html`
 - クラウド保存・読み込みは設定エリアの折りたたみ「クラウド保存・同期」（summary）を展開し、ログイン後は `cloudSignedInPanel` 内ボタンから操作
 - 下部ナビは inline SVG 線画アイコン（絵文字ではない）
-- ログイン中の変更は自動保存されるが、debounce のため即時同期ではない
+- ログイン中の変更は自動保存されるが、debounce のため即時同期ではない。**ログイン直後は auto-load 完了まで auto-save しない**
 
 ## 次回作業開始時の確認コマンド
 

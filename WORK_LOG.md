@@ -4,9 +4,29 @@
 
 ---
 
-## 2026-06（Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
+## 2026-06（Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### Cloud-Login-1 本番QA Docs（本作業・未コミット）
+### Data-2 Core Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Data-2 Core 実装・QA結果を反映
+- コード変更なし（`index.html` 3本は未変更）
+
+### Data-2 Core 実装（`9c11037`）
+
+- **コミット**: `9c11037` feat(data-2): auto-load cloud data on login and sync profile v2
+- **`app_data.version: 2`**: `collectLocalAppData().data.userProfile` 追加（`mileUserProfile`）
+- **プロフィール同期**: 表示名・アイコンをクラウド同期対象化。`saveProfileSettings` / `resetProfileSettings` で dirty
+- **ログイン auto-load**: Google / Magic Link 共通、`handleCloudAuthSession` → `autoLoadCloudDataForUser`（`user.id` 基準）
+- **auto-save ガード**: ログイン直後・auto-load 完了前は `scheduleCloudAutoSave` / auto `saveAppDataToCloud` 停止
+- **空クラウド**: `backupLocalAppData()` 後に `applyEmptyAppDataToLocal()`（端末データの自動アップロードなし）
+- **v1 互換**: `userProfile` なしでも読み込み可。手動読み込み時はプロフィール非破壊
+- **backup**: `backupLocalAppData()` に `mileUserProfile` 追加
+- **Supabase**: テーブル変更なし（`user_app_data.app_data` JSON のみ）
+- **3 HTML**: 同期済み
+- **ローカル QA**: Playwright + コードレビュー合格
+- **未実施**: 本番 Google / Magic Link / A→B アカウント切替 E2E
+
+### Cloud-Login-1 本番QA Docs（`cfa585e`）
 
 - README / CONTINUE / WORK_LOG / NEXT_TASKS に Cloud-Login-1 本番QA結果を反映
 - コード変更なし（`index.html` 3本は未変更）
@@ -152,11 +172,11 @@
 ## コミット履歴（直近）
 
 ```
+9c11037 feat(data-2): auto-load cloud data on login and sync profile v2
+cfa585e docs: record Cloud-Login-1 production QA partial pass
 c75f7de feat(cloud-login): add Google OAuth login button
 c37a177 docs: complete Launch-1 production QA and launch readiness
 c20ef74 docs: document GoalView-1 monthly review and yearly category
-f6f7a0c feat(goal-view): add yearly goal category field
-24ee53e feat(goal-view): clarify monthly goals review navigation
 ```
 
 ※ `git log` で常に最新を確認すること。
