@@ -1225,6 +1225,109 @@
         opacity: 1;
       }
 
+      .history-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .history-nav-button {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0;
+        font-size: 1.1rem;
+        line-height: 1;
+      }
+
+      .history-nav-button:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      .history-date-label {
+        margin: 0;
+        min-width: 8.5em;
+        text-align: center;
+        color: var(--text);
+        font-size: 0.95rem;
+        font-weight: 850;
+      }
+
+      .history-completed-section {
+        display: grid;
+        gap: 10px;
+      }
+
+      .history-completed-heading {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.92rem;
+        font-weight: 850;
+      }
+
+      .history-completed-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .history-goal-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        border: 1px solid var(--line-soft);
+        border-radius: 16px;
+        background: #fbfcf8;
+        padding: 12px 14px;
+      }
+
+      .history-goal-check {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        background: rgba(184, 217, 106, 0.35);
+        color: var(--text);
+        font-size: 0.82rem;
+        font-weight: 900;
+      }
+
+      .history-goal-content {
+        display: grid;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .history-goal-title {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.92rem;
+        font-weight: 750;
+        line-height: 1.5;
+      }
+
+      .history-completed-empty {
+        border: 1px dashed var(--line-soft);
+        border-radius: 16px;
+        background: #fbfcf8;
+        padding: 14px 16px;
+      }
+
+      .history-completed-empty .empty-title {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+        font-weight: 750;
+      }
+
+      .reflection-field textarea:read-only {
+        background: #f6f8f4;
+        color: var(--muted);
+      }
+
       .cloud-card {
         display: grid;
         gap: 14px;
@@ -5247,6 +5350,25 @@
       .settings-fold .cloud-heading {
         margin-top: 0;
       }
+
+      .beta-notice {
+        margin: 0 0 12px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(46, 125, 80, 0.08);
+        border: 1px solid rgba(46, 125, 80, 0.15);
+      }
+
+      .beta-notice-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.6;
+      }
+
+      .beta-notice-copy + .beta-notice-copy {
+        margin-top: 8px;
+      }
     </style>
   </head>
   <body>
@@ -5716,16 +5838,34 @@
               </div>
             </details>
           </aside>
-        <section class="reflection-card" aria-label="振り返りメモ">
+        <section class="reflection-card" aria-label="日付の記録">
                   <div class="reflection-heading">
                     <div>
-                      <h2 class="section-title">振り返りメモ</h2>
-                      <p class="reflection-copy">今日の気づきや、明日に活かしたいことを残せます。</p>
+                      <h2 class="section-title">日付の記録</h2>
+                      <p class="reflection-copy">直近30日分の完了タスクと振り返りメモを見返せます。</p>
                     </div>
-                    <span class="reflection-date" id="reflectionDate"></span>
                   </div>
+                  <div class="history-nav" aria-label="日付移動">
+                    <button
+                      class="button secondary history-nav-button"
+                      type="button"
+                      id="historyPrevButton"
+                      aria-label="前の日へ"
+                    >←</button>
+                    <p class="history-date-label" id="historyDateLabel"></p>
+                    <button
+                      class="button secondary history-nav-button"
+                      type="button"
+                      id="historyNextButton"
+                      aria-label="次の日へ"
+                    >→</button>
+                  </div>
+                  <section class="history-completed-section" aria-label="この日に完了したタスク">
+                    <h3 class="history-completed-heading" id="historyCompletedHeading">この日に完了したタスク</h3>
+                    <div class="history-completed-list" id="historyCompletedList"></div>
+                  </section>
                   <div class="field reflection-field">
-                    <label for="reflectionNote">今日のメモ</label>
+                    <label for="reflectionNote" id="reflectionNoteLabel">今日のメモ</label>
                     <textarea
                       id="reflectionNote"
                       rows="5"
@@ -5733,14 +5873,15 @@
                       placeholder="例：今日は朝に作業できた。明日は先に重要タスクから進める。"
                     ></textarea>
                   </div>
-                  <div class="reflection-actions">
+                  <div class="reflection-actions" id="reflectionActions">
                     <button class="button" type="button" id="saveReflectionButton">保存する</button>
                     <span class="reflection-status" id="reflectionStatus" aria-live="polite"></span>
                   </div>
-                  <div class="recent-notes">
-                    <h3>最近のメモ</h3>
-                    <div class="recent-notes-list" id="recentNotesList"></div>
-                  </div>
+                </section>
+
+                <section class="beta-notice" aria-label="β版の案内">
+                  <p class="beta-notice-copy">MILEは現在β版です。大切な目標は念のためご自身でも控えておいてください。</p>
+                  <p class="beta-notice-copy">不具合や表示崩れがあれば、スクリーンショット付きで教えてください。</p>
                 </section>
 
                 <details class="profile-settings-card settings-fold" id="profile-settings-section" aria-label="プロフィール設定">
@@ -5790,12 +5931,12 @@
                   <div class="cloud-heading">
                     <div>
                       <h2 class="section-title">クラウド保存</h2>
-                      <p class="cloud-copy" id="cloudDescription">基本はこの端末に保存されています。ログインすると自動でクラウド保存され、手動保存も使えます。</p>
+                      <p class="cloud-copy" id="cloudDescription">基本はこの端末に保存されています。ログインすると、プロフィール・ToDo・目標・メモをクラウドに保存できます。</p>
                     </div>
                   </div>
 
                   <div class="cloud-panel" id="cloudSignedOutPanel">
-                    <p class="cloud-copy">ログイン後、変更は自動でクラウド保存されます。手動保存・読み込みも使えます。メールアドレスを入力してログインリンクを送信してください。</p>
+                    <p class="cloud-copy">ログイン後は変更が自動でクラウド保存されます。手動保存・読み込みも使えます。メールアドレスを入力してログインリンクを送信してください。</p>
                     <div class="field">
                       <label for="cloudEmailInput">メールアドレス</label>
                       <input id="cloudEmailInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
@@ -5937,6 +6078,8 @@
         その他: "🎯",
       };
 
+      const HISTORY_DAYS = 30;
+
       const initialGoals = {
         year: [],
         month: [],
@@ -5960,6 +6103,7 @@
       let selectedMonthKey = "";
       let editingGoalId = "";
       let isCompletedTasksOpen = false;
+      let selectedHistoryDateKey = getTodayKey();
       let supabaseClient = createSupabaseClient();
       let cloudSession = null;
       let cloudLoginCooldownTimer = null;
@@ -6008,11 +6152,16 @@
       const monthlyGoalList = document.getElementById("monthlyGoalList");
       const monthlyGoalPastYearsBlock = document.getElementById("monthlyGoalPastYearsBlock");
       const monthlyGoalArchive = document.getElementById("monthlyGoalArchive");
-      const reflectionDate = document.getElementById("reflectionDate");
       const reflectionNote = document.getElementById("reflectionNote");
+      const reflectionNoteLabel = document.getElementById("reflectionNoteLabel");
       const saveReflectionButton = document.getElementById("saveReflectionButton");
       const reflectionStatus = document.getElementById("reflectionStatus");
-      const recentNotesList = document.getElementById("recentNotesList");
+      const reflectionActions = document.getElementById("reflectionActions");
+      const historyPrevButton = document.getElementById("historyPrevButton");
+      const historyNextButton = document.getElementById("historyNextButton");
+      const historyDateLabel = document.getElementById("historyDateLabel");
+      const historyCompletedHeading = document.getElementById("historyCompletedHeading");
+      const historyCompletedList = document.getElementById("historyCompletedList");
       const cloudCard = document.getElementById("settings-section");
       const cloudDescription = document.getElementById("cloudDescription");
       const cloudStatusBadge = document.getElementById("cloudStatusBadge");
@@ -6143,6 +6292,8 @@
         render();
       });
       saveReflectionButton.addEventListener("click", saveReflectionNote);
+      historyPrevButton.addEventListener("click", () => moveHistoryDate(-1));
+      historyNextButton.addEventListener("click", () => moveHistoryDate(1));
       saveProfileButton.addEventListener("click", saveProfileSettings);
       resetProfileButton.addEventListener("click", resetProfileSettings);
       googleLoginButton.addEventListener("click", signInWithGoogleOAuth);
@@ -7585,6 +7736,8 @@
       }
 
       function saveReflectionNote() {
+        if (selectedHistoryDateKey !== getTodayKey()) return;
+
         const todayKey = getTodayKey();
         const note = reflectionNote.value.trim();
 
@@ -7595,7 +7748,7 @@
         }
 
         saveReflectionNotes();
-        renderReflectionNotes();
+        renderHistoryDay();
         showReflectionStatus();
       }
 
@@ -7705,35 +7858,80 @@
         return `${year}年${Number(month)}月の目標`;
       }
 
-      function getRecentReflectionNotes() {
-        return Object.entries(reflectionNotes)
-          .filter(([, note]) => note.trim())
-          .sort(([dateA], [dateB]) => dateB.localeCompare(dateA))
-          .slice(0, 3);
+      function formatHistoryDateLabel(dateKey) {
+        const date = new Date(`${dateKey}T00:00:00`);
+        if (Number.isNaN(date.getTime())) return dateKey;
+        const weekday = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
+        return `${date.getMonth() + 1}/${date.getDate()}（${weekday}）`;
+      }
+
+      function getHistoryMinDateKey() {
+        return addDays(getTodayKey(), -(HISTORY_DAYS - 1));
+      }
+
+      function clampHistoryDateKey(key) {
+        const todayKey = getTodayKey();
+        const minKey = getHistoryMinDateKey();
+        if (key > todayKey) return todayKey;
+        if (key < minKey) return minKey;
+        return key;
+      }
+
+      function getCompletedTasksForHistoryDate(dateKey) {
+        return goalsByTab.today.filter((goal) => getDateKeyFromValue(goal.completedAt) === dateKey);
+      }
+
+      function renderHistoryGoalItem(goal) {
+        return `
+          <article class="history-goal-item">
+            <span class="history-goal-check" aria-hidden="true">✓</span>
+            <div class="history-goal-content">
+              <p class="history-goal-title">${escapeHtml(goal.title)}</p>
+              <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+            </div>
+          </article>
+        `;
+      }
+
+      function moveHistoryDate(offset) {
+        const nextKey = clampHistoryDateKey(addDays(selectedHistoryDateKey, offset));
+        if (nextKey === selectedHistoryDateKey) return;
+        selectedHistoryDateKey = nextKey;
+        renderHistoryDay();
+      }
+
+      function renderHistoryDay() {
+        selectedHistoryDateKey = clampHistoryDateKey(selectedHistoryDateKey);
+        const todayKey = getTodayKey();
+        const minKey = getHistoryMinDateKey();
+        const isToday = selectedHistoryDateKey === todayKey;
+        const completedTasks = sortGoals(getCompletedTasksForHistoryDate(selectedHistoryDateKey));
+        const note = reflectionNotes[selectedHistoryDateKey] || "";
+
+        historyDateLabel.textContent = formatHistoryDateLabel(selectedHistoryDateKey);
+        historyPrevButton.disabled = selectedHistoryDateKey <= minKey;
+        historyNextButton.disabled = selectedHistoryDateKey >= todayKey;
+        historyCompletedHeading.textContent = isToday
+          ? "今日完了したタスク"
+          : "この日に完了したタスク";
+
+        historyCompletedList.innerHTML = completedTasks.length
+          ? completedTasks.map(renderHistoryGoalItem).join("")
+          : `<div class="history-completed-empty">
+              <p class="empty-title">この日に完了したタスクはありません。</p>
+            </div>`;
+
+        reflectionNoteLabel.textContent = isToday ? "今日のメモ" : "この日のメモ";
+        reflectionNote.value = note;
+        reflectionNote.readOnly = !isToday;
+        reflectionNote.placeholder = isToday
+          ? "例：今日は朝に作業できた。明日は先に重要タスクから進める。"
+          : "";
+        reflectionActions.hidden = !isToday;
       }
 
       function renderReflectionNotes() {
-        const todayKey = getTodayKey();
-        const todayNote = reflectionNotes[todayKey] || "";
-        const recentNotes = getRecentReflectionNotes();
-
-        reflectionDate.textContent = formatShortDate(todayKey);
-        reflectionNote.value = todayNote;
-        recentNotesList.innerHTML = recentNotes.length
-          ? recentNotes
-              .map(
-                ([dateKey, note]) => `
-                  <article class="recent-note">
-                    <span class="recent-note-date">${escapeHtml(formatShortDate(dateKey))}</span>
-                    <p class="recent-note-text">${escapeHtml(note)}</p>
-                  </article>
-                `
-              )
-              .join("")
-          : `<div class="recent-notes-empty">
-              <p class="empty-title">まだ振り返りメモはありません</p>
-              <p class="empty-text">今日の気づきをひとこと残してみましょう。</p>
-            </div>`;
+        renderHistoryDay();
       }
 
       function renderYearlyGoal() {
