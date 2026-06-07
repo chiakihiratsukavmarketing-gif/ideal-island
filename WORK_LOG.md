@@ -4,9 +4,34 @@
 
 ---
 
-## 2026-06（Todo-2 Core / Monthly-2 Core / Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
+## 2026-06（History-1 Core / Release-Beta-1 / Todo-2 Core / Monthly-2 Core / Data-2 Core / Cloud-Login-1 / Launch-1 / GoalView-1 / Todo-1 / World-3 mini / Release-3 / Release-4）
 
-### Todo-2 Core 本番QA Docs（本作業・未コミット）
+### Release-Beta-1 / History-1 Core Docs（本作業・未コミット）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Release-Beta-1 + History-1 Core 実装・QA 結果を反映
+- コード変更なし（`index.html` 3本は `a42db45` でコミット済み）
+
+### Release-Beta-1 / History-1 Core 実装（`a42db45`）
+
+- **コミット**: `a42db45` feat(release): add beta notices and 30-day history view（push 前）
+- **Release-Beta-1**: 設定エリアにβ版案内・クラウド保存説明・不具合報告案内
+- **History-1 Core**:
+  - `reflection-card` →「日付の記録」。← / → で直近30日（今日〜過去29日）
+  - 選択日の完了タスク: `goalsByTab.today` × `getDateKeyFromValue(completedAt) === 選択日`、read-only
+  - 振り返り: `reflectionNotes[選択日]`。今日のみ編集・保存。過去日 readOnly
+  - 「最近のメモ」削除（日付ナビに統合）
+- **据え置き**: MILE / バッジ / streak / ダッシュボード / 達成履歴7日 / 今日タブ一覧
+- **`collectLocalAppData()` / `app_data.version: 2` / Supabase 変更なし**
+- **`completedAt` / `reflectionNotes` 既存構造利用**。新規 `localStorage` キーなし
+- **ローカル QA**: Playwright **15/15 合格**
+- **3 HTML 同期済み**
+- **次アクション**: Docs コミット → push → 本番QA → 5人β共有
+
+### Release-Beta-1 Docs（旧・本作業に統合）
+
+- README / CONTINUE / WORK_LOG / NEXT_TASKS に Release-Beta-1 開始・限定β方針を反映（History-1 Docs と統合）
+
+### Todo-2 Core 本番QA Docs（`2f54348`）
 
 - README / CONTINUE / WORK_LOG / NEXT_TASKS に Todo-2 Core 本番QA 結果を反映
 - コード変更なし（`index.html` 3本は未変更）

@@ -8,14 +8,24 @@
 
 ## 次アクション
 
-1. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
-   - [ ] Google ログイン後、そのアカウントのクラウドデータが自動表示される
-   - [ ] Magic Link ログイン後、同様に auto-load
-   - [ ] プロフィール変更 → クラウド保存 → 再ログイン後に復元
-   - [ ] A→B アカウント切替で B のデータが表示される（A の端末データが B へ自動保存されない）
-   - [ ] クラウド空の新規アカウントで空画面（backup 後）
-   - [ ] 手動「クラウドに保存」「クラウドから読み込み」が従来どおり動く
-2. **確認結果を Docs 更新**
+1. **Release-Beta-1 / History-1 Docs コミット**（本作業）
+2. **`a42db45` を push → 本番QA**
+3. **5人程度に限定β共有**
+4. **βフィードバック収集**（保存・ログイン・表示崩れ）
+5. **正式リリース前の最終確認**（β利用者の報告を確認）
+
+### Release-Beta-1 / History-1 チェック（共有前）
+
+- [x] Data-2 Core 実アカウントE2E — 問題なし
+- [x] Todo-2 Core 本番QA — 15/15 合格
+- [x] Monthly-2 Core — push 済み
+- [x] Release-Beta-1 β案内・クラウド説明・フィードバック依頼（`a42db45`）
+- [x] History-1 Core 30日日付ナビ・完了 read-only・振り返り today のみ編集（`a42db45`）
+- [x] History-1 Core ローカル QA — 15/15 合格
+- [x] 3 HTML 同期済み（`a42db45`）
+- [ ] Docs コミット → push → 本番QA
+- [ ] 5人に URL 共有
+- [ ] フィードバック収集
 
 ### その他（任意 / 後回し）
 
@@ -25,7 +35,22 @@
 
 ---
 
-## 完了済み: Todo-2 Core（`985c60a` / Docs `23370b8`）
+## Release-Beta-1 / History-1 Core（`a42db45`）
+
+- **実装コミット**: `a42db45` feat(release): add beta notices and 30-day history view（push 前）
+- **Release-Beta-1**: β版案内・クラウド保存説明・不具合報告案内（設定エリア）
+- **History-1 Core**: 直近30日の ← / → 日付ナビ。「日付の記録」カード
+- 選択日の完了タスク read-only（`goalsByTab.today` × `completedAt` 一致）
+- 振り返りメモは今日のみ編集・保存。過去日 readOnly
+- 「最近のメモ」は日付ナビに統合
+- `completedAt` / `reflectionNotes` 既存構造。`collectLocalAppData()` / v2 / Supabase 変更なし
+- MILE / バッジ / streak / ダッシュボード / 達成履歴7日 / 今日タブ一覧は据え置き
+- ローカル QA 15/15。3 HTML 同期済み
+- Docs 反映は本作業（未コミット）
+
+---
+
+## 完了済み: Todo-2 Core（`985c60a` / Docs `23370b8` / `2f54348`）
 
 - `isDashboardTodayTask` / `getDashboardTodayGoals` で今日の達成率・残り・完了を算出
 - 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外
@@ -34,9 +59,8 @@
 - 据え置き: MILE / バッジ / 履歴 / streak、今日タブ一覧、保存構造
 - `collectLocalAppData()` / `app_data` v2 / Supabase 変更なし
 - ローカル Playwright QA 14/14。3 HTML 同期済み
-- Docs `23370b8` 反映済み
+- Docs `23370b8` / `2f54348` 反映済み
 - 本番QA（2026-06-06）: **合格**（15/15 OK・P0/P1/P2/P3 なし）。本番 `985c60a` / `23370b8` 反映確認
-- 本番QA Docs 反映は本作業（未コミット）
 
 ---
 
@@ -74,30 +98,19 @@
 
 ---
 
-## Data-2 Core 実アカウントE2E QA（2026-06-06）
+## 完了済み: Data-2 Core 実アカウントE2E QA（2026-06-06）
 
 **URL**: https://ideal-island.vercel.app/  
 **本番反映**: `5ffb027`（P2 文言含む）  
-**判定**: **未完了 / 保留**（P0/P1なし）  
-**理由**: Google / Magic Link の実ログイン認証が必要で、自動QAでは完了不可
+**判定**: **問題なし**（P0/P1なし）
 
-### 自動確認 OK
-
-- [x] `5ffb027` 本番反映（プロフィール説明文修正済み）
-- [x] 「クラウド同期対象外」文言なし
-- [x] Data-2 Core JS マーカー（`autoLoadCloudDataForUser` 等）
-- [x] `collectLocalAppData().version === 2`
-- [x] 初回ロードの致命的コンソールエラーなし
-
-### 実ログイン E2E 未確認
-
-- [ ] Google ログイン後 auto-load
-- [ ] Magic Link ログイン後 auto-load
-- [ ] プロフィール変更 → クラウド保存 → 再ログイン復元
-- [ ] A→B アカウント切替
-- [ ] A の端末データが B へ自動保存されないこと
-- [ ] 空クラウド新規アカウントで空画面
-- [ ] ログイン後の手動クラウド保存/読み込み
+- [x] Google ログイン後 auto-load
+- [x] Magic Link ログイン後 auto-load
+- [x] プロフィール変更 → クラウド保存 → 再ログイン復元
+- [x] A→B アカウント切替
+- [x] A の端末データが B へ自動保存されないこと
+- [x] 空クラウド新規アカウントで空画面
+- [x] ログイン後の手動クラウド保存/読み込み
 
 ---
 
@@ -235,6 +248,25 @@
 
 ---
 
+## 完了済みフェーズ詳細: Release-Beta-1 / History-1 Core（`a42db45`）
+
+### Release-Beta-1
+
+- 設定エリア（プロフィール/クラウド保存の前）にβ版案内・クラウド保存説明・不具合報告案内
+- 5人程度の限定βリリース前整備
+
+### History-1 Core
+
+- `reflection-card` →「日付の記録」。← / → で直近30日（今日〜過去29日）
+- 選択日の完了タスク: `goalsByTab.today` × `getDateKeyFromValue(completedAt) === 選択日`、read-only
+- 振り返り: `reflectionNotes[選択日]`。今日のみ編集・保存。過去日 readOnly
+- 「最近のメモ」削除（日付ナビに統合）
+- 据え置き: MILE / バッジ / streak / ダッシュボード / 達成履歴7日 / 今日タブ一覧
+- `completedAt` / `reflectionNotes` 既存構造。`collectLocalAppData()` / v2 / Supabase 変更なし
+- ローカル QA 15/15。3 HTML 同期済み
+
+---
+
 ## 完了済みフェーズ詳細: Todo-1（`8929ed0`）
 
 - 「明日へ」ボタン: 今日タブ・未完了・（期限なし / 今日 / 期限切れ）のみ
@@ -265,14 +297,16 @@
 
 ## 完了済み（直近）
 
-- [x] Todo-2 Core 本番QA Docs 反映（本作業・未コミット）
+- [x] Release-Beta-1 / History-1 Core Docs 反映（本作業・未コミット）
+- [x] Release-Beta-1 / History-1 Core 実装（`a42db45`）— β案内 + 30日日付ナビ・QA 15/15
 - [x] Todo-2 Core 本番QA（2026-06-06）— 合格（15/15 OK・P0/P1/P2/P3 なし）
+- [x] Todo-2 Core 本番QA Docs（`2f54348`）
 - [x] Todo-2 Core Docs（`23370b8`）
 - [x] Todo-2 Core 実装（`985c60a`）— 今日ダッシュボード対象定義・Playwright QA 14/14
 - [x] Monthly-2 Core Docs（`3dfd177`）
 - [x] Monthly-2 Core 実装（`1d8b91c`）— 当年 12 ヶ月チップ・選択月 CRUD・Playwright QA 14/14
 - [x] Data-2 Core 実アカウントE2E QA Docs（`7a667f4`）
-- [x] Data-2 Core 実アカウントE2E QA（2026-06-06）— 未完了 / 保留（P0/P1なし）
+- [x] Data-2 Core 実アカウントE2E QA（2026-06-06）— 問題なし
 - [x] Data-2 Core P2 修正（`5ffb027`）— push 済み
 - [x] Data-2 Core 本番QA Docs（`2acbd70`）
 - [x] Data-2 Core 実装（`9c11037`）+ Docs（`9d10a2a`）— push 済み

@@ -34,11 +34,14 @@ https://ideal-island.vercel.app/
 - **Data-2 Core 実装済み**（`9c11037`、push 済み・本番反映済み）: ログイン auto-load、profile v2、auto-save ガード
 - **Data-2 Core P2 修正済み**（`5ffb027`、push 済み・本番反映済み）: プロフィール説明文を v2 クラウド同期に合わせて更新
 - **Data-2 Core 本番QA済み**（2026-06-06、部分合格・P0/P1なし）
-- **Data-2 Core 実アカウントE2E QA**（2026-06-06）: **未完了 / 保留**（Google / Magic Link 実ログイン要。自動QAでは完了不可）
+- **Data-2 Core 実アカウントE2E QA**（2026-06-06）: **問題なし**（Google / Magic Link 実ログイン確認済み）
 - **Monthly-2 Core 実装済み**（`1d8b91c` / Docs `3dfd177`、push 済み）: 当年 1〜12 月の月チップ、選択月の月間目標 CRUD、過去年 read-only
 - **Todo-2 Core 実装済み**（`985c60a` / Docs `23370b8`、push 済み・本番反映済み）: 「明日へ」/ 未来期限タスクを今日ダッシュボード分母から除外
 - **Todo-2 Core 本番QA済み**（2026-06-06、合格・15/15 OK・P0/P1/P2/P3 なし）
-- 最新 Docs コミット: `23370b8`（Todo-2 Core docs）。本番QA docs は本作業（未コミット）
+- **Release-Beta-1 実装済み**（`a42db45`、push 前）: β案内・クラウド保存説明・不具合報告案内
+- **History-1 Core 実装済み**（`a42db45`、push 前）: 直近30日の日付ナビで完了タスク・振り返りメモを見返し
+- **History-1 Core ローカルQA**: 実施済み（15/15 合格）
+- 最新 Docs コミット: `2f54348`（Todo-2 Core 本番QA docs）。Release-Beta-1 / History-1 docs は本作業（未コミット）
 - 本番 https://ideal-island.vercel.app/
 
 ## 現在の画面構成
@@ -52,7 +55,7 @@ https://ideal-island.vercel.app/
 7. 今月の目標
 8. 年間目標
 9. 進捗サマリー / 詳しい進捗（連続達成・週間・達成履歴など）
-10. 振り返りメモ
+10. 日付の記録（直近30日・完了タスク + 振り返りメモ）
 11. プロフィール（折りたたみ・summary「プロフィール」・下部ナビ「設定」で開く）
 12. クラウド保存・同期（折りたたみ・summary「クラウド保存・同期」＋状態バッジ）
 13. スローガン
@@ -302,7 +305,7 @@ const mileGoalPlan = {
 - **クラウドデータが空**の新規アカウント: 端末データを自動アップロードせず、`backupLocalAppData()` 後に空画面を表示します。
 - 読み込み前には上書き確認ダイアログが表示されます（手動読み込み時）。
 - 保存中にさらに編集された場合は、誤って「クラウド保存済み」と判定しないよう、保存開始時のスナップショットと成功後のローカル状態を比較します。
-- ログイン → 保存 → 別端末読み込みの E2E は Cloud-6 時点で確認済み。Data-2 Core 実ログイン E2E（auto-load / A→B 切替等）は未完了 / 保留（手動確認待ち）。
+- ログイン → 保存 → 別端末読み込みの E2E は Cloud-6 時点で確認済み。Data-2 Core 実アカウント E2E も問題なし（Google / Magic Link）。
 
 ### プロフィール（`mileUserProfile`）の扱い
 
@@ -482,23 +485,14 @@ const mileGoalPlan = {
 
 - **URL**: https://ideal-island.vercel.app/
 - **本番反映**: `5ffb027`（P2 文言含む）
-- **判定**: **未完了 / 保留**（P0/P1なし）
-- **理由**: Google / Magic Link の実ログイン認証が必要で、自動QAでは完了不可
-- **自動確認 OK**
-  - `5ffb027` 本番反映（プロフィール説明文修正済み）
-  - 「クラウド同期対象外」文言なし
-  - Data-2 Core JS マーカー（`autoLoadCloudDataForUser` 等）
-  - `collectLocalAppData().version === 2`
-  - 初回ロードの致命的コンソールエラーなし
-- **実ログイン E2E 未確認**
-  - Google ログイン後 auto-load
-  - Magic Link ログイン後 auto-load
+- **判定**: **問題なし**（P0/P1なし）
+- **確認済み**
+  - Google / Magic Link ログイン後 auto-load
   - プロフィール変更 → クラウド保存 → 再ログイン復元
-  - A→B アカウント切替
-  - A の端末データが B へ自動保存されないこと
+  - A→B アカウント切替（端末データの誤保存なし）
   - 空クラウド新規アカウントで空画面
-  - ログイン後の手動クラウド保存/読み込み
-- **次アクション**: ユーザー本人が Google アカウントで手動 E2E 確認 → 確認結果を Docs 更新 → 問題なければ Monthly-2 へ
+  - 手動クラウド保存/読み込み
+- **次アクション**: Release-Beta-1 / History-1 Docs → push → 本番QA → 5人β共有
 
 ## Cloud-Login-1 本番QA（2026-06-05）
 
@@ -600,7 +594,7 @@ const mileGoalPlan = {
   - 320 / 375 / 390px レイアウト OK
   - 初回ロードの致命的コンソールエラーなし
 - **QA用スクリプト**: `work/todo-2-prod-qa.mjs`（実行後削除済み）
-- **次アクション**: Data-2 Core 実アカウント手動 E2E（Google / Magic Link）
+- **次アクション**: Release-Beta-1 / History-1 Docs → push → 本番QA → 5人β共有
 
 ## 現在の制限
 
@@ -609,7 +603,7 @@ const mileGoalPlan = {
 - 同じブラウザ内で基本保存される
 - ブラウザのデータ削除を行うと端末内の保存内容も消える可能性あり
 - クラウド読み込み前バックアップの復元 UI はない
-- Data-2 Core 実ログイン E2E（Google / Magic Link auto-load / A→B 切替 / プロフィール同期 / 空クラウド空画面 / 手動保存読み込み）は **未完了 / 保留**（手動確認待ち）
+- Data-2 Core 実アカウント E2E は **問題なし**（Google / Magic Link 確認済み）
 - 端末データをクラウドへ取り込む確認 UI は未実装
 
 ## ファイル構成メモ
@@ -628,17 +622,53 @@ const mileGoalPlan = {
 - `main` にpushすると自動デプロイされる想定
 - 公開URL: https://ideal-island.vercel.app/
 
+## Release-Beta-1 / History-1 Core（`a42db45`）
+
+- **実装コミット**: `a42db45` feat(release): add beta notices and 30-day history view（push 前）
+- **Docs**: 本作業（未コミット）
+
+### Release-Beta-1（限定βリリース準備）
+
+- **目的**: 5人程度のテストユーザーに共有する前の最終整備
+- **アプリ内案内**（設定エリア）:
+  - β版である旨（大切な目標は控えを推奨）
+  - クラウド保存の説明（ログインでプロフィール・ToDo・目標・メモをクラウド保存）
+  - フィードバック依頼（不具合・表示崩れはスクリーンショット付きで連絡）
+
+### History-1 Core（日付の記録）
+
+- `reflection-card` を **「日付の記録」** に拡張
+- **← / →** で日付移動。初期表示は今日。範囲は今日〜過去29日（計30日）。未来日不可
+- **完了タスク**: `goalsByTab.today` のうち `getDateKeyFromValue(completedAt) === 選択日` を read-only 表示
+- **振り返りメモ**: `reflectionNotes[選択日]` を表示。今日のみ編集・保存（過去日は readOnly）
+- **「最近のメモ」**: 日付ナビに統合（削除）
+- **データ**: 既存 `completedAt` / `reflectionNotes` を利用。新規 `localStorage` キーなし
+
+**据え置き**
+
+- `collectLocalAppData()` / `app_data.version: 2` / Supabase
+- MILE / バッジ / streak / ダッシュボード / 達成履歴7日 / 今日タブ一覧
+
+**QA**
+
+- ローカル Playwright QA: **15/15 合格**
+- 3 HTML 同期済み
+
+**次アクション**: Docs コミット → push → 本番QA → 5人β共有
+
 ## 今後の追加予定
 
-1. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
-2. **確認結果を Docs 更新**
+1. **Release-Beta-1 / History-1 Docs コミット → push → 本番QA**
+2. **5人程度に限定β共有**
+3. **βフィードバック収集**（保存・ログイン・表示崩れ）
+4. **正式リリース前の最終確認**
 - **Monthly-3 以降**: 過去年の編集 UI、年切替 UI
 - Data-2 後続: バックアップ復元 UI、端末データ取り込み UI
 - Launch-2 候補: スローガン編集 UI 復帰
 
 後回し: ステージ演出強化、未獲得バッジ一覧、Profile-6 画像、年間目標アイコン
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み・実アカウントE2E保留）, **Monthly-2 Core**（`1d8b91c` / Docs `3dfd177`・ローカルQA 14/14）, **Todo-2 Core**（`985c60a` / Docs `23370b8`・本番QA合格 15/15）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA・Docs）, Cloud-Login-1（Google OAuth・本番QA部分合格・Docs `cfa585e`）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・実アカウントE2E問題なし）, **Monthly-2 Core**（`1d8b91c` / Docs `3dfd177`）, **Todo-2 Core**（`985c60a` / Docs `23370b8` / `2f54348`・本番QA合格 15/15）, **Release-Beta-1 / History-1 Core**（`a42db45`・ローカルQA 15/15）
 
 ## 作業時の確認コマンド
 

@@ -6,7 +6,9 @@
 - 公開URL: https://ideal-island.vercel.app/
 - GitHub `main` ブランチとVercelが連携済み
 - `main` にpushすると自動デプロイされる想定
-- 最新 Docs コミット: `23370b8` docs: record Todo-2 Core today dashboard scope filtering
+- 最新 HTML コミット: `a42db45` feat(release): add beta notices and 30-day history view（push 前）
+- 最新 Docs コミット: `2f54348` docs: record Todo-2 Core production QA pass
+- **Release-Beta-1 / History-1 Core**（`a42db45`）: β案内 + 30日日付ナビ。Docs 反映は本作業（未コミット）
 - Monthly-2 Core 実装: `1d8b91c` feat(monthly-2): add year-wide month selector for monthly goals（push 済み）
 - Todo-2 Core 実装: `985c60a` feat(todo-2): exclude postponed tasks from today dashboard scope（push 済み・本番反映済み）
 - Data-2 Core P2 修正: `5ffb027` fix(ui): update profile settings copy for Data-2 cloud sync（push 済み・本番反映済み）
@@ -18,11 +20,16 @@
 - Cloud-Login-1 本番QA: 2026-06-05 実施、部分合格（OAuth開始まで OK、ログイン後 E2E は手動未完了）
 - Data-2 Core ローカルQA: 実施済み（Playwright + コードレビュー）
 - Data-2 Core 本番QA: 2026-06-06 実施、部分合格（P0/P1なし）。本番 `9c11037` / `9d10a2a` / `5ffb027` 反映確認
-- Data-2 Core 実アカウントE2E QA: 2026-06-06 実施、**未完了 / 保留**（Google / Magic Link 実ログイン要。自動QAでは完了不可）
+- Data-2 Core 実アカウントE2E QA: 2026-06-06 実施、**問題なし**（Google / Magic Link 実ログイン確認済み）
 - Monthly-2 Core ローカルQA: 実施済み（Playwright 14/14 合格）
 - Todo-2 Core ローカルQA: 実施済み（Playwright 14/14 合格）
 - Todo-2 Core 本番QA: 2026-06-06 実施、**合格**（15/15 OK・P0/P1/P2/P3 なし）。本番 `985c60a` / `23370b8` 反映確認
-- 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
+- Release-Beta-1 / History-1 Core（`a42db45`、push 前）
+  - **Release-Beta-1**: 設定エリアにβ版案内・クラウド保存説明・不具合報告案内
+  - **History-1 Core**: `reflection-card` →「日付の記録」。← / → で直近30日。選択日の完了タスク read-only + 振り返りメモ（今日のみ編集・保存）
+  - 「最近のメモ」は日付ナビに統合。`completedAt` / `reflectionNotes` 既存構造利用
+  - 据え置き: MILE / バッジ / streak / ダッシュボード / 達成履歴7日 / 今日タブ一覧 / `collectLocalAppData()` / Supabase
+  - ローカル QA 15/15。3 HTML 同期済み。Docs 反映は本作業（未コミット）
 - `index.html` / `outputs/index.html` / `ideal-island/outputs/index.html` は同一内容で同期
 - `work/` と `ideal-island/work/` はGit管理対象外
 
@@ -58,11 +65,8 @@
   - P3: 実ログイン E2E 未実施
   - Docs `2acbd70`
 - Data-2 Core 実アカウントE2E QA（2026-06-06）
-  - 判定: **未完了 / 保留**（P0/P1なし）
-  - 理由: Google / Magic Link の実ログイン認証が必要で、自動QAでは完了不可
-  - 自動確認 OK: `5ffb027` 反映、プロフィール説明文修正済み、「クラウド同期対象外」なし、Data-2 JS マーカー、`version === 2`、初回コンソール OK
-  - 未確認: Google / Magic Link auto-load、プロフィール保存→再ログイン、A→B 切替、空クラウド空画面、手動保存/読み込み
-  - Docs 反映は `7a667f4`
+  - 判定: **問題なし**（P0/P1なし）
+  - Google / Magic Link auto-load、プロフィール保存→再ログイン、A→B 切替、空クラウド空画面、手動保存/読み込みを確認
 - Monthly-2 Core（`1d8b91c`、push 済み）
   - 当年 1〜12 月の月チップ（`#monthlyGoalMonthPicker`）。デフォルト選択は今月（`selectedMonthKey`）
   - 選択月の月間目標を追加・編集・削除（未来月・過去月も可）。`addMonthlyGoal()` の追加先を `selectedMonthKey` に変更
@@ -76,8 +80,15 @@
   - 「明日へ」/ 未来期限の未完了を今日ダッシュボード分母から除外。今日完了（`completedAt` 今日）のみ完了カウント
   - ダッシュボード / 詳しい進捗 / stage2 / 「次にやること」を同一定義に統一
   - 据え置き: MILE / バッジ / 履歴 / streak、今日タブ一覧、保存構造
-  - `collectLocalAppData()` / Supabase 変更なし。ローカル QA 14/14。Docs 反映は `23370b8`
+  - `collectLocalAppData()` / Supabase 変更なし。ローカル QA 14/14。Docs 反映は `23370b8` / `2f54348`
   - 本番QA（2026-06-06）: **合格**（15/15 OK・P0/P1/P2/P3 なし）
+- Release-Beta-1 / History-1 Core（`a42db45`、push 前）
+  - **Release-Beta-1**: 設定エリアにβ版案内・クラウド保存説明・不具合報告案内
+  - **History-1 Core**: 「日付の記録」。← / → で直近30日。選択日の完了タスク read-only + 振り返り（今日のみ編集・保存）
+  - 「最近のメモ」は日付ナビに統合。`completedAt` / `reflectionNotes` 既存構造利用
+  - 据え置き: MILE / バッジ / streak / ダッシュボード / 達成履歴7日 / 今日タブ一覧 / `collectLocalAppData()` / Supabase
+  - ローカル QA 15/15。3 HTML 同期済み。Docs 反映は本作業（未コミット）
+- 直近 UI 文言: `56bc682` fix(ui): refine profile cloud and greeting labels
 
 ## ローンチ前の方針（2026-06）
 
@@ -244,7 +255,7 @@
   - ローカル QA 済み（`9c11037`）。Docs `9d10a2a` / `2acbd70`
   - P2 修正（`5ffb027`）: プロフィール説明文を v2 同期に合わせて更新
   - 本番QA（2026-06-06）: 部分合格（P0/P1なし）
-  - 実アカウントE2E QA（2026-06-06）: 未完了 / 保留（手動 Google E2E 待ち）
+  - 実アカウントE2E QA（2026-06-06）: **問題なし**
 - Phase Monthly-2 Core（`1d8b91c`、push 済み）
   - 当年 1〜12 月の月チップ。`selectedMonthKey` で選択月 CRUD
   - `addMonthlyGoal()` → `selectedMonthKey`。当年アーカイブを月チップに統合
@@ -281,7 +292,7 @@
 7. 今月の目標
 8. 年間目標
 9. 進捗サマリー / 詳しい進捗（連続達成・週間・達成履歴など）
-10. 振り返りメモ
+10. 日付の記録（直近30日・完了タスク + 振り返りメモ）
 11. プロフィール（折りたたみ・summary「プロフィール」・下部ナビ「設定」で開いてスクロール）
 12. クラウド保存・同期（折りたたみ・summary「クラウド保存・同期」＋状態表示）
 13. スローガン
@@ -289,9 +300,10 @@
 ## 直近の変更内容
 
 - Phase Cloud-Login-1: Google OAuth ボタン（`c75f7de`）、本番QA 部分合格、Docs `cfa585e`
-- Phase Data-2 Core: ログイン auto-load・profile v2（`9c11037`）、P2 文言（`5ffb027`）、Docs `9d10a2a` / `2acbd70` / `7a667f4`、本番QA 部分合格、実アカウントE2E 保留
+- Phase Data-2 Core: ログイン auto-load・profile v2（`9c11037`）、P2 文言（`5ffb027`）、Docs `9d10a2a` / `2acbd70` / `7a667f4`、本番QA 部分合格、実アカウントE2E 問題なし
 - Phase Monthly-2 Core: 当年 12 ヶ月チップ・選択月 CRUD（`1d8b91c` / Docs `3dfd177`）、ローカル QA 14/14
-- Phase Todo-2 Core: 今日ダッシュボード対象定義（`985c60a` / Docs `23370b8`）、本番QA 合格 15/15
+- Phase Todo-2 Core: 今日ダッシュボード対象定義（`985c60a` / Docs `23370b8` / `2f54348`）、本番QA 合格 15/15
+- Phase Release-Beta-1 / History-1 Core: β案内 + 30日日付ナビ（`a42db45`）、ローカル QA 15/15、Docs 本作業
 - Phase Launch-1: 本番QA合格（2026-06-04）、Docs `c37a177`
 - Phase GoalView-1: 月間見返し導線（`24ee53e`）+ 年間ジャンル（`f6f7a0c`）、Docs `c20ef74`
 - Phase Todo-1: 「明日へ」で `dueDate` を翌日に、3 HTML + Docs（`8929ed0` / `07747bb`）
@@ -363,8 +375,11 @@
 
 ## ローンチ後の次アクション
 
-1. **ユーザー本人が Google アカウントで Data-2 Core 手動 E2E 確認**（Magic Link は可能なら）
-2. **確認結果を Docs 更新**
+1. **Release-Beta-1 / History-1 Docs コミット**
+2. **`a42db45` を push → 本番QA**
+3. **5人程度に限定β共有**
+4. **βフィードバック収集**（保存・ログイン・表示崩れ）
+5. **正式リリース前の最終確認**（β利用者の報告を確認）
 - **Monthly-3 以降**: 過去年の編集 UI、年切替 UI
 - スローガン UI 復帰は Launch-2 以降に判断（Launch-1 P2）
 - Data-2 後続: バックアップ復元 UI、端末データ取り込み UI（`NEXT_TASKS.md` 参照）
@@ -377,7 +392,7 @@
 - **Phase Monthly-3 以降**: 過去年の編集 UI、年切替 UI
 - **ステージ演出強化**（旧 World-3 案の装飾系）
 
-完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・P2修正済み）, **Monthly-2 Core**（`1d8b91c` / Docs `3dfd177`）, **Todo-2 Core**（`985c60a` / Docs `23370b8`・本番QA合格 15/15）
+完了済み（参考）: UX-1, Profile-4, Profile-5, Data-1（調査・ドキュメント）, World-1, World-2, World-3 mini, Todo-1, GoalView-1, Release-2, Release-3, Release-4, Launch-1（本番QA）, Cloud-Login-1（Google OAuth・本番QA部分合格）, **Data-2 Core**（`9c11037` / `5ffb027`・本番QA部分合格・実アカウントE2E問題なし）, **Monthly-2 Core**（`1d8b91c` / Docs `3dfd177`）, **Todo-2 Core**（`985c60a` / Docs `23370b8` / `2f54348`・本番QA合格 15/15）, **Release-Beta-1 / History-1 Core**（`a42db45`・ローカルQA 15/15）
 
 ## 注意点
 
