@@ -2680,40 +2680,62 @@
         font-size: 0.76rem;
       }
 
-      .monthly-goal-month-picker {
+      .monthly-goal-month-nav {
         display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
+        align-items: center;
+        gap: 8px;
         margin: 10px 0 12px;
       }
 
-      .monthly-goal-month-chip {
-        min-width: 44px;
+      .monthly-goal-month-nav-button {
+        flex: 0 0 auto;
+        min-width: 36px;
         min-height: 36px;
         border: 1.5px solid var(--line-soft);
-        border-radius: 999px;
+        border-radius: 12px;
+        background: #fff;
+        color: var(--text);
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .monthly-goal-month-nav-button:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+      }
+
+      .monthly-goal-month-select-wrap {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .monthly-goal-month-select {
+        width: 100%;
+        min-height: 40px;
+        border: 1.5px solid var(--line-soft);
+        border-radius: 12px;
         background: #fff;
         color: var(--text);
         font: inherit;
-        font-size: 0.82rem;
-        font-weight: 700;
-        cursor: pointer;
-        padding: 6px 10px;
+        font-size: 0.92rem;
+        font-weight: 800;
+        padding: 0 12px;
       }
 
-      .monthly-goal-month-chip.is-current {
-        border-color: #8fd6a8;
-      }
-
-      .monthly-goal-month-chip.is-selected {
-        background: #e8f7ee;
-        border-color: #6fbf8b;
+      .monthly-goal-month-jump-button {
+        flex: 0 0 auto;
+        min-height: 36px;
+        padding: 0 12px;
+        border: 1.5px solid #8fd6a8;
+        border-radius: 999px;
+        background: #f0f7e8;
         color: #1f5d37;
+        font-size: 0.78rem;
+        font-weight: 800;
       }
 
-      .monthly-goal-month-chip.is-current.is-selected {
-        background: #dff5e8;
-        border-color: var(--green);
+      .monthly-goal-month-jump-button[hidden] {
+        display: none;
       }
 
       .monthly-goal-period-head {
@@ -6171,7 +6193,15 @@
           </button>
         </div>
 
-        <div class="monthly-goal-month-picker" id="monthlyGoalMonthPicker" role="tablist" aria-label="月を選択"></div>
+        <div class="monthly-goal-month-nav" aria-label="月を選択">
+          <button class="monthly-goal-month-nav-button" type="button" id="monthlyGoalPrevMonth" aria-label="前の月">←</button>
+          <label class="monthly-goal-month-select-wrap">
+            <span class="ui-heading-hidden">対象月</span>
+            <select class="monthly-goal-month-select" id="monthlyGoalMonthSelect" aria-label="対象月を選択"></select>
+          </label>
+          <button class="monthly-goal-month-nav-button" type="button" id="monthlyGoalNextMonth" aria-label="次の月">→</button>
+          <button class="monthly-goal-month-jump-button" type="button" id="monthlyGoalJumpCurrentMonth" hidden>今月</button>
+        </div>
         <div class="monthly-goal-period-head">
           <p class="monthly-goal-period-label" id="monthlyGoalPeriod">今月の目標</p>
           <p class="monthly-goal-count" id="monthlyGoalCount">0件の目標</p>
@@ -6794,7 +6824,10 @@
       const yearlyGoalCategory = document.getElementById("yearlyGoalCategory");
       const cancelYearlyGoalButton = document.getElementById("cancelYearlyGoalButton");
       const monthlyGoalYearTitle = document.getElementById("monthlyGoalYearTitle");
-      const monthlyGoalMonthPicker = document.getElementById("monthlyGoalMonthPicker");
+      const monthlyGoalMonthSelect = document.getElementById("monthlyGoalMonthSelect");
+      const monthlyGoalPrevMonth = document.getElementById("monthlyGoalPrevMonth");
+      const monthlyGoalNextMonth = document.getElementById("monthlyGoalNextMonth");
+      const monthlyGoalJumpCurrentMonth = document.getElementById("monthlyGoalJumpCurrentMonth");
       const monthlyGoalPeriod = document.getElementById("monthlyGoalPeriod");
       const monthlyGoalPeriodHint = document.getElementById("monthlyGoalPeriodHint");
       const monthlyGoalCount = document.getElementById("monthlyGoalCount");
@@ -6968,14 +7001,18 @@
         monthlyGoalIcon.value = getDefaultIconForCategory(monthlyGoalCategory.value);
       });
       monthlyGoalList.addEventListener("submit", saveMonthlyGoalEdit);
-      monthlyGoalMonthPicker.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-month-key]");
-        if (!button) return;
-
-        const monthKey = button.dataset.monthKey;
+      monthlyGoalMonthSelect.addEventListener("change", () => {
+        const monthKey = monthlyGoalMonthSelect.value;
         if (!monthKey || monthKey === selectedMonthKey) return;
-
         selectedMonthKey = monthKey;
+        editingMonthlyGoalId = "";
+        closeMonthlyGoalForm();
+        render();
+      });
+      monthlyGoalPrevMonth.addEventListener("click", () => shiftSelectedMonth(-1));
+      monthlyGoalNextMonth.addEventListener("click", () => shiftSelectedMonth(1));
+      monthlyGoalJumpCurrentMonth.addEventListener("click", () => {
+        selectedMonthKey = getCurrentMonthKey();
         editingMonthlyGoalId = "";
         closeMonthlyGoalForm();
         render();
@@ -8548,6 +8585,20 @@
           }, {});
       }
 
+      function shiftSelectedMonth(delta) {
+        const monthKeys = getCurrentYearMonthKeys();
+        const index = monthKeys.indexOf(selectedMonthKey);
+        if (index === -1) return;
+
+        const nextIndex = Math.max(0, Math.min(monthKeys.length - 1, index + delta));
+        if (monthKeys[nextIndex] === selectedMonthKey) return;
+
+        selectedMonthKey = monthKeys[nextIndex];
+        editingMonthlyGoalId = "";
+        closeMonthlyGoalForm();
+        render();
+      }
+
       function getSelectedMonthPeriodLabel(monthKey) {
         return monthKey === getCurrentMonthKey() ? "今月の目標" : formatMonthLabel(monthKey);
       }
@@ -9097,31 +9148,20 @@
         monthlyGoalInputLabel.textContent =
           selectedMonthKey === currentMonth ? "今月の目標タイトル" : `${formatMonthLabel(selectedMonthKey)}タイトル`;
 
-        monthlyGoalMonthPicker.innerHTML = getCurrentYearMonthKeys()
+        const monthKeys = getCurrentYearMonthKeys();
+        monthlyGoalMonthSelect.innerHTML = monthKeys
           .map((monthKey) => {
             const monthNumber = Number(monthKey.split("-")[1]);
             const goalCount = getMonthlyGoalsForMonth(monthKey).length;
-            const classNames = [
-              "monthly-goal-month-chip",
-              monthKey === currentMonth ? "is-current" : "",
-              monthKey === selectedMonthKey ? "is-selected" : "",
-            ]
-              .filter(Boolean)
-              .join(" ");
+            const label = monthKey === currentMonth ? `今月（${monthNumber}月）` : `${monthNumber}月`;
             const countLabel = goalCount > 0 ? ` · ${goalCount}件` : "";
-
-            return `
-              <button
-                type="button"
-                class="${classNames}"
-                data-month-key="${escapeHtml(monthKey)}"
-                role="tab"
-                aria-selected="${monthKey === selectedMonthKey ? "true" : "false"}"
-                aria-label="${monthNumber}月${countLabel}"
-              >${monthNumber}月</button>
-            `;
+            return `<option value="${escapeHtml(monthKey)}">${escapeHtml(label + countLabel)}</option>`;
           })
           .join("");
+        monthlyGoalMonthSelect.value = selectedMonthKey;
+        monthlyGoalPrevMonth.disabled = selectedMonthKey === monthKeys[0];
+        monthlyGoalNextMonth.disabled = selectedMonthKey === monthKeys[monthKeys.length - 1];
+        monthlyGoalJumpCurrentMonth.hidden = selectedMonthKey === currentMonth;
 
         monthlyGoalList.innerHTML = goals.length
           ? goals
