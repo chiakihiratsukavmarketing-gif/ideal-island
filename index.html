@@ -3186,6 +3186,26 @@
         color: #4c7f79;
       }
 
+      .goal-time-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #fff8e8;
+        border: 1px solid rgba(226, 181, 72, 0.35);
+        color: #9a7420;
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .goal-reminder-hint {
+        margin: -2px 0 10px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.5;
+      }
+
       .goal-item .button.danger {
         width: 34px;
         min-width: 34px;
@@ -6161,14 +6181,15 @@
           </div>
           <div class="time-fields-row">
             <div class="field">
-              <label for="goalStartTime">開始時刻</label>
+              <label for="goalStartTime">リマインド時刻</label>
               <input id="goalStartTime" type="time" />
             </div>
             <div class="field">
-              <label for="goalEndTime">終了時刻</label>
+              <label for="goalEndTime">終了時刻（任意）</label>
               <input id="goalEndTime" type="time" />
             </div>
           </div>
+          <p class="goal-reminder-hint">リマインド時刻を入れると、その時間にポップアップでお知らせします。</p>
           <div class="field">
             <label for="goalMonthlyGoal">今月の目標</label>
             <select id="goalMonthlyGoal">
@@ -6692,7 +6713,8 @@
         <h3 class="schedule-reminder-title" id="scheduleReminderTitle"></h3>
         <p class="schedule-reminder-meta" id="scheduleReminderMeta"></p>
         <div class="schedule-reminder-actions">
-          <button class="button" type="button" id="scheduleReminderDismiss">OK</button>
+          <button class="button" type="button" id="scheduleReminderComplete" hidden>完了にする</button>
+          <button class="button secondary" type="button" id="scheduleReminderDismiss">あとで</button>
         </div>
       </div>
     </div>
@@ -6733,7 +6755,8 @@
       const GOOGLE_CALENDAR_STORAGE_KEY = "mileGoogleCalendar";
       const GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
       const GOOGLE_CALENDAR_AUTO_SYNC_MS = 15 * 60 * 1000;
-      const SCHEDULE_REMINDER_CHECK_MS = 30 * 1000;
+      const SCHEDULE_REMINDER_CHECK_MS = 15 * 1000;
+      const SCHEDULE_REMINDER_WINDOW_MS = 3 * 60 * 1000;
       const SCHEDULE_NOTIFIED_STORAGE_KEY = "mileScheduleNotifiedKeys";
       const CATEGORY_CALENDAR_COLORS = {
         仕事: "#36c9ff",
@@ -6804,6 +6827,8 @@
       let googleCalendarData = loadGoogleCalendarData();
       let googleTokenClient = null;
       let scheduleReminderTimer = 0;
+      let lastReminderDateKey = "";
+      let activeReminderItem = null;
       let googleCalendarAutoSyncTimer = 0;
       const scheduleNotifiedKeys = loadScheduleNotifiedKeys();
 
@@ -6974,6 +6999,7 @@
       const scheduleReminderTitle = document.getElementById("scheduleReminderTitle");
       const scheduleReminderMeta = document.getElementById("scheduleReminderMeta");
       const scheduleReminderDismiss = document.getElementById("scheduleReminderDismiss");
+      const scheduleReminderComplete = document.getElementById("scheduleReminderComplete");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -7111,6 +7137,7 @@
       googleCalendarSettingsDisconnectButton.addEventListener("click", disconnectGoogleCalendar);
       enableScheduleNotificationsButton.addEventListener("click", enableScheduleNotifications);
       scheduleReminderDismiss.addEventListener("click", dismissScheduleReminder);
+      scheduleReminderComplete.addEventListener("click", completeScheduleReminder);
       scheduleReminderOverlay.addEventListener("click", (event) => {
         if (event.target === scheduleReminderOverlay) dismissScheduleReminder();
       });
@@ -9451,13 +9478,14 @@
         }
 
         const now = new Date().toISOString();
+        const nextDueDate = dueDateInput.value || (startTimeInput?.value ? getTodayKey() : "");
 
         goalsByTab[activeTab] = goalsByTab[activeTab].map((goal) =>
           goal.id === goalId
             ? {
                 ...goal,
                 title,
-                dueDate: dueDateInput.value,
+                dueDate: nextDueDate,
                 startTime: startTimeInput ? startTimeInput.value : "",
                 endTime: endTimeInput ? endTimeInput.value : "",
                 category: categoryInput.value,
@@ -9985,6 +10013,11 @@
         const dueBadge = dueMeta
           ? `<span class="due-badge is-${dueMeta.tone}">${escapeHtml(dueMeta.label)}</span>`
           : "";
+        const timeBadge = goal.startTime
+          ? `<span class="goal-time-badge">🕐 ${escapeHtml(goal.startTime)}${
+              goal.endTime ? ` - ${escapeHtml(goal.endTime)}` : ""
+            }</span>`
+          : "";
         const linkedMonthlyGoal = findMonthlyGoal(goal.monthlyGoalId);
         const monthlyGoalBadge = linkedMonthlyGoal
           ? `<span class="goal-monthly-link"><span class="goal-monthly-icon" aria-hidden="true">${escapeHtml(
@@ -10007,6 +10040,7 @@
               <p class="goal-title">${escapeHtml(goal.title)}</p>
               <div class="goal-meta-row">
                 <span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>
+                ${timeBadge}
                 ${dueBadge}
                 ${monthlyGoalBadge}
               </div>
@@ -10069,7 +10103,7 @@
                     </div>
                     <div class="time-fields-row">
                       <div class="field">
-                        <label for="goal-edit-start-${escapeHtml(goal.id)}">開始時刻</label>
+                        <label for="goal-edit-start-${escapeHtml(goal.id)}">リマインド時刻</label>
                         <input
                           id="goal-edit-start-${escapeHtml(goal.id)}"
                           type="time"
@@ -10078,7 +10112,7 @@
                         />
                       </div>
                       <div class="field">
-                        <label for="goal-edit-end-${escapeHtml(goal.id)}">終了時刻</label>
+                        <label for="goal-edit-end-${escapeHtml(goal.id)}">終了時刻（任意）</label>
                         <input
                           id="goal-edit-end-${escapeHtml(goal.id)}"
                           type="time"
@@ -10964,18 +10998,56 @@
         return `${dateKey}:${item.id}:${item.startTime || "allday"}`;
       }
 
+      function goalToReminderItem(goal) {
+        return {
+          id: goal.id,
+          source: "mile",
+          title: goal.title,
+          startTime: goal.startTime || "",
+          endTime: goal.endTime || "",
+          location: "",
+          done: Boolean(goal.done),
+          goalId: goal.id,
+        };
+      }
+
+      function getTodayReminderItems() {
+        const dateKey = getTodayKey();
+        const mileItems = getDashboardTodayGoals()
+          .filter((goal) => goal.startTime && !goal.done)
+          .map(goalToReminderItem);
+        const googleItems = getGoogleEventsForDate(dateKey).filter((item) => item.startTime && !item.done);
+        return [...mileItems, ...googleItems];
+      }
+
+      function isReminderDueNow(startTime, now = new Date()) {
+        const [hours, minutes] = startTime.split(":").map(Number);
+        if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return false;
+
+        const startAt = new Date(now);
+        startAt.setHours(hours, minutes, 0, 0);
+        const diffMs = now.getTime() - startAt.getTime();
+        return diffMs >= 0 && diffMs <= SCHEDULE_REMINDER_WINDOW_MS;
+      }
+
+      function resetReminderStateForNewDay(dateKey) {
+        if (!lastReminderDateKey) {
+          lastReminderDateKey = dateKey;
+          return;
+        }
+        if (lastReminderDateKey === dateKey) return;
+        scheduleNotifiedKeys.clear();
+        saveScheduleNotifiedKeys();
+        lastReminderDateKey = dateKey;
+      }
+
       function checkScheduleReminders() {
         const now = new Date();
         const dateKey = getTodayKey();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-        const items = getScheduleItemsForDate(dateKey).filter((item) => item.startTime && !item.done);
+        resetReminderStateForNewDay(dateKey);
 
-        items.forEach((item) => {
-          const [hours, minutes] = item.startTime.split(":").map(Number);
-          if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return;
-          const startMinutes = hours * 60 + minutes;
-          const diff = currentMinutes - startMinutes;
-          if (diff < 0 || diff > 1) return;
+        getTodayReminderItems().forEach((item) => {
+          if (!item.startTime || !isReminderDueNow(item.startTime, now)) return;
 
           const key = getReminderKey(item, dateKey);
           if (scheduleNotifiedKeys.has(key)) return;
@@ -10986,6 +11058,7 @@
       }
 
       function showScheduleReminder(item) {
+        activeReminderItem = item;
         const timeLabel = formatScheduleTimeRange(item);
         scheduleReminderTime.textContent = timeLabel;
         scheduleReminderTitle.textContent = item.title;
@@ -10993,7 +11066,8 @@
           ? `${item.location} / ${item.source === "google" ? "Googleカレンダー" : "MILE ToDo"}`
           : item.source === "google"
             ? "Googleカレンダーの予定です"
-            : "MILEのToDoです。タップして進めましょう。";
+            : "設定した時刻になりました。進められるところから始めましょう。";
+        scheduleReminderComplete.hidden = !(item.source === "mile" && item.goalId);
         scheduleReminderOverlay.hidden = false;
 
         if ("Notification" in window && Notification.permission === "granted") {
@@ -11006,11 +11080,23 @@
 
       function dismissScheduleReminder() {
         scheduleReminderOverlay.hidden = true;
+        activeReminderItem = null;
+      }
+
+      function completeScheduleReminder() {
+        if (activeReminderItem?.source === "mile" && activeReminderItem.goalId) {
+          activeTab = "today";
+          toggleGoal(activeReminderItem.goalId);
+        }
+        dismissScheduleReminder();
       }
 
       function initializeScheduleReminders() {
         if (scheduleReminderTimer) window.clearInterval(scheduleReminderTimer);
         scheduleReminderTimer = window.setInterval(checkScheduleReminders, SCHEDULE_REMINDER_CHECK_MS);
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") checkScheduleReminders();
+        });
         checkScheduleReminders();
       }
 
