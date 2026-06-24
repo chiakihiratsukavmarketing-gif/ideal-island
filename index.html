@@ -6662,7 +6662,7 @@
               <input id="goalEndTime" type="time" />
             </div>
           </div>
-          <p class="goal-reminder-hint">リマインド時刻を入れると、その時間にポップアップでお知らせします。</p>
+          <p class="goal-reminder-hint">リマインドを入れると、その時間に通知します。アプリを閉じていても届くには設定で「バックグラウンド通知」を許可し、クラウドにログインしてください。</p>
           <div class="field">
             <label for="goalMonthlyGoal">今月の目標</label>
             <select id="goalMonthlyGoal">
@@ -7036,9 +7036,10 @@
                       <button class="button secondary" type="button" id="googleCalendarSettingsConnectButton">連携する</button>
                       <button class="button" type="button" id="googleCalendarSettingsSyncButton" hidden>今すぐ同期</button>
                       <button class="button secondary" type="button" id="googleCalendarSettingsDisconnectButton" hidden>連携を解除</button>
-                      <button class="button secondary" type="button" id="enableScheduleNotificationsButton">通知を許可</button>
+                      <button class="button secondary" type="button" id="enableScheduleNotificationsButton">バックグラウンド通知を許可</button>
                     </div>
                     <p class="cloud-sync-status" id="googleCalendarSettingsStatus" aria-live="polite">未連携</p>
+                    <p class="goal-reminder-hint">ログイン＋クラウド同期済みのToDoは、アプリを閉じていてもリマインド時刻に届きます。</p>
                   </div>
                 </details>
 
@@ -7200,6 +7201,8 @@
       ];
       const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWVkcmtwdnJ3a3N6YmthaGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODYwMDMsImV4cCI6MjA5NjA2MjAwM30.ZTaJhkZPzd0CAqiCfMYTAib3iNSWXtT70285m5mxbOI";
+      const VAPID_PUBLIC_KEY =
+        "BGIBzpENj4hs1sg-X5rHMTcwKEssF71FokbcBGzOVyhPAwmUkHFi_LPDMuOfwMjgBhMsQel7mjPr9gflk6lbGGQ";
       const GOOGLE_CALENDAR_CLIENT_ID = "YOUR_GOOGLE_CALENDAR_CLIENT_ID";
       const GOOGLE_CALENDAR_STORAGE_KEY = "mileGoogleCalendar";
       const GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
@@ -8281,6 +8284,9 @@
           cloudAutoLoadInProgress = false;
           cloudAutoLoadPromise = null;
           clearCloudAutoSaveTimer();
+          clearPushSubscriptionForLogout().catch((error) => {
+            console.warn("Push subscription cleanup failed.", error);
+          });
           renderCloudAuth();
           return;
         }
@@ -8309,6 +8315,7 @@
 
         try {
           await cloudAutoLoadPromise;
+          await syncPushSubscriptionIfNeeded();
         } finally {
           cloudAutoLoadPromise = null;
         }
@@ -11095,19 +11102,17 @@
 
         if (!configured) {
           setGoogleCalendarStatus("未設定");
-          return;
-        }
-
-        if (connected) {
+        } else if (connected) {
           const eventCount = googleCalendarData.events.length;
           const syncHint = googleCalendarData.lastSyncAt
             ? ` · ${formatCloudRelativeSavedTime(new Date(googleCalendarData.lastSyncAt).getTime())}`
             : "";
           setGoogleCalendarStatus(`連携済み（${eventCount}件）${syncHint}`);
-          return;
+        } else {
+          setGoogleCalendarStatus("未連携");
         }
 
-        setGoogleCalendarStatus("未連携");
+        updateScheduleNotificationsButton();
       }
 
       function updateGoogleCalendarButton() {
@@ -11269,19 +11274,126 @@
         }, GOOGLE_CALENDAR_AUTO_SYNC_MS);
       }
 
+      function urlBase64ToUint8Array(base64String) {
+        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let index = 0; index < rawData.length; index += 1) {
+          outputArray[index] = rawData.charCodeAt(index);
+        }
+        return outputArray;
+      }
+
+      function pushSubscriptionToRow(subscription, userId) {
+        const json = subscription.toJSON();
+        const keys = json.keys || {};
+        return {
+          user_id: userId,
+          endpoint: json.endpoint,
+          p256dh: keys.p256dh,
+          auth: keys.auth,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo",
+          updated_at: new Date().toISOString(),
+        };
+      }
+
+      async function registerMileServiceWorker() {
+        if (!("serviceWorker" in navigator)) return null;
+        return navigator.serviceWorker.register("/sw.js");
+      }
+
+      async function getOrCreatePushSubscription(registration) {
+        let subscription = await registration.pushManager.getSubscription();
+        if (subscription) return subscription;
+        if (!VAPID_PUBLIC_KEY) return null;
+        return registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        });
+      }
+
+      async function savePushSubscriptionToCloud(subscription) {
+        const user = getCloudUser();
+        if (!supabaseClient || !user || !subscription) return false;
+
+        const { error } = await supabaseClient
+          .from("push_subscriptions")
+          .upsert(pushSubscriptionToRow(subscription, user.id), { onConflict: "user_id,endpoint" });
+
+        if (error) {
+          console.warn("Push subscription save failed.", error);
+          return false;
+        }
+
+        return true;
+      }
+
+      async function clearPushSubscriptionForLogout() {
+        if (!supabaseClient) return;
+        const registration = await navigator.serviceWorker?.getRegistration("/sw.js");
+        const subscription = await registration?.pushManager?.getSubscription();
+        if (!subscription) return;
+        await supabaseClient.from("push_subscriptions").delete().eq("endpoint", subscription.endpoint);
+      }
+
+      async function syncPushSubscriptionIfNeeded() {
+        if (!("Notification" in window) || Notification.permission !== "granted") return;
+        if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+
+        const registration = await registerMileServiceWorker();
+        if (!registration) return;
+
+        const subscription = await getOrCreatePushSubscription(registration);
+        if (subscription && getCloudUser()) {
+          await savePushSubscriptionToCloud(subscription);
+        }
+      }
+
+      function updateScheduleNotificationsButton() {
+        if (!enableScheduleNotificationsButton) return;
+        const enabled = "Notification" in window && Notification.permission === "granted";
+        enableScheduleNotificationsButton.textContent = enabled
+          ? "通知は許可済み"
+          : "バックグラウンド通知を許可";
+        enableScheduleNotificationsButton.disabled = enabled;
+      }
+
       async function enableScheduleNotifications() {
         if (!("Notification" in window)) {
           setGoogleCalendarStatus("このブラウザは通知に対応していません。");
           return;
         }
+
+        if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+          setGoogleCalendarStatus("このブラウザはバックグラウンド通知に対応していません。");
+          return;
+        }
+
         const permission = await Notification.requestPermission();
         if (permission === "granted") {
-          setGoogleCalendarStatus("予定の通知を許可しました。開始時刻になるとポップアップが表示されます。");
+          try {
+            await syncPushSubscriptionIfNeeded();
+            if (getCloudUser()) {
+              setGoogleCalendarStatus(
+                "バックグラウンド通知を有効にしました。クラウド同期済みのToDoが届きます。"
+              );
+            } else {
+              setGoogleCalendarStatus(
+                "通知を許可しました。アプリを閉じても届けるにはクラウドにログインしてください。"
+              );
+            }
+          } catch (error) {
+            console.warn("Enable schedule notifications failed.", error);
+            setGoogleCalendarStatus("通知の設定に失敗しました。時間を置いて再度お試しください。");
+          }
         } else if (permission === "denied") {
           setGoogleCalendarStatus("通知がブロックされています。ブラウザ設定から許可してください。");
         } else {
           setGoogleCalendarStatus("通知の許可がキャンセルされました。");
         }
+
+        updateScheduleNotificationsButton();
       }
 
       function getGoogleEventsForDate(dateKey) {
@@ -11644,6 +11756,12 @@
       updateCloudSyncStatusUI();
       initializeSupabaseAuth();
       initializeScheduleReminders();
+      registerMileServiceWorker()
+        .then(() => syncPushSubscriptionIfNeeded())
+        .catch((error) => {
+          console.warn("Service worker registration failed.", error);
+        });
+      updateScheduleNotificationsButton();
       initializeGoogleCalendarAutoSync();
       if (isGoogleCalendarConnected() && !googleCalendarData.lastSyncAt) {
         syncGoogleCalendarEvents();
