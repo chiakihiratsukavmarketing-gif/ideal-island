@@ -1,0 +1,10 @@
+project_id = "mmmedrkpvrwkszbkahii"
+
+[api]
+enabled = true
+
+[db]
+major_version = 15
+
+[functions.send-schedule-reminders]
+verify_jwt = false
