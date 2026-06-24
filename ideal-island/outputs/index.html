@@ -5845,8 +5845,8 @@
         display: grid;
         place-items: center;
         padding: 18px;
-        background: rgba(5, 8, 18, 0.72);
-        backdrop-filter: blur(6px);
+        background: rgba(36, 38, 34, 0.45);
+        backdrop-filter: blur(8px);
       }
 
       .schedule-reminder-overlay[hidden] {
@@ -5854,45 +5854,69 @@
       }
 
       .schedule-reminder-modal {
-        width: min(100%, 360px);
-        padding: 20px 18px 16px;
-        border-radius: 18px;
-        border: 1px solid rgba(54, 201, 255, 0.35);
-        background: linear-gradient(180deg, #0f1830, #0a1020);
-        box-shadow: var(--shadow-cyan);
+        width: min(100%, 340px);
+        padding: 22px 20px 18px;
+        border-radius: 22px;
+        border: 1.5px solid var(--line-soft);
+        background: #ffffff;
+        box-shadow: 0 24px 60px rgba(28, 32, 25, 0.22);
+        color: var(--text);
+        animation: schedule-reminder-pop 220ms ease;
+      }
+
+      @keyframes schedule-reminder-pop {
+        from {
+          opacity: 0;
+          transform: translateY(12px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
 
       .schedule-reminder-eyebrow {
-        margin: 0 0 6px;
-        color: var(--cyan);
-        font-size: 0.76rem;
+        margin: 0 0 8px;
+        color: var(--lime-deep);
+        font-size: 0.8rem;
         font-weight: 800;
         letter-spacing: 0.06em;
       }
 
       .schedule-reminder-time {
-        margin: 0 0 8px;
-        font-size: 1.15rem;
+        margin: 0 0 10px;
+        color: #1f5d37;
+        font-size: 2rem;
         font-weight: 900;
+        line-height: 1.1;
       }
 
       .schedule-reminder-title {
-        margin: 0 0 6px;
-        font-size: 1.05rem;
+        margin: 0 0 8px;
+        color: var(--text);
+        font-size: 1.12rem;
         font-weight: 800;
+        line-height: 1.45;
       }
 
       .schedule-reminder-meta {
-        margin: 0 0 14px;
+        margin: 0 0 18px;
         color: var(--muted);
-        font-size: 0.86rem;
-        line-height: 1.55;
+        font-size: 0.88rem;
+        line-height: 1.6;
       }
 
       .schedule-reminder-actions {
         display: grid;
         grid-template-columns: 1fr;
         gap: 8px;
+      }
+
+      .schedule-reminder-ok {
+        min-height: 48px;
+        border-radius: 999px;
+        font-size: 1rem;
+        font-weight: 800;
       }
 
       @media (max-width: 760px) {
@@ -6713,8 +6737,7 @@
         <h3 class="schedule-reminder-title" id="scheduleReminderTitle"></h3>
         <p class="schedule-reminder-meta" id="scheduleReminderMeta"></p>
         <div class="schedule-reminder-actions">
-          <button class="button" type="button" id="scheduleReminderComplete" hidden>完了にする</button>
-          <button class="button secondary" type="button" id="scheduleReminderDismiss">あとで</button>
+          <button class="button schedule-reminder-ok" type="button" id="scheduleReminderDismiss">OK</button>
         </div>
       </div>
     </div>
@@ -6999,7 +7022,6 @@
       const scheduleReminderTitle = document.getElementById("scheduleReminderTitle");
       const scheduleReminderMeta = document.getElementById("scheduleReminderMeta");
       const scheduleReminderDismiss = document.getElementById("scheduleReminderDismiss");
-      const scheduleReminderComplete = document.getElementById("scheduleReminderComplete");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -7137,7 +7159,6 @@
       googleCalendarSettingsDisconnectButton.addEventListener("click", disconnectGoogleCalendar);
       enableScheduleNotificationsButton.addEventListener("click", enableScheduleNotifications);
       scheduleReminderDismiss.addEventListener("click", dismissScheduleReminder);
-      scheduleReminderComplete.addEventListener("click", completeScheduleReminder);
       scheduleReminderOverlay.addEventListener("click", (event) => {
         if (event.target === scheduleReminderOverlay) dismissScheduleReminder();
       });
@@ -11066,9 +11087,9 @@
           ? `${item.location} / ${item.source === "google" ? "Googleカレンダー" : "MILE ToDo"}`
           : item.source === "google"
             ? "Googleカレンダーの予定です"
-            : "設定した時刻になりました。進められるところから始めましょう。";
-        scheduleReminderComplete.hidden = !(item.source === "mile" && item.goalId);
+            : "設定した時刻になりました。";
         scheduleReminderOverlay.hidden = false;
+        window.requestAnimationFrame(() => scheduleReminderDismiss.focus());
 
         if ("Notification" in window && Notification.permission === "granted") {
           new Notification(`予定: ${item.title}`, {
@@ -11081,14 +11102,6 @@
       function dismissScheduleReminder() {
         scheduleReminderOverlay.hidden = true;
         activeReminderItem = null;
-      }
-
-      function completeScheduleReminder() {
-        if (activeReminderItem?.source === "mile" && activeReminderItem.goalId) {
-          activeTab = "today";
-          toggleGoal(activeReminderItem.goalId);
-        }
-        dismissScheduleReminder();
       }
 
       function initializeScheduleReminders() {
