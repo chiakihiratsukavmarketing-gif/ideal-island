@@ -3465,54 +3465,35 @@
         display: none;
       }
 
-      .progress-details {
+      .settings-stack {
         display: grid;
-        order: 1;
-        gap: 10px;
+        gap: 8px;
+        width: min(100%, 720px);
+        margin: 0 auto;
       }
 
-      .progress-details-summary {
+      .settings-stack .settings-fold {
+        margin: 0;
+      }
+
+      .settings-status-row {
         display: flex;
-        min-height: 48px;
+        flex-wrap: wrap;
         align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        border: 1.5px solid var(--line);
-        border-radius: 999px;
-        background: #ffffff;
-        color: var(--text);
-        padding: 10px 14px;
-        font-size: 0.9rem;
-        font-weight: 850;
-        cursor: pointer;
-        box-shadow: var(--shadow-soft);
-        list-style: none;
+        gap: 8px;
       }
 
-      .progress-details-summary::-webkit-details-marker {
-        display: none;
-      }
-
-      .summary-close {
-        display: none;
-      }
-
-      .progress-details[open] .summary-open {
-        display: none;
-      }
-
-      .progress-details[open] .summary-close {
-        display: inline;
-      }
-
-      .progress-details[open] .progress-details-summary span:last-child {
-        transform: rotate(45deg);
+      .settings-status-row .cloud-sync-status {
+        margin: 0;
+        padding: 0;
+        font-size: 0.76rem;
+        color: var(--muted);
       }
 
       .progress-details-content {
         display: grid;
         gap: 10px;
-        padding-top: 10px;
+        padding: 0;
       }
 
       .yearly-goal-card,
@@ -5322,42 +5303,12 @@
         display: none;
       }
 
-      .settings-fold-summary-cloud {
-        flex-wrap: wrap;
-      }
-
-      .settings-fold-summary-main {
-        flex: 1 1 auto;
-        min-width: 0;
-      }
-
-      .settings-fold-summary-meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 6px;
-        margin-left: auto;
-      }
-
       .settings-fold-chevron {
         flex: 0 0 auto;
         color: var(--muted);
         font-size: 1.1rem;
         font-weight: 800;
         line-height: 1;
-      }
-
-      .settings-fold .summary-close {
-        display: none;
-      }
-
-      .settings-fold[open] .summary-open {
-        display: none;
-      }
-
-      .settings-fold[open] .summary-close {
-        display: inline;
       }
 
       .settings-fold[open] .settings-fold-summary {
@@ -5379,40 +5330,6 @@
         margin-bottom: 12px;
         padding: 0;
         gap: 0;
-      }
-
-      .cloud-badge-inline {
-        flex: 0 0 auto;
-        font-size: 0.72rem;
-      }
-
-      .cloud-sync-status-inline {
-        margin: 0;
-        padding: 4px 8px;
-        font-size: 0.72rem;
-      }
-
-      .settings-fold .cloud-heading {
-        margin-top: 0;
-      }
-
-      .beta-notice {
-        margin: 0 0 12px;
-        padding: 12px 14px;
-        border-radius: 12px;
-        background: rgba(46, 125, 80, 0.08);
-        border: 1px solid rgba(46, 125, 80, 0.15);
-      }
-
-      .beta-notice-copy {
-        margin: 0;
-        color: var(--muted);
-        font-size: 0.86rem;
-        line-height: 1.6;
-      }
-
-      .beta-notice-copy + .beta-notice-copy {
-        margin-top: 8px;
       }
 
       .vision-board-card {
@@ -6235,7 +6152,7 @@
               </nav>
               <div class="goal-list calendar-schedule-list" id="goalList"></div>
             </section>
-            <p class="calendar-sync-status" id="googleCalendarStatus">Googleカレンダー未連携。連携すると予定を表示できます。</p>
+            <p class="calendar-sync-status" id="googleCalendarStatus">未連携</p>
           </div>
         </div>
       </section>
@@ -6518,13 +6435,13 @@
               <p class="progress-note" id="overallCount">0個中0個達成</p>
             </section>
 
-            <details class="progress-details">
-              <summary class="progress-details-summary">
-                <span class="summary-open">詳しい進捗を見る</span>
-                <span class="summary-close">詳しい進捗を閉じる</span>
-                <span aria-hidden="true">+</span>
+            <div class="settings-stack">
+            <details class="settings-fold progress-details" id="progress-details-section">
+              <summary class="settings-fold-summary">
+                <span class="settings-fold-summary-label">詳しい進捗</span>
+                <span class="settings-fold-chevron" aria-hidden="true">+</span>
               </summary>
-              <div class="progress-details-content">
+              <div class="settings-fold-body progress-details-content">
             <section class="progress-card streak-card">
               <div class="progress-head">
                 <p class="progress-label">連続達成日数</p>
@@ -6598,19 +6515,13 @@
             </section>
               </div>
             </details>
-          </aside>
+
         <details class="reflection-card settings-fold" id="reflection-section" aria-label="振り返りメモ">
                   <summary class="settings-fold-summary">
                     <span class="settings-fold-summary-label">振り返りメモ</span>
                     <span class="settings-fold-chevron" aria-hidden="true">+</span>
                   </summary>
                   <div class="settings-fold-body">
-                  <div class="reflection-heading">
-                    <div>
-                      <h2 class="section-title">日付の記録</h2>
-                      <p class="reflection-copy">直近30日分の完了タスクと振り返りメモを見返せます。</p>
-                    </div>
-                  </div>
                   <div class="history-nav" aria-label="日付移動">
                     <button
                       class="button secondary history-nav-button"
@@ -6646,21 +6557,12 @@
                   </div>
                 </details>
 
-                <section class="beta-notice" aria-label="β版の案内">
-                  <p class="beta-notice-copy">MILEは現在β版です。大切な目標は念のためご自身でも控えておいてください。</p>
-                  <p class="beta-notice-copy">不具合や表示崩れがあれば、スクリーンショット付きで教えてください。</p>
-                </section>
-
                 <details class="profile-settings-card settings-fold" id="profile-settings-section" aria-label="プロフィール設定">
                   <summary class="settings-fold-summary">
                     <span class="settings-fold-summary-label">プロフィール</span>
                     <span class="settings-fold-chevron" aria-hidden="true">+</span>
                   </summary>
                   <div class="settings-fold-body">
-                  <div class="profile-settings-heading">
-                    <h2 class="section-title">プロフィール設定</h2>
-                    <p class="cloud-copy">プロフィール名・アイコンはこの端末に保存されます。ログイン中はクラウド同期の対象になります。</p>
-                  </div>
                   <div class="field">
                     <label for="profileDisplayNameInput">表示名</label>
                     <input
@@ -6689,39 +6591,28 @@
                     <span class="settings-fold-chevron" aria-hidden="true">+</span>
                   </summary>
                   <div class="settings-fold-body">
-                    <p class="cloud-copy">Googleカレンダーの予定を読み取り専用で表示します。MILEのクラウド同期とは別で、この端末にのみ連携情報を保存します。</p>
-                    <p class="cloud-copy">連携には Google Cloud Console で Calendar API を有効化し、OAuth クライアント ID を <code>meta[name=mile-google-calendar-client-id]</code> に設定してください。</p>
                     <div class="cloud-actions">
                       <button class="button secondary" type="button" id="googleCalendarSettingsConnectButton">連携する</button>
                       <button class="button" type="button" id="googleCalendarSettingsSyncButton" hidden>今すぐ同期</button>
                       <button class="button secondary" type="button" id="googleCalendarSettingsDisconnectButton" hidden>連携を解除</button>
                       <button class="button secondary" type="button" id="enableScheduleNotificationsButton">通知を許可</button>
                     </div>
-                    <p class="cloud-copy" id="googleCalendarSettingsStatus" aria-live="polite">未連携</p>
+                    <p class="cloud-sync-status" id="googleCalendarSettingsStatus" aria-live="polite">未連携</p>
                   </div>
                 </details>
 
                 <details class="cloud-card settings-fold" id="settings-section" aria-label="クラウド保存" data-state="signed-out">
-                  <summary class="settings-fold-summary settings-fold-summary-cloud">
-                    <span class="settings-fold-summary-main">
-                      <span class="settings-fold-summary-label">クラウド保存・同期</span>
-                    </span>
-                    <span class="settings-fold-summary-meta">
-                      <span class="cloud-badge cloud-badge-inline" id="cloudStatusBadge">未ログイン</span>
-                      <span class="cloud-sync-status cloud-sync-status-inline" id="cloudSyncStatus" aria-live="polite">端末に保存済み</span>
-                    </span>
+                  <summary class="settings-fold-summary">
+                    <span class="settings-fold-summary-label">クラウド保存・同期</span>
                     <span class="settings-fold-chevron" aria-hidden="true">+</span>
                   </summary>
                   <div class="settings-fold-body">
-                  <div class="cloud-heading">
-                    <div>
-                      <h2 class="section-title">クラウド保存</h2>
-                      <p class="cloud-copy" id="cloudDescription">基本はこの端末に保存されています。ログインすると、プロフィール・ToDo・目標・メモをクラウドに保存できます。</p>
-                    </div>
+                  <div class="settings-status-row">
+                    <span class="cloud-badge" id="cloudStatusBadge">未ログイン</span>
+                    <span class="cloud-sync-status" id="cloudSyncStatus" aria-live="polite"></span>
                   </div>
 
                   <div class="cloud-panel" id="cloudSignedOutPanel">
-                    <p class="cloud-copy">ログイン後は変更が自動でクラウド保存されます。手動保存・読み込みも使えます。メールアドレスを入力してログインリンクを送信してください。</p>
                     <div class="field">
                       <label for="cloudEmailInput">メールアドレス</label>
                       <input id="cloudEmailInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
@@ -6734,10 +6625,8 @@
 
                   <div class="cloud-panel" id="cloudSignedInPanel" hidden>
                     <div class="cloud-user">
-                      <span>ログイン中</span>
                       <strong id="cloudUserEmail">user@example.com</strong>
                     </div>
-                    <p class="cloud-copy">変更は自動でクラウド保存されます。必要に応じて手動保存や読み込みもできます。</p>
                     <div class="cloud-actions">
                       <button class="button" type="button" id="cloudSaveButton">クラウドに保存</button>
                       <button class="button secondary" type="button" id="cloudLoadButton">クラウドから読み込み</button>
@@ -6748,6 +6637,7 @@
                   <p class="cloud-status" id="cloudAuthStatus" aria-live="polite"></p>
                   </div>
                 </details>
+            </div>
 
                 <section class="slogan-card" id="slogan-section" aria-label="スローガン">
                   <div class="slogan-display" id="sloganDisplay">
@@ -6766,6 +6656,7 @@
                     </div>
                   </div>
                 </section>
+      </aside>
       <nav class="bottom-nav" aria-label="アプリ内ナビゲーション">
         <button class="bottom-nav-item is-active" type="button" data-nav="today" aria-label="今日のタスクへ移動">
           <span class="nav-icon" aria-hidden="true">
@@ -6997,7 +6888,6 @@
       const historyCompletedHeading = document.getElementById("historyCompletedHeading");
       const historyCompletedList = document.getElementById("historyCompletedList");
       const cloudCard = document.getElementById("settings-section");
-      const cloudDescription = document.getElementById("cloudDescription");
       const cloudStatusBadge = document.getElementById("cloudStatusBadge");
       const cloudSignedOutPanel = document.getElementById("cloudSignedOutPanel");
       const cloudSignedInPanel = document.getElementById("cloudSignedInPanel");
@@ -7584,7 +7474,7 @@
         const user = getCloudUser();
 
         if (!user) {
-          return "端末に保存済み";
+          return "";
         }
 
         if (cloudSyncState === "saving") {
@@ -7592,18 +7482,18 @@
         }
 
         if (cloudSyncState === "failed") {
-          return "保存失敗。再度お試しください。";
+          return "保存失敗";
         }
 
         if (isCloudDataDirty()) {
-          return "端末に保存済み · クラウド未保存の変更があります";
+          return "未保存あり";
         }
 
         if (cloudLastSavedAt > 0) {
-          return `クラウドに保存済み（最終保存：${formatCloudRelativeSavedTime(cloudLastSavedAt)}）`;
+          return formatCloudRelativeSavedTime(cloudLastSavedAt);
         }
 
-        return "端末に保存済み（クラウド未同期）";
+        return "";
       }
 
       function updateCloudSyncStatusUI() {
@@ -8002,7 +7892,6 @@
         cloudUserEmail.textContent = userEmail || "";
 
         if (userEmail) {
-          cloudDescription.textContent = "ログイン中です。変更は自動でクラウド保存されます。「クラウドから読み込み」も使えます。";
           cloudStatusBadge.textContent = "ログイン中";
           renderUserProfile();
           syncProfileSettingsForm();
@@ -8013,7 +7902,6 @@
 
         stopCloudSyncStatusRefresh();
         clearCloudAutoSaveTimer();
-        cloudDescription.textContent = "基本はこの端末に保存されています。ログインすると自動でクラウド保存され、手動保存も使えます。";
         cloudStatusBadge.textContent = isConfigured ? "未ログイン" : "未設定";
 
         if (!isConfigured) {
@@ -10824,7 +10712,6 @@
       function renderGoogleCalendarSettingsUI() {
         const configured = isGoogleCalendarConfigured();
         const connected = isGoogleCalendarConnected();
-        const syncLabel = formatGoogleCalendarSyncLabel();
 
         if (googleCalendarConnectButton) {
           googleCalendarConnectButton.textContent = connected ? "Gカレンダー同期" : "Gカレンダー連携";
@@ -10840,23 +10727,20 @@
         if (googleCalendarSettingsDisconnectButton) googleCalendarSettingsDisconnectButton.hidden = !connected;
 
         if (!configured) {
-          setGoogleCalendarStatus(
-            "OAuth クライアント ID が未設定です。head の meta[name=mile-google-calendar-client-id] を設定してください。"
-          );
+          setGoogleCalendarStatus("未設定");
           return;
         }
 
         if (connected) {
           const eventCount = googleCalendarData.events.length;
-          setGoogleCalendarStatus(
-            syncLabel
-              ? `Googleカレンダー連携済み（${eventCount}件） / ${syncLabel}`
-              : `Googleカレンダー連携済み（${eventCount}件）`
-          );
+          const syncHint = googleCalendarData.lastSyncAt
+            ? ` · ${formatCloudRelativeSavedTime(new Date(googleCalendarData.lastSyncAt).getTime())}`
+            : "";
+          setGoogleCalendarStatus(`連携済み（${eventCount}件）${syncHint}`);
           return;
         }
 
-        setGoogleCalendarStatus("Googleカレンダー未連携。連携すると予定を表示できます。");
+        setGoogleCalendarStatus("未連携");
       }
 
       function updateGoogleCalendarButton() {
@@ -10896,7 +10780,7 @@
             scope: GOOGLE_CALENDAR_SCOPE,
             callback: (response) => {
               if (response.error) {
-                setGoogleCalendarStatus("Googleカレンダー連携に失敗しました。時間を置いて再度お試しください。");
+                setGoogleCalendarStatus("連携失敗");
                 return;
               }
               googleCalendarData.accessToken = response.access_token;
@@ -10918,7 +10802,7 @@
         }
         const client = await ensureGoogleTokenClient();
         if (!client) {
-          setGoogleCalendarStatus("Googleログイン用スクリプトの読み込みに失敗しました。再読み込みしてください。");
+          setGoogleCalendarStatus("スクリプト読み込み失敗");
           return;
         }
         client.requestAccessToken({ prompt: googleCalendarData.accessToken ? "" : "consent" });
@@ -10935,7 +10819,7 @@
           googleCalendarAutoSyncTimer = 0;
         }
         updateGoogleCalendarButton();
-        setGoogleCalendarStatus("Googleカレンダー連携を解除しました。");
+        setGoogleCalendarStatus("連携解除");
         renderCalendar();
       }
 
@@ -10945,7 +10829,7 @@
             await requestGoogleCalendarAccess();
             return;
           }
-          setGoogleCalendarStatus("Googleカレンダー未連携です。");
+          setGoogleCalendarStatus("未連携");
           updateGoogleCalendarButton();
           return;
         }
@@ -10956,7 +10840,7 @@
         timeMax.setDate(timeMax.getDate() + 7);
 
         try {
-          setGoogleCalendarStatus("Googleカレンダーを同期中...");
+          setGoogleCalendarStatus("同期中…");
           const params = new URLSearchParams({
             singleEvents: "true",
             orderBy: "startTime",
@@ -10991,7 +10875,7 @@
           renderCalendar();
         } catch (error) {
           console.warn("Google Calendar sync failed", error);
-          setGoogleCalendarStatus("Googleカレンダーの同期に失敗しました。再度連携をお試しください。");
+          setGoogleCalendarStatus("同期失敗");
         }
       }
 
@@ -11000,9 +10884,7 @@
           const settingsFold = document.getElementById("google-calendar-settings-section");
           if (settingsFold) settingsFold.open = true;
           scrollToSection("google-calendar-settings-section");
-          setGoogleCalendarStatus(
-            "設定の「Googleカレンダー」で OAuth クライアント ID を確認してください。"
-          );
+          setGoogleCalendarStatus("OAuth 未設定");
           return;
         }
         if (isGoogleCalendarConnected()) {
