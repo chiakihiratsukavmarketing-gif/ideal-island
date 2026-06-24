@@ -3476,6 +3476,7 @@
       .yearly-goal-card,
       .monthly-goal-card,
       .goal-console,
+      .calendar-section,
       .today-add-card,
       .reflection-card,
       .profile-settings-card,
@@ -5377,11 +5378,9 @@
         overflow: hidden;
         margin: 0 0 16px;
         padding: 18px 16px 14px;
-        border: 1px solid rgba(54, 201, 255, 0.28);
+        border: 1px solid var(--line-soft);
         border-radius: 20px;
-        background:
-          linear-gradient(180deg, rgba(12, 18, 36, 0.92), rgba(8, 12, 24, 0.96)),
-          radial-gradient(circle at 50% 100%, rgba(50, 232, 137, 0.12), transparent 55%);
+        background: linear-gradient(180deg, #ffffff 0%, #f8faf5 100%);
         box-shadow: var(--shadow-soft);
       }
 
@@ -5395,7 +5394,7 @@
 
       .vision-board-label {
         margin: 0;
-        color: var(--cyan);
+        color: var(--lime-deep);
         font-size: 0.78rem;
         font-weight: 800;
         letter-spacing: 0.08em;
@@ -5405,11 +5404,12 @@
         margin: 4px 0 0;
         font-size: 1.05rem;
         font-weight: 800;
+        color: var(--text);
       }
 
       .vision-board-percent {
         margin: 0;
-        color: var(--green);
+        color: var(--lime-deep);
         font-size: 1.45rem;
         font-weight: 900;
         line-height: 1;
@@ -5419,7 +5419,8 @@
         position: relative;
         height: 148px;
         border-radius: 14px;
-        background: linear-gradient(180deg, rgba(54, 201, 255, 0.08) 0%, rgba(50, 232, 137, 0.06) 55%, rgba(174, 92, 255, 0.08) 100%);
+        background: linear-gradient(180deg, #f3f8ea 0%, #eef7f2 55%, #f7f2e8 100%);
+        border: 1px solid var(--line-soft);
         overflow: hidden;
       }
 
@@ -5428,7 +5429,7 @@
         inset: auto 0 0;
         width: 100%;
         height: 88px;
-        opacity: 0.9;
+        opacity: 0.95;
       }
 
       .vision-board-path {
@@ -5448,9 +5449,9 @@
         width: 34px;
         height: 34px;
         border-radius: 50%;
-        background: rgba(5, 8, 18, 0.82);
-        border: 2px solid var(--green);
-        box-shadow: 0 0 18px rgba(50, 232, 137, 0.45);
+        background: #ffffff;
+        border: 2px solid var(--lime-deep);
+        box-shadow: 0 8px 18px rgba(143, 179, 63, 0.25);
         font-size: 1.1rem;
         transition: left 600ms ease, bottom 600ms ease;
       }
@@ -5461,9 +5462,9 @@
         right: 14px;
         padding: 4px 8px;
         border-radius: 999px;
-        background: rgba(255, 210, 50, 0.16);
-        border: 1px solid rgba(255, 210, 50, 0.35);
-        color: var(--yellow);
+        background: rgba(226, 181, 72, 0.18);
+        border: 1px solid rgba(226, 181, 72, 0.35);
+        color: #9a7420;
         font-size: 0.72rem;
         font-weight: 800;
       }
@@ -5476,14 +5477,15 @@
       }
 
       .calendar-section {
-        margin: 0 0 18px;
+        width: min(100%, 720px);
+        margin: 0 auto 18px;
       }
 
       .calendar-card {
         padding: 16px 14px 14px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--line-soft);
         border-radius: 20px;
-        background: rgba(12, 18, 36, 0.88);
+        background: rgba(255, 255, 255, 0.94);
         box-shadow: var(--shadow-soft);
       }
 
@@ -5507,9 +5509,9 @@
         min-width: 52px;
         height: 52px;
         border-radius: 14px;
-        background: rgba(54, 201, 255, 0.12);
-        border: 1px solid rgba(54, 201, 255, 0.35);
-        color: var(--cyan);
+        background: #f0f7e8;
+        border: 1px solid rgba(143, 179, 63, 0.28);
+        color: var(--lime-deep);
         font-size: 1.8rem;
         font-weight: 900;
         line-height: 1;
@@ -5536,8 +5538,8 @@
         min-height: 32px;
         padding: 0 10px;
         border-radius: 10px;
-        border: 1px solid rgba(54, 201, 255, 0.25);
-        background: rgba(54, 201, 255, 0.08);
+        border: 1px solid var(--line-soft);
+        background: #f8faf5;
         color: var(--text);
         font-size: 0.78rem;
         font-weight: 700;
@@ -5555,17 +5557,17 @@
         min-height: 32px;
         padding: 0 10px;
         border-radius: 10px;
-        border: 1px solid rgba(50, 232, 137, 0.3);
-        background: rgba(50, 232, 137, 0.1);
-        color: var(--green);
+        border: 1px solid rgba(143, 179, 63, 0.28);
+        background: #f3f8ea;
+        color: var(--lime-deep);
         font-size: 0.76rem;
         font-weight: 800;
       }
 
       .calendar-sync-button.is-connected {
-        border-color: rgba(54, 201, 255, 0.35);
-        background: rgba(54, 201, 255, 0.12);
-        color: var(--cyan);
+        border-color: rgba(154, 219, 214, 0.55);
+        background: #eefaf8;
+        color: #3d8f88;
       }
 
       .calendar-weekdays {
@@ -5583,11 +5585,11 @@
       }
 
       .calendar-weekday.is-sun {
-        color: #ff8a9a;
+        color: #d96b5f;
       }
 
       .calendar-weekday.is-sat {
-        color: #7ec8ff;
+        color: #4f8ea8;
       }
 
       .calendar-grid {
@@ -5601,28 +5603,30 @@
         padding: 5px 4px 4px;
         border: 1px solid transparent;
         border-radius: 12px;
-        background: rgba(16, 25, 50, 0.55);
+        background: #f8faf5;
         text-align: left;
         cursor: pointer;
         transition: border-color 160ms ease, background 160ms ease;
       }
 
       .calendar-cell:hover {
-        border-color: rgba(54, 201, 255, 0.25);
+        border-color: rgba(143, 179, 63, 0.28);
       }
 
       .calendar-cell.is-other-month {
-        opacity: 0.42;
+        opacity: 0.45;
+        background: #f3f5f0;
       }
 
       .calendar-cell.is-today {
-        border-color: rgba(50, 232, 137, 0.35);
+        border-color: rgba(143, 179, 63, 0.45);
+        background: #f3f8ea;
       }
 
       .calendar-cell.is-selected {
-        border-color: rgba(54, 201, 255, 0.55);
-        background: rgba(54, 201, 255, 0.14);
-        box-shadow: inset 0 0 0 1px rgba(54, 201, 255, 0.2);
+        border-color: rgba(143, 179, 63, 0.55);
+        background: #edf5df;
+        box-shadow: inset 0 0 0 1px rgba(143, 179, 63, 0.18);
       }
 
       .calendar-cell-date {
@@ -5641,8 +5645,8 @@
         overflow: hidden;
         padding: 1px 4px;
         border-radius: 4px;
-        border-left: 2px solid var(--chip-color, var(--cyan));
-        background: rgba(255, 255, 255, 0.06);
+        border-left: 2px solid var(--chip-color, var(--lime-deep));
+        background: #ffffff;
         color: var(--text);
         font-size: 0.62rem;
         font-weight: 700;
@@ -5653,7 +5657,7 @@
       .calendar-day-detail {
         margin-top: 14px;
         padding-top: 12px;
-        border-top: 1px solid rgba(54, 201, 255, 0.16);
+        border-top: 1px solid var(--line-soft);
       }
 
       .calendar-selected-label {
@@ -5674,8 +5678,8 @@
         align-items: start;
         padding: 10px 12px;
         border-radius: 12px;
-        background: rgba(16, 25, 50, 0.72);
-        border: 1px solid rgba(54, 201, 255, 0.12);
+        background: #f8faf5;
+        border: 1px solid var(--line-soft);
       }
 
       .calendar-schedule-item.is-done {
@@ -5686,7 +5690,7 @@
         width: 4px;
         align-self: stretch;
         border-radius: 999px;
-        background: var(--accent, var(--cyan));
+        background: var(--accent, var(--lime-deep));
       }
 
       .calendar-schedule-time {
@@ -5713,32 +5717,55 @@
         margin-top: 6px;
         padding: 2px 7px;
         border-radius: 999px;
-        background: rgba(54, 201, 255, 0.1);
-        color: var(--cyan);
+        background: #f0f7e8;
+        color: var(--lime-deep);
         font-size: 0.68rem;
         font-weight: 800;
       }
 
       .calendar-schedule-source.is-google {
-        background: rgba(255, 138, 42, 0.12);
-        color: var(--orange);
+        background: #fff4e8;
+        color: #b06d18;
       }
 
       .calendar-empty {
         margin: 0;
         padding: 14px 10px;
         border-radius: 12px;
-        background: rgba(16, 25, 50, 0.45);
+        background: #f8faf5;
         color: var(--muted);
         font-size: 0.84rem;
         text-align: center;
       }
 
-      .calendar-today-todos-heading {
-        margin: 14px 0 8px;
-        color: var(--green);
-        font-size: 0.84rem;
-        font-weight: 800;
+      .calendar-today-panel {
+        margin-top: 10px;
+      }
+
+      .calendar-today-panel[hidden] {
+        display: none;
+      }
+
+      .calendar-today-panel .today-todo-heading {
+        margin: 0 0 8px;
+      }
+
+      .calendar-today-panel .task-filter,
+      .calendar-today-panel .category-filter {
+        margin-bottom: 8px;
+      }
+
+      .goal-console .today-tasks-card {
+        display: none;
+      }
+
+      .goal-console[data-active-tab="today"] .layout {
+        display: none;
+      }
+
+      .settings-fold.reflection-card {
+        width: min(100%, 720px);
+        margin-inline: auto;
       }
 
       .calendar-sync-status {
@@ -6029,8 +6056,25 @@
           <div class="calendar-day-detail">
             <h3 class="calendar-selected-label" id="calendarSelectedDateLabel">今日</h3>
             <div class="calendar-schedule-list" id="calendarScheduleList"></div>
-            <p class="calendar-today-todos-heading" id="calendarTodayTodosHeading" hidden>今日のToDo</p>
-            <div class="calendar-schedule-list" id="calendarTodayTodos"></div>
+            <section class="calendar-today-panel today-tasks-card" id="calendarTodayPanel" aria-label="今日のToDo">
+              <p class="today-todo-heading">今日のToDo</p>
+              <nav class="task-filter" aria-label="タスク表示フィルター">
+                <button class="task-filter-button is-active" type="button" data-filter="all">すべて</button>
+                <button class="task-filter-button" type="button" data-filter="today">今日</button>
+                <button class="task-filter-button" type="button" data-filter="week">今週</button>
+                <button class="task-filter-button" type="button" data-filter="noDue">期限なし</button>
+              </nav>
+              <nav class="category-filter" aria-label="カテゴリフィルター">
+                <button class="category-filter-button is-active" type="button" data-category-filter="all">すべて</button>
+                <button class="category-filter-button" type="button" data-category-filter="仕事">仕事</button>
+                <button class="category-filter-button" type="button" data-category-filter="学習">学習</button>
+                <button class="category-filter-button" type="button" data-category-filter="健康">健康</button>
+                <button class="category-filter-button" type="button" data-category-filter="家族">家族</button>
+                <button class="category-filter-button" type="button" data-category-filter="お金">お金</button>
+                <button class="category-filter-button" type="button" data-category-filter="その他">その他</button>
+              </nav>
+              <div class="goal-list" id="goalList"></div>
+            </section>
             <p class="calendar-sync-status" id="googleCalendarStatus">Googleカレンダー未連携。連携すると予定を表示できます。</p>
           </div>
         </div>
@@ -6056,29 +6100,10 @@
         </nav>
 
         <div class="layout">
-          <section class="panel today-tasks-card" aria-label="今日やること一覧">
+          <section class="panel today-tasks-card" aria-label="目標一覧">
             <h2 class="section-title ui-heading-hidden" id="currentTabTitle" aria-hidden="true">年間の目標</h2>
-
-            <p class="today-todo-heading">今日のToDo</p>
-
-            <nav class="task-filter" aria-label="タスク表示フィルター">
-              <button class="task-filter-button is-active" type="button" data-filter="all">すべて</button>
-              <button class="task-filter-button" type="button" data-filter="today">今日</button>
-              <button class="task-filter-button" type="button" data-filter="week">今週</button>
-              <button class="task-filter-button" type="button" data-filter="noDue">期限なし</button>
-            </nav>
-            <nav class="category-filter" aria-label="カテゴリフィルター">
-              <button class="category-filter-button is-active" type="button" data-category-filter="all">すべて</button>
-              <button class="category-filter-button" type="button" data-category-filter="仕事">仕事</button>
-              <button class="category-filter-button" type="button" data-category-filter="学習">学習</button>
-              <button class="category-filter-button" type="button" data-category-filter="健康">健康</button>
-              <button class="category-filter-button" type="button" data-category-filter="家族">家族</button>
-              <button class="category-filter-button" type="button" data-category-filter="お金">お金</button>
-              <button class="category-filter-button" type="button" data-category-filter="その他">その他</button>
-            </nav>
-            <div class="goal-list" id="goalList"></div>
+            <div class="goal-list" id="goalListConsole"></div>
           </section>
-
                   </div>
       </section>
 
@@ -6405,7 +6430,12 @@
               </div>
             </details>
           </aside>
-        <section class="reflection-card" aria-label="日付の記録">
+        <details class="reflection-card settings-fold" id="reflection-section" aria-label="振り返りメモ">
+                  <summary class="settings-fold-summary">
+                    <span class="settings-fold-summary-label">振り返りメモ</span>
+                    <span class="settings-fold-chevron" aria-hidden="true">+</span>
+                  </summary>
+                  <div class="settings-fold-body">
                   <div class="reflection-heading">
                     <div>
                       <h2 class="section-title">日付の記録</h2>
@@ -6444,7 +6474,8 @@
                     <button class="button" type="button" id="saveReflectionButton">保存する</button>
                     <span class="reflection-status" id="reflectionStatus" aria-live="polite"></span>
                   </div>
-                </section>
+                  </div>
+                </details>
 
                 <section class="beta-notice" aria-label="β版の案内">
                   <p class="beta-notice-copy">MILEは現在β版です。大切な目標は念のためご自身でも控えておいてください。</p>
@@ -6826,6 +6857,8 @@
       const goalDueDate = document.getElementById("goalDueDate");
       const goalMonthlyGoal = document.getElementById("goalMonthlyGoal");
       const goalList = document.getElementById("goalList");
+      const goalListConsole = document.getElementById("goalListConsole");
+      const calendarTodayPanel = document.getElementById("calendarTodayPanel");
       const overallPercent = document.getElementById("overallPercent");
       const overallBar = document.getElementById("overallBar");
       const overallCount = document.getElementById("overallCount");
@@ -6893,8 +6926,6 @@
       const calendarGrid = document.getElementById("calendarGrid");
       const calendarSelectedDateLabel = document.getElementById("calendarSelectedDateLabel");
       const calendarScheduleList = document.getElementById("calendarScheduleList");
-      const calendarTodayTodosHeading = document.getElementById("calendarTodayTodosHeading");
-      const calendarTodayTodos = document.getElementById("calendarTodayTodos");
       const googleCalendarConnectButton = document.getElementById("googleCalendarConnectButton");
       const googleCalendarDisconnectButton = document.getElementById("googleCalendarDisconnectButton");
       const googleCalendarStatus = document.getElementById("googleCalendarStatus");
@@ -6963,10 +6994,17 @@
       closeGoalFormButton.addEventListener("click", closeGoalForm);
       goalForm.addEventListener("submit", addGoal);
       goalList.addEventListener("submit", saveGoalEdit);
+      goalListConsole.addEventListener("submit", saveGoalEdit);
 
       tabButtons.forEach((button) => {
         button.addEventListener("click", () => {
           activeTab = button.dataset.tab;
+          if (activeTab === "today") {
+            calendarSelectedDateKey = getTodayKey();
+            render();
+            scrollToSection("calendar-section");
+            return;
+          }
           render();
         });
       });
@@ -6978,8 +7016,9 @@
 
           if (nav === "today") {
             activeTab = "today";
+            calendarSelectedDateKey = getTodayKey();
             render();
-            scrollToSection("goal-console");
+            scrollToSection("calendar-section");
             return;
           }
 
@@ -8012,7 +8051,7 @@
         }
       }
 
-      goalList.addEventListener("click", (event) => {
+      function handleGoalListClick(event) {
         const button = event.target.closest("button[data-action]");
         if (!button) return;
 
@@ -8044,7 +8083,10 @@
         if (action === "reschedule-tomorrow") {
           rescheduleGoalToTomorrow(goalId);
         }
-      });
+      }
+
+      goalList.addEventListener("click", handleGoalListClick);
+      goalListConsole.addEventListener("click", handleGoalListClick);
 
       monthlyGoalList.addEventListener("click", (event) => {
         const button = event.target.closest("button[data-monthly-action]");
@@ -9885,6 +9927,8 @@
           button.classList.toggle("is-active", button.dataset.tab === activeTab);
         });
         currentTabTitle.textContent = `${TAB_LABELS[activeTab]}の目標`;
+        const goalConsole = document.getElementById("goal-console");
+        if (goalConsole) goalConsole.dataset.activeTab = activeTab;
       }
 
       function renderFilters() {
@@ -10032,7 +10076,16 @@
         `;
       }
 
+      function getActiveGoalListElement() {
+        return activeTab === "today" ? goalList : goalListConsole;
+      }
+
       function renderGoals() {
+        const listEl = getActiveGoalListElement();
+        const inactiveList = activeTab === "today" ? goalListConsole : goalList;
+        if (inactiveList) inactiveList.innerHTML = "";
+        if (!listEl) return;
+
         const goals = goalsByTab[activeTab];
         const visibleGoals = filterGoals(goals);
         const sortedVisibleGoals = sortGoals(visibleGoals);
@@ -10040,7 +10093,7 @@
         const completedGoals = sortedVisibleGoals.filter((goal) => goal.done);
 
         if (visibleGoals.length === 0) {
-          goalList.innerHTML = `
+          listEl.innerHTML = `
             <div class="empty">
               <span class="empty-icon" aria-hidden="true">☑</span>
               <p class="empty-title">${getEmptyMessage()}</p>
@@ -10073,14 +10126,13 @@
             `
             : "";
 
-        goalList.innerHTML =
+        listEl.innerHTML =
           `${activeGoalRows}${completedSection}` ||
           `<div class="empty">
             <span class="empty-icon" aria-hidden="true">☑</span>
             <p class="empty-title">${getEmptyMessage()}</p>
             <p class="empty-text">${getEmptyDescription()}</p>
           </div>`;
-        return;
       }
 
       function renderProgress() {
@@ -10771,6 +10823,11 @@
         const cell = event.target.closest("[data-calendar-date]");
         if (!cell) return;
         calendarSelectedDateKey = cell.dataset.calendarDate;
+        if (calendarSelectedDateKey === getTodayKey()) {
+          activeTab = "today";
+          renderGoals();
+          renderTabs();
+        }
         renderCalendar();
       }
 
@@ -10835,32 +10892,26 @@
           })
           .join("");
 
-        const scheduleItems = getScheduleItemsForDate(calendarSelectedDateKey);
+        const isSelectedToday = calendarSelectedDateKey === todayKey;
+        const scheduleItems = isSelectedToday
+          ? [
+              ...getGoogleEventsForDate(calendarSelectedDateKey),
+              ...getMileScheduleItemsForDate(calendarSelectedDateKey).filter((item) => item.startTime),
+            ].sort((a, b) => {
+              const aRank = a.startTime ? Number(a.startTime.replace(":", "")) : 9999;
+              const bRank = b.startTime ? Number(b.startTime.replace(":", "")) : 9999;
+              return aRank - bRank;
+            })
+          : getScheduleItemsForDate(calendarSelectedDateKey);
+
         calendarScheduleList.innerHTML = scheduleItems.length
           ? scheduleItems.map(renderCalendarScheduleItem).join("")
-          : `<p class="calendar-empty">この日の予定はありません</p>`;
+          : isSelectedToday
+            ? ""
+            : `<p class="calendar-empty">この日の予定はありません</p>`;
 
-        const showTodayTodos = calendarSelectedDateKey === todayKey;
-        calendarTodayTodosHeading.hidden = !showTodayTodos;
-        if (showTodayTodos) {
-          const todayTodos = getDashboardTodayGoals();
-          calendarTodayTodos.innerHTML = todayTodos.length
-            ? todayTodos.map((goal) =>
-                renderCalendarScheduleItem({
-                  id: goal.id,
-                  source: "mile",
-                  title: goal.title,
-                  startTime: goal.startTime || "",
-                  endTime: goal.endTime || "",
-                  location: "",
-                  done: goal.done,
-                  category: goal.category || "その他",
-                  allDay: !goal.startTime,
-                })
-              ).join("")
-            : `<p class="calendar-empty">今日のToDoはありません</p>`;
-        } else {
-          calendarTodayTodos.innerHTML = "";
+        if (calendarTodayPanel) {
+          calendarTodayPanel.hidden = !isSelectedToday;
         }
 
         renderGoogleCalendarSettingsUI();
