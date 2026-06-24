@@ -3219,6 +3219,24 @@
         outline: none;
       }
 
+      .goal-edit-form input[type="time"] {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.84rem;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .goal-edit-form .time-fields-row .field label {
+        font-size: 0.74rem;
+        letter-spacing: -0.01em;
+      }
+
+      .goal-edit-form .time-fields-row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 8px;
+      }
+
       .goal-edit-form input:focus,
       .goal-edit-form select:focus {
         box-shadow: 0 0 0 4px rgba(184, 217, 106, 0.22);
@@ -6130,11 +6148,31 @@
       }
 
       .calendar-today-panel .goal-schedule-sub {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
         margin: 2px 0 0;
         color: #8f968a;
-        font-size: 0.72rem;
-        font-weight: 650;
-        line-height: 1.3;
+        font-size: 0.68rem;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+
+      .calendar-today-panel .goal-schedule-time-text {
+        color: #6f7768;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.01em;
+      }
+
+      .calendar-today-panel .goal-schedule-due-text {
+        color: #a0a79b;
+      }
+
+      .calendar-today-panel .goal-schedule-due-text.has-sep::before {
+        content: "·";
+        margin-right: 6px;
+        color: #c5cbc0;
       }
 
       .calendar-today-panel .goal-schedule-item .calendar-schedule-title {
@@ -6179,6 +6217,32 @@
       .calendar-today-panel .goal-schedule-item.is-editing .goal-edit-form {
         grid-column: 1 / -1;
         margin-top: 8px;
+        padding: 10px;
+        gap: 8px;
+        border-radius: 14px;
+      }
+
+      .calendar-today-panel .goal-edit-form .field label {
+        font-size: 0.72rem;
+      }
+
+      .calendar-today-panel .goal-edit-form input,
+      .calendar-today-panel .goal-edit-form select {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.88rem;
+        border-radius: 12px;
+      }
+
+      .calendar-today-panel .goal-edit-form input[type="time"] {
+        min-height: 36px;
+        padding: 6px 8px;
+        font-size: 0.8rem;
+      }
+
+      .calendar-today-panel .goal-edit-form .time-fields-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
       }
 
       .calendar-schedule-list[hidden] {
@@ -6222,8 +6286,25 @@
 
       .time-fields-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 8px;
+        width: 100%;
+      }
+
+      .time-fields-row .field {
+        min-width: 0;
+      }
+
+      .time-fields-row input[type="time"] {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.84rem;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .time-fields-row .field label {
+        font-size: 0.74rem;
       }
 
       .schedule-reminder-overlay {
@@ -6573,11 +6654,11 @@
           </div>
           <div class="time-fields-row">
             <div class="field">
-              <label for="goalStartTime">リマインド時刻</label>
+              <label for="goalStartTime">リマインド</label>
               <input id="goalStartTime" type="time" />
             </div>
             <div class="field">
-              <label for="goalEndTime">終了時刻（任意）</label>
+              <label for="goalEndTime">終了（任意）</label>
               <input id="goalEndTime" type="time" />
             </div>
           </div>
@@ -10397,7 +10478,7 @@
                     </div>
                     <div class="time-fields-row">
                       <div class="field">
-                        <label for="goal-edit-start-${escapeHtml(goal.id)}">リマインド時刻</label>
+                        <label for="goal-edit-start-${escapeHtml(goal.id)}">リマインド</label>
                         <input
                           id="goal-edit-start-${escapeHtml(goal.id)}"
                           type="time"
@@ -10406,7 +10487,7 @@
                         />
                       </div>
                       <div class="field">
-                        <label for="goal-edit-end-${escapeHtml(goal.id)}">終了時刻（任意）</label>
+                        <label for="goal-edit-end-${escapeHtml(goal.id)}">終了（任意）</label>
                         <input
                           id="goal-edit-end-${escapeHtml(goal.id)}"
                           type="time"
@@ -10448,8 +10529,15 @@
             ? `${goal.startTime} - ${goal.endTime}`
             : goal.startTime
           : "";
-        const subParts = [timeLabel, dueMeta ? dueMeta.label : ""].filter(Boolean);
-        const subLine = subParts.join(" · ");
+        const subLine = timeLabel || dueMeta
+          ? `<p class="goal-schedule-sub">${
+              timeLabel ? `<span class="goal-schedule-time-text">${escapeHtml(timeLabel)}</span>` : ""
+            }${
+              dueMeta
+                ? `<span class="goal-schedule-due-text${timeLabel ? " has-sep" : ""}">${escapeHtml(dueMeta.label)}</span>`
+                : ""
+            }</p>`
+          : "";
         const isEditing = goal.id === editingGoalId;
 
         return `
@@ -10464,7 +10552,7 @@
             >${goal.done ? "✓" : ""}</button>
             <div class="goal-schedule-main">
               <p class="calendar-schedule-title">${escapeHtml(goal.title)}</p>
-              ${subLine ? `<p class="goal-schedule-sub">${escapeHtml(subLine)}</p>` : ""}
+              ${subLine}
             </div>
             <div class="goal-actions goal-schedule-actions">
               <button
