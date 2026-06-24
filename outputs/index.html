@@ -10,8 +10,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="MILE" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="mile-google-calendar-client-id" content="YOUR_GOOGLE_CALENDAR_CLIENT_ID" />
     <title>MILE | 目標管理アプリ</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
       :root {
         color-scheme: dark;
@@ -3249,7 +3251,7 @@
         bottom: 14px;
         z-index: 20;
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 6px;
         width: min(100%, 520px);
         margin: 28px auto 0;
@@ -5369,8 +5371,500 @@
       .beta-notice-copy + .beta-notice-copy {
         margin-top: 8px;
       }
+
+      .vision-board-card {
+        position: relative;
+        overflow: hidden;
+        margin: 0 0 16px;
+        padding: 18px 16px 14px;
+        border: 1px solid rgba(54, 201, 255, 0.28);
+        border-radius: 20px;
+        background:
+          linear-gradient(180deg, rgba(12, 18, 36, 0.92), rgba(8, 12, 24, 0.96)),
+          radial-gradient(circle at 50% 100%, rgba(50, 232, 137, 0.12), transparent 55%);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .vision-board-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .vision-board-label {
+        margin: 0;
+        color: var(--cyan);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+      }
+
+      .vision-board-title {
+        margin: 4px 0 0;
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      .vision-board-percent {
+        margin: 0;
+        color: var(--green);
+        font-size: 1.45rem;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .vision-board-scene {
+        position: relative;
+        height: 148px;
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(54, 201, 255, 0.08) 0%, rgba(50, 232, 137, 0.06) 55%, rgba(174, 92, 255, 0.08) 100%);
+        overflow: hidden;
+      }
+
+      .vision-board-mountain {
+        position: absolute;
+        inset: auto 0 0;
+        width: 100%;
+        height: 88px;
+        opacity: 0.9;
+      }
+
+      .vision-board-path {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .vision-board-marker {
+        position: absolute;
+        left: var(--marker-x, 8%);
+        bottom: var(--marker-y, 18%);
+        z-index: 2;
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(5, 8, 18, 0.82);
+        border: 2px solid var(--green);
+        box-shadow: 0 0 18px rgba(50, 232, 137, 0.45);
+        font-size: 1.1rem;
+        transition: left 600ms ease, bottom 600ms ease;
+      }
+
+      .vision-board-goal-flag {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(255, 210, 50, 0.16);
+        border: 1px solid rgba(255, 210, 50, 0.35);
+        color: var(--yellow);
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .vision-board-caption {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.55;
+      }
+
+      .calendar-section {
+        margin: 0 0 18px;
+      }
+
+      .calendar-card {
+        padding: 16px 14px 14px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(12, 18, 36, 0.88);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .calendar-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .calendar-month-block {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .calendar-month-number {
+        display: grid;
+        place-items: center;
+        min-width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: rgba(54, 201, 255, 0.12);
+        border: 1px solid rgba(54, 201, 255, 0.35);
+        color: var(--cyan);
+        font-size: 1.8rem;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .calendar-month-meta {
+        display: grid;
+        gap: 4px;
+      }
+
+      .calendar-year-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      .calendar-nav-row {
+        display: flex;
+        gap: 6px;
+      }
+
+      .calendar-nav-button {
+        min-height: 32px;
+        padding: 0 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(54, 201, 255, 0.25);
+        background: rgba(54, 201, 255, 0.08);
+        color: var(--text);
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .calendar-header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: flex-end;
+      }
+
+      .calendar-today-button,
+      .calendar-sync-button {
+        min-height: 32px;
+        padding: 0 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(50, 232, 137, 0.3);
+        background: rgba(50, 232, 137, 0.1);
+        color: var(--green);
+        font-size: 0.76rem;
+        font-weight: 800;
+      }
+
+      .calendar-sync-button.is-connected {
+        border-color: rgba(54, 201, 255, 0.35);
+        background: rgba(54, 201, 255, 0.12);
+        color: var(--cyan);
+      }
+
+      .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 4px;
+        margin-bottom: 6px;
+      }
+
+      .calendar-weekday {
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .calendar-weekday.is-sun {
+        color: #ff8a9a;
+      }
+
+      .calendar-weekday.is-sat {
+        color: #7ec8ff;
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 4px;
+      }
+
+      .calendar-cell {
+        min-height: 74px;
+        padding: 5px 4px 4px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background: rgba(16, 25, 50, 0.55);
+        text-align: left;
+        cursor: pointer;
+        transition: border-color 160ms ease, background 160ms ease;
+      }
+
+      .calendar-cell:hover {
+        border-color: rgba(54, 201, 255, 0.25);
+      }
+
+      .calendar-cell.is-other-month {
+        opacity: 0.42;
+      }
+
+      .calendar-cell.is-today {
+        border-color: rgba(50, 232, 137, 0.35);
+      }
+
+      .calendar-cell.is-selected {
+        border-color: rgba(54, 201, 255, 0.55);
+        background: rgba(54, 201, 255, 0.14);
+        box-shadow: inset 0 0 0 1px rgba(54, 201, 255, 0.2);
+      }
+
+      .calendar-cell-date {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .calendar-cell-events {
+        display: grid;
+        gap: 2px;
+      }
+
+      .calendar-cell-chip {
+        overflow: hidden;
+        padding: 1px 4px;
+        border-radius: 4px;
+        border-left: 2px solid var(--chip-color, var(--cyan));
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        font-size: 0.62rem;
+        font-weight: 700;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .calendar-day-detail {
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(54, 201, 255, 0.16);
+      }
+
+      .calendar-selected-label {
+        margin: 0 0 10px;
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .calendar-schedule-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .calendar-schedule-item {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 10px;
+        align-items: start;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(16, 25, 50, 0.72);
+        border: 1px solid rgba(54, 201, 255, 0.12);
+      }
+
+      .calendar-schedule-item.is-done {
+        opacity: 0.62;
+      }
+
+      .calendar-schedule-accent {
+        width: 4px;
+        align-self: stretch;
+        border-radius: 999px;
+        background: var(--accent, var(--cyan));
+      }
+
+      .calendar-schedule-time {
+        margin: 0 0 4px;
+        color: var(--muted);
+        font-size: 0.76rem;
+        font-weight: 700;
+      }
+
+      .calendar-schedule-title {
+        margin: 0;
+        font-size: 0.92rem;
+        font-weight: 800;
+      }
+
+      .calendar-schedule-meta {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .calendar-schedule-source {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: rgba(54, 201, 255, 0.1);
+        color: var(--cyan);
+        font-size: 0.68rem;
+        font-weight: 800;
+      }
+
+      .calendar-schedule-source.is-google {
+        background: rgba(255, 138, 42, 0.12);
+        color: var(--orange);
+      }
+
+      .calendar-empty {
+        margin: 0;
+        padding: 14px 10px;
+        border-radius: 12px;
+        background: rgba(16, 25, 50, 0.45);
+        color: var(--muted);
+        font-size: 0.84rem;
+        text-align: center;
+      }
+
+      .calendar-today-todos-heading {
+        margin: 14px 0 8px;
+        color: var(--green);
+        font-size: 0.84rem;
+        font-weight: 800;
+      }
+
+      .calendar-sync-status {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 0.76rem;
+        line-height: 1.55;
+      }
+
+      .calendar-disconnect-button {
+        min-height: 32px;
+        padding: 0 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 111, 123, 0.35);
+        background: rgba(255, 111, 123, 0.1);
+        color: var(--danger);
+        font-size: 0.76rem;
+        font-weight: 800;
+      }
+
+      .calendar-disconnect-button[hidden] {
+        display: none;
+      }
+
+      .time-fields-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .schedule-reminder-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: rgba(5, 8, 18, 0.72);
+        backdrop-filter: blur(6px);
+      }
+
+      .schedule-reminder-overlay[hidden] {
+        display: none;
+      }
+
+      .schedule-reminder-modal {
+        width: min(100%, 360px);
+        padding: 20px 18px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(54, 201, 255, 0.35);
+        background: linear-gradient(180deg, #0f1830, #0a1020);
+        box-shadow: var(--shadow-cyan);
+      }
+
+      .schedule-reminder-eyebrow {
+        margin: 0 0 6px;
+        color: var(--cyan);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+      }
+
+      .schedule-reminder-time {
+        margin: 0 0 8px;
+        font-size: 1.15rem;
+        font-weight: 900;
+      }
+
+      .schedule-reminder-title {
+        margin: 0 0 6px;
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      .schedule-reminder-meta {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.55;
+      }
+
+      .schedule-reminder-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      @media (max-width: 760px) {
+        .bottom-nav {
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          width: min(100%, 100%);
+          gap: 4px;
+          padding: 6px;
+        }
+
+        .bottom-nav-item {
+          min-height: 52px;
+          font-size: 0.68rem;
+          gap: 2px;
+        }
+
+        .nav-icon {
+          width: 24px;
+          height: 24px;
+        }
+
+        .nav-icon svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .calendar-cell {
+          min-height: 62px;
+        }
+
+        .calendar-month-number {
+          min-width: 44px;
+          height: 44px;
+          font-size: 1.5rem;
+        }
+
+        .vision-board-scene {
+          height: 128px;
+        }
+      }
     </style>
-  </head>
   <body>
     <main class="app">
       <section class="user-profile" id="user-profile" aria-label="ユーザープロフィール" data-state="guest">
@@ -5479,6 +5973,69 @@
         </div>
       </section>
 
+      <section class="calendar-section" id="calendar-section" aria-label="カレンダー">
+        <article class="vision-board-card" id="visionBoardCard" aria-label="ビジョンボード">
+          <div class="vision-board-head">
+            <div>
+              <p class="vision-board-label">VISION BOARD</p>
+              <p class="vision-board-title" id="visionBoardTitle">目標への道のり</p>
+            </div>
+            <p class="vision-board-percent" id="visionBoardPercent">0%</p>
+          </div>
+          <div class="vision-board-scene" id="visionBoardScene">
+            <svg class="vision-board-mountain" viewBox="0 0 400 88" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 88 L80 42 L140 58 L210 18 L280 50 L340 30 L400 68 L400 88 Z" fill="rgba(54,201,255,0.14)" />
+              <path d="M0 88 L120 52 L200 62 L300 28 L400 55 L400 88 Z" fill="rgba(50,232,137,0.1)" />
+            </svg>
+            <svg class="vision-board-path" viewBox="0 0 400 148" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M24 118 C90 108, 120 92, 170 78 C220 64, 260 48, 320 28" fill="none" stroke="rgba(255,210,50,0.55)" stroke-width="3" stroke-dasharray="6 6" />
+            </svg>
+            <span class="vision-board-goal-flag" id="visionBoardGoalFlag">🏁 目標</span>
+            <span class="vision-board-marker" id="visionBoardMarker" aria-hidden="true">🧗</span>
+          </div>
+          <p class="vision-board-caption" id="visionBoardCaption">年間・今月・今日の進捗を合わせて、登っていく距離を表示します。</p>
+        </article>
+
+        <div class="calendar-card">
+          <header class="calendar-header">
+            <div class="calendar-month-block">
+              <span class="calendar-month-number" id="calendarMonthNumber" aria-hidden="true">1</span>
+              <div class="calendar-month-meta">
+                <p class="calendar-year-label" id="calendarYearLabel">2026年</p>
+                <div class="calendar-nav-row">
+                  <button class="calendar-nav-button" type="button" id="calendarPrevMonth" aria-label="前の月">←</button>
+                  <button class="calendar-nav-button" type="button" id="calendarNextMonth" aria-label="次の月">→</button>
+                </div>
+              </div>
+            </div>
+            <div class="calendar-header-actions">
+              <button class="calendar-today-button" type="button" id="calendarTodayButton">今日</button>
+              <button class="calendar-sync-button" type="button" id="googleCalendarConnectButton">Gカレンダー連携</button>
+              <button class="calendar-disconnect-button" type="button" id="googleCalendarDisconnectButton" hidden>解除</button>
+            </div>
+          </header>
+
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span class="calendar-weekday">月</span>
+            <span class="calendar-weekday">火</span>
+            <span class="calendar-weekday">水</span>
+            <span class="calendar-weekday">木</span>
+            <span class="calendar-weekday">金</span>
+            <span class="calendar-weekday is-sat">土</span>
+            <span class="calendar-weekday is-sun">日</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="月間カレンダー"></div>
+
+          <div class="calendar-day-detail">
+            <h3 class="calendar-selected-label" id="calendarSelectedDateLabel">今日</h3>
+            <div class="calendar-schedule-list" id="calendarScheduleList"></div>
+            <p class="calendar-today-todos-heading" id="calendarTodayTodosHeading" hidden>今日のToDo</p>
+            <div class="calendar-schedule-list" id="calendarTodayTodos"></div>
+            <p class="calendar-sync-status" id="googleCalendarStatus">Googleカレンダー未連携。連携すると予定を表示できます。</p>
+          </div>
+        </div>
+      </section>
+
       <section class="goal-console" id="goal-console" aria-label="目標管理コンソール">
         <h2 class="section-heading console-heading ui-heading-hidden" aria-hidden="true">今日やること</h2>
 
@@ -5554,6 +6111,16 @@
           <div class="field due-date-field">
             <label for="goalDueDate">期限</label>
             <input id="goalDueDate" type="date" />
+          </div>
+          <div class="time-fields-row">
+            <div class="field">
+              <label for="goalStartTime">開始時刻</label>
+              <input id="goalStartTime" type="time" />
+            </div>
+            <div class="field">
+              <label for="goalEndTime">終了時刻</label>
+              <input id="goalEndTime" type="time" />
+            </div>
           </div>
           <div class="field">
             <label for="goalMonthlyGoal">今月の目標</label>
@@ -5916,6 +6483,24 @@
                   </div>
                 </details>
 
+                <details class="settings-fold" id="google-calendar-settings-section" aria-label="Googleカレンダー設定">
+                  <summary class="settings-fold-summary">
+                    <span class="settings-fold-summary-label">Googleカレンダー</span>
+                    <span class="settings-fold-chevron" aria-hidden="true">+</span>
+                  </summary>
+                  <div class="settings-fold-body">
+                    <p class="cloud-copy">Googleカレンダーの予定を読み取り専用で表示します。MILEのクラウド同期とは別で、この端末にのみ連携情報を保存します。</p>
+                    <p class="cloud-copy">連携には Google Cloud Console で Calendar API を有効化し、OAuth クライアント ID を <code>meta[name=mile-google-calendar-client-id]</code> に設定してください。</p>
+                    <div class="cloud-actions">
+                      <button class="button secondary" type="button" id="googleCalendarSettingsConnectButton">連携する</button>
+                      <button class="button" type="button" id="googleCalendarSettingsSyncButton" hidden>今すぐ同期</button>
+                      <button class="button secondary" type="button" id="googleCalendarSettingsDisconnectButton" hidden>連携を解除</button>
+                      <button class="button secondary" type="button" id="enableScheduleNotificationsButton">通知を許可</button>
+                    </div>
+                    <p class="cloud-copy" id="googleCalendarSettingsStatus" aria-live="polite">未連携</p>
+                  </div>
+                </details>
+
                 <details class="cloud-card settings-fold" id="settings-section" aria-label="クラウド保存" data-state="signed-out">
                   <summary class="settings-fold-summary settings-fold-summary-cloud">
                     <span class="settings-fold-summary-main">
@@ -5992,6 +6577,15 @@
           </span>
           <span>今日</span>
         </button>
+        <button class="bottom-nav-item" type="button" data-nav="calendar" aria-label="カレンダーへ移動">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="16" rx="2" />
+              <path d="M8 3v4M16 3v4M3 11h18" />
+            </svg>
+          </span>
+          <span>カレンダー</span>
+        </button>
         <button class="bottom-nav-item" type="button" data-nav="goals" aria-label="目標リストへ移動">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -6030,6 +6624,18 @@
       <span class="mile-toast-copy">いい一歩！</span>
     </div>
 
+    <div class="schedule-reminder-overlay" id="scheduleReminderOverlay" hidden>
+      <div class="schedule-reminder-modal" role="alertdialog" aria-labelledby="scheduleReminderTitle" aria-describedby="scheduleReminderMeta">
+        <p class="schedule-reminder-eyebrow" id="scheduleReminderEyebrow">予定の時間です</p>
+        <p class="schedule-reminder-time" id="scheduleReminderTime"></p>
+        <h3 class="schedule-reminder-title" id="scheduleReminderTitle"></h3>
+        <p class="schedule-reminder-meta" id="scheduleReminderMeta"></p>
+        <div class="schedule-reminder-actions">
+          <button class="button" type="button" id="scheduleReminderDismiss">OK</button>
+        </div>
+      </div>
+    </div>
+
     <script>
       const DEFAULT_SLOGAN = "目標達成までの一歩を、今日から整える";
       const SLOGAN_STORAGE_KEY = "idealIslandSlogan";
@@ -6062,6 +6668,20 @@
       ];
       const SUPABASE_URL = "https://mmmedrkpvrwkszbkahii.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tbWVkcmtwdnJ3a3N6YmthaGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODYwMDMsImV4cCI6MjA5NjA2MjAwM30.ZTaJhkZPzd0CAqiCfMYTAib3iNSWXtT70285m5mxbOI";
+      const GOOGLE_CALENDAR_CLIENT_ID = "YOUR_GOOGLE_CALENDAR_CLIENT_ID";
+      const GOOGLE_CALENDAR_STORAGE_KEY = "mileGoogleCalendar";
+      const GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
+      const GOOGLE_CALENDAR_AUTO_SYNC_MS = 15 * 60 * 1000;
+      const SCHEDULE_REMINDER_CHECK_MS = 30 * 1000;
+      const SCHEDULE_NOTIFIED_STORAGE_KEY = "mileScheduleNotifiedKeys";
+      const CATEGORY_CALENDAR_COLORS = {
+        仕事: "#36c9ff",
+        学習: "#ae5cff",
+        健康: "#32e889",
+        家族: "#ff8a2a",
+        お金: "#ffd232",
+        その他: "#8d9bb5",
+      };
       const TAB_LABELS = {
         year: "年間",
         month: "今月",
@@ -6117,6 +6737,14 @@
       let cloudAutoLoadComplete = false;
       let cloudAutoLoadPromise = null;
       let lastCloudUserId = null;
+      let calendarViewYear = new Date().getFullYear();
+      let calendarViewMonth = new Date().getMonth();
+      let calendarSelectedDateKey = "";
+      let googleCalendarData = loadGoogleCalendarData();
+      let googleTokenClient = null;
+      let scheduleReminderTimer = 0;
+      let googleCalendarAutoSyncTimer = 0;
+      const scheduleNotifiedKeys = loadScheduleNotifiedKeys();
 
       const sloganText = document.getElementById("sloganText");
       const sloganInput = document.getElementById("sloganInput");
@@ -6252,6 +6880,36 @@
       const mileWorldBadges = document.getElementById("mileWorldBadges");
       const mileWorldBadgesList = document.getElementById("mileWorldBadgesList");
       const mileWorldBadgesEmpty = document.getElementById("mileWorldBadgesEmpty");
+      const visionBoardPercent = document.getElementById("visionBoardPercent");
+      const visionBoardTitle = document.getElementById("visionBoardTitle");
+      const visionBoardCaption = document.getElementById("visionBoardCaption");
+      const visionBoardMarker = document.getElementById("visionBoardMarker");
+      const visionBoardGoalFlag = document.getElementById("visionBoardGoalFlag");
+      const calendarMonthNumber = document.getElementById("calendarMonthNumber");
+      const calendarYearLabel = document.getElementById("calendarYearLabel");
+      const calendarPrevMonth = document.getElementById("calendarPrevMonth");
+      const calendarNextMonth = document.getElementById("calendarNextMonth");
+      const calendarTodayButton = document.getElementById("calendarTodayButton");
+      const calendarGrid = document.getElementById("calendarGrid");
+      const calendarSelectedDateLabel = document.getElementById("calendarSelectedDateLabel");
+      const calendarScheduleList = document.getElementById("calendarScheduleList");
+      const calendarTodayTodosHeading = document.getElementById("calendarTodayTodosHeading");
+      const calendarTodayTodos = document.getElementById("calendarTodayTodos");
+      const googleCalendarConnectButton = document.getElementById("googleCalendarConnectButton");
+      const googleCalendarDisconnectButton = document.getElementById("googleCalendarDisconnectButton");
+      const googleCalendarStatus = document.getElementById("googleCalendarStatus");
+      const googleCalendarSettingsConnectButton = document.getElementById("googleCalendarSettingsConnectButton");
+      const googleCalendarSettingsSyncButton = document.getElementById("googleCalendarSettingsSyncButton");
+      const googleCalendarSettingsDisconnectButton = document.getElementById("googleCalendarSettingsDisconnectButton");
+      const googleCalendarSettingsStatus = document.getElementById("googleCalendarSettingsStatus");
+      const enableScheduleNotificationsButton = document.getElementById("enableScheduleNotificationsButton");
+      const goalStartTime = document.getElementById("goalStartTime");
+      const goalEndTime = document.getElementById("goalEndTime");
+      const scheduleReminderOverlay = document.getElementById("scheduleReminderOverlay");
+      const scheduleReminderTime = document.getElementById("scheduleReminderTime");
+      const scheduleReminderTitle = document.getElementById("scheduleReminderTitle");
+      const scheduleReminderMeta = document.getElementById("scheduleReminderMeta");
+      const scheduleReminderDismiss = document.getElementById("scheduleReminderDismiss");
 
       editSloganButton.addEventListener("click", startSloganEdit);
       saveSloganButton.addEventListener("click", saveSlogan);
@@ -6325,6 +6983,11 @@
             return;
           }
 
+          if (nav === "calendar") {
+            scrollToSection("calendar-section");
+            return;
+          }
+
           if (nav === "goals") {
             scrollToSection("monthly-goal-section");
             return;
@@ -6359,6 +7022,21 @@
           renderGoals();
           renderFilters();
         });
+      });
+
+      calendarPrevMonth.addEventListener("click", () => shiftCalendarMonth(-1));
+      calendarNextMonth.addEventListener("click", () => shiftCalendarMonth(1));
+      calendarTodayButton.addEventListener("click", jumpCalendarToToday);
+      calendarGrid.addEventListener("click", handleCalendarCellClick);
+      googleCalendarConnectButton.addEventListener("click", handleGoogleCalendarConnectClick);
+      googleCalendarDisconnectButton.addEventListener("click", disconnectGoogleCalendar);
+      googleCalendarSettingsConnectButton.addEventListener("click", requestGoogleCalendarAccess);
+      googleCalendarSettingsSyncButton.addEventListener("click", () => syncGoogleCalendarEvents());
+      googleCalendarSettingsDisconnectButton.addEventListener("click", disconnectGoogleCalendar);
+      enableScheduleNotificationsButton.addEventListener("click", enableScheduleNotifications);
+      scheduleReminderDismiss.addEventListener("click", dismissScheduleReminder);
+      scheduleReminderOverlay.addEventListener("click", (event) => {
+        if (event.target === scheduleReminderOverlay) dismissScheduleReminder();
       });
 
       function isSupabaseConfigured() {
@@ -7417,6 +8095,8 @@
           category: CATEGORIES.includes(goal.category) ? goal.category : "その他",
           done: Boolean(goal.done ?? goal.completed),
           dueDate: typeof goal.dueDate === "string" ? goal.dueDate : "",
+          startTime: typeof goal.startTime === "string" ? goal.startTime : "",
+          endTime: typeof goal.endTime === "string" ? goal.endTime : "",
           monthlyGoalId: typeof goal.monthlyGoalId === "string" ? goal.monthlyGoalId : "",
           createdAt: goal.createdAt || new Date().toISOString(),
           completedAt: typeof goal.completedAt === "string" ? goal.completedAt : "",
@@ -8594,6 +9274,8 @@
         goalForm.reset();
         goalCategory.value = "その他";
         goalDueDate.value = "";
+        goalStartTime.value = "";
+        goalEndTime.value = "";
         goalMonthlyGoal.value = "";
         renderGoalFormState();
       }
@@ -8619,7 +9301,9 @@
           id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
           title,
           category: goalCategory.value,
-          dueDate: goalDueDate.value,
+          dueDate: goalDueDate.value || (goalStartTime.value ? getTodayKey() : ""),
+          startTime: goalStartTime.value,
+          endTime: goalEndTime.value,
           monthlyGoalId: goalMonthlyGoal.value,
           done: false,
           createdAt: new Date().toISOString(),
@@ -8632,6 +9316,8 @@
         goalForm.reset();
         goalCategory.value = "その他";
         goalDueDate.value = "";
+        goalStartTime.value = "";
+        goalEndTime.value = "";
         goalMonthlyGoal.value = "";
         if (window.innerWidth <= 760) {
           closeGoalForm();
@@ -8671,6 +9357,8 @@
         const goalId = form.dataset.id;
         const titleInput = form.querySelector("[data-goal-edit-title]");
         const dueDateInput = form.querySelector("[data-goal-edit-due-date]");
+        const startTimeInput = form.querySelector("[data-goal-edit-start-time]");
+        const endTimeInput = form.querySelector("[data-goal-edit-end-time]");
         const categoryInput = form.querySelector("[data-goal-edit-category]");
         const monthlyGoalInput = form.querySelector("[data-goal-edit-monthly-goal]");
         const title = titleInput.value.trim();
@@ -8688,6 +9376,8 @@
                 ...goal,
                 title,
                 dueDate: dueDateInput.value,
+                startTime: startTimeInput ? startTimeInput.value : "",
+                endTime: endTimeInput ? endTimeInput.value : "",
                 category: categoryInput.value,
                 monthlyGoalId: monthlyGoalInput.value,
                 updatedAt: now,
@@ -9293,6 +9983,26 @@
                         data-goal-edit-due-date="${escapeHtml(goal.id)}"
                       />
                     </div>
+                    <div class="time-fields-row">
+                      <div class="field">
+                        <label for="goal-edit-start-${escapeHtml(goal.id)}">開始時刻</label>
+                        <input
+                          id="goal-edit-start-${escapeHtml(goal.id)}"
+                          type="time"
+                          value="${escapeHtml(goal.startTime || "")}"
+                          data-goal-edit-start-time="${escapeHtml(goal.id)}"
+                        />
+                      </div>
+                      <div class="field">
+                        <label for="goal-edit-end-${escapeHtml(goal.id)}">終了時刻</label>
+                        <input
+                          id="goal-edit-end-${escapeHtml(goal.id)}"
+                          type="time"
+                          value="${escapeHtml(goal.endTime || "")}"
+                          data-goal-edit-end-time="${escapeHtml(goal.id)}"
+                        />
+                      </div>
+                    </div>
                     <div class="field">
                       <label for="goal-edit-category-${escapeHtml(goal.id)}">カテゴリ</label>
                       <select
@@ -9628,6 +10338,591 @@
         nextStepDescription.textContent = description;
       }
 
+      function getVisionBoardProgress() {
+        const todayGoals = getDashboardTodayGoals();
+        const todayPercent = getProgress(todayGoals).percent;
+        const monthPercent = getDashboardMonthProgress();
+        const yearPercent = getDashboardYearProgress();
+        return Math.round((todayPercent + monthPercent + yearPercent) / 3);
+      }
+
+      function renderVisionBoard() {
+        if (!visionBoardPercent) return;
+
+        const progress = getVisionBoardProgress();
+        const yearlyGoals = Array.isArray(goalPlan.yearlyGoals) ? goalPlan.yearlyGoals : [];
+        const topGoal = yearlyGoals[0];
+        const markerX = 8 + progress * 0.72;
+        const markerY = 18 + progress * 0.52;
+
+        visionBoardPercent.textContent = `${progress}%`;
+        visionBoardTitle.textContent = topGoal?.title ? `目標：${topGoal.title}` : "目標への道のり";
+        visionBoardCaption.textContent =
+          progress >= 100
+            ? "頂上まで到達しました。次の目標を設定して、さらに登り続けましょう。"
+            : `年間 ${getDashboardYearProgress()}% / 今月 ${getDashboardMonthProgress()}% / 今日 ${getProgress(getDashboardTodayGoals()).percent}% の平均で登っています。`;
+        visionBoardGoalFlag.textContent = topGoal?.title ? `🏁 ${topGoal.title}` : "🏁 目標";
+        visionBoardMarker.style.setProperty("--marker-x", `${markerX}%`);
+        visionBoardMarker.style.setProperty("--marker-y", `${markerY}%`);
+      }
+
+      function getGoogleCalendarClientId() {
+        const meta = document.querySelector('meta[name="mile-google-calendar-client-id"]');
+        const fromMeta = meta?.getAttribute("content")?.trim() || "";
+        if (fromMeta && fromMeta !== "YOUR_GOOGLE_CALENDAR_CLIENT_ID") return fromMeta;
+        if (typeof window.MILE_GOOGLE_CALENDAR_CLIENT_ID === "string") {
+          const fromWindow = window.MILE_GOOGLE_CALENDAR_CLIENT_ID.trim();
+          if (fromWindow && fromWindow !== "YOUR_GOOGLE_CALENDAR_CLIENT_ID") return fromWindow;
+        }
+        if (GOOGLE_CALENDAR_CLIENT_ID && GOOGLE_CALENDAR_CLIENT_ID !== "YOUR_GOOGLE_CALENDAR_CLIENT_ID") {
+          return GOOGLE_CALENDAR_CLIENT_ID;
+        }
+        return "";
+      }
+
+      function loadScheduleNotifiedKeys() {
+        try {
+          const raw = sessionStorage.getItem(SCHEDULE_NOTIFIED_STORAGE_KEY);
+          if (!raw) return new Set();
+          const parsed = JSON.parse(raw);
+          return new Set(Array.isArray(parsed) ? parsed : []);
+        } catch {
+          return new Set();
+        }
+      }
+
+      function saveScheduleNotifiedKeys() {
+        sessionStorage.setItem(SCHEDULE_NOTIFIED_STORAGE_KEY, JSON.stringify([...scheduleNotifiedKeys]));
+      }
+
+      function loadGoogleCalendarData() {
+        try {
+          const raw = localStorage.getItem(GOOGLE_CALENDAR_STORAGE_KEY);
+          if (!raw) return { accessToken: "", expiresAt: 0, events: [], lastSyncAt: "" };
+          const parsed = JSON.parse(raw);
+          return {
+            accessToken: typeof parsed.accessToken === "string" ? parsed.accessToken : "",
+            expiresAt: Number(parsed.expiresAt) || 0,
+            events: Array.isArray(parsed.events) ? parsed.events : [],
+            lastSyncAt: typeof parsed.lastSyncAt === "string" ? parsed.lastSyncAt : "",
+          };
+        } catch {
+          return { accessToken: "", expiresAt: 0, events: [], lastSyncAt: "" };
+        }
+      }
+
+      function saveGoogleCalendarData() {
+        localStorage.setItem(GOOGLE_CALENDAR_STORAGE_KEY, JSON.stringify(googleCalendarData));
+      }
+
+      function isGoogleCalendarConfigured() {
+        return Boolean(getGoogleCalendarClientId());
+      }
+
+      function isGoogleCalendarConnected() {
+        return Boolean(googleCalendarData.accessToken && Date.now() < googleCalendarData.expiresAt - 60000);
+      }
+
+      function formatGoogleCalendarSyncLabel() {
+        if (!googleCalendarData.lastSyncAt) return "";
+        const syncedAt = new Date(googleCalendarData.lastSyncAt);
+        if (Number.isNaN(syncedAt.getTime())) return "";
+        return `最終同期: ${syncedAt.toLocaleString("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}`;
+      }
+
+      function setGoogleCalendarStatus(message) {
+        if (googleCalendarStatus) googleCalendarStatus.textContent = message;
+        if (googleCalendarSettingsStatus) googleCalendarSettingsStatus.textContent = message;
+      }
+
+      function renderGoogleCalendarSettingsUI() {
+        const configured = isGoogleCalendarConfigured();
+        const connected = isGoogleCalendarConnected();
+        const syncLabel = formatGoogleCalendarSyncLabel();
+
+        if (googleCalendarConnectButton) {
+          googleCalendarConnectButton.textContent = connected ? "Gカレンダー同期" : "Gカレンダー連携";
+          googleCalendarConnectButton.classList.toggle("is-connected", connected);
+          googleCalendarConnectButton.disabled = !configured;
+        }
+        if (googleCalendarDisconnectButton) googleCalendarDisconnectButton.hidden = !connected;
+        if (googleCalendarSettingsConnectButton) {
+          googleCalendarSettingsConnectButton.hidden = connected;
+          googleCalendarSettingsConnectButton.disabled = !configured;
+        }
+        if (googleCalendarSettingsSyncButton) googleCalendarSettingsSyncButton.hidden = !connected;
+        if (googleCalendarSettingsDisconnectButton) googleCalendarSettingsDisconnectButton.hidden = !connected;
+
+        if (!configured) {
+          setGoogleCalendarStatus(
+            "OAuth クライアント ID が未設定です。head の meta[name=mile-google-calendar-client-id] を設定してください。"
+          );
+          return;
+        }
+
+        if (connected) {
+          const eventCount = googleCalendarData.events.length;
+          setGoogleCalendarStatus(
+            syncLabel
+              ? `Googleカレンダー連携済み（${eventCount}件） / ${syncLabel}`
+              : `Googleカレンダー連携済み（${eventCount}件）`
+          );
+          return;
+        }
+
+        setGoogleCalendarStatus("Googleカレンダー未連携。連携すると予定を表示できます。");
+      }
+
+      function updateGoogleCalendarButton() {
+        renderGoogleCalendarSettingsUI();
+      }
+
+      function waitForGoogleIdentityServices() {
+        return new Promise((resolve) => {
+          if (window.google?.accounts?.oauth2) {
+            resolve(true);
+            return;
+          }
+          let attempts = 0;
+          const timer = window.setInterval(() => {
+            attempts += 1;
+            if (window.google?.accounts?.oauth2) {
+              window.clearInterval(timer);
+              resolve(true);
+              return;
+            }
+            if (attempts >= 40) {
+              window.clearInterval(timer);
+              resolve(false);
+            }
+          }, 250);
+        });
+      }
+
+      async function ensureGoogleTokenClient() {
+        if (!isGoogleCalendarConfigured()) return null;
+        const ready = await waitForGoogleIdentityServices();
+        if (!ready) return null;
+        const clientId = getGoogleCalendarClientId();
+        if (!googleTokenClient) {
+          googleTokenClient = window.google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: GOOGLE_CALENDAR_SCOPE,
+            callback: (response) => {
+              if (response.error) {
+                setGoogleCalendarStatus("Googleカレンダー連携に失敗しました。時間を置いて再度お試しください。");
+                return;
+              }
+              googleCalendarData.accessToken = response.access_token;
+              googleCalendarData.expiresAt = Date.now() + Number(response.expires_in || 3600) * 1000;
+              saveGoogleCalendarData();
+              syncGoogleCalendarEvents();
+            },
+          });
+        }
+        return googleTokenClient;
+      }
+
+      async function requestGoogleCalendarAccess() {
+        if (!isGoogleCalendarConfigured()) {
+          setGoogleCalendarStatus(
+            "Google Cloud Console で Calendar API を有効化し、OAuth クライアント ID を meta に設定してください。"
+          );
+          return;
+        }
+        const client = await ensureGoogleTokenClient();
+        if (!client) {
+          setGoogleCalendarStatus("Googleログイン用スクリプトの読み込みに失敗しました。再読み込みしてください。");
+          return;
+        }
+        client.requestAccessToken({ prompt: googleCalendarData.accessToken ? "" : "consent" });
+      }
+
+      function disconnectGoogleCalendar() {
+        if (window.google?.accounts?.oauth2 && googleCalendarData.accessToken) {
+          window.google.accounts.oauth2.revoke(googleCalendarData.accessToken, () => {});
+        }
+        googleCalendarData = { accessToken: "", expiresAt: 0, events: [], lastSyncAt: "" };
+        saveGoogleCalendarData();
+        if (googleCalendarAutoSyncTimer) {
+          window.clearInterval(googleCalendarAutoSyncTimer);
+          googleCalendarAutoSyncTimer = 0;
+        }
+        updateGoogleCalendarButton();
+        setGoogleCalendarStatus("Googleカレンダー連携を解除しました。");
+        renderCalendar();
+      }
+
+      async function syncGoogleCalendarEvents() {
+        if (!isGoogleCalendarConnected()) {
+          if (googleCalendarData.accessToken) {
+            await requestGoogleCalendarAccess();
+            return;
+          }
+          setGoogleCalendarStatus("Googleカレンダー未連携です。");
+          updateGoogleCalendarButton();
+          return;
+        }
+
+        const timeMin = new Date(calendarViewYear, calendarViewMonth, 1);
+        timeMin.setDate(timeMin.getDate() - 7);
+        const timeMax = new Date(calendarViewYear, calendarViewMonth + 1, 0);
+        timeMax.setDate(timeMax.getDate() + 7);
+
+        try {
+          setGoogleCalendarStatus("Googleカレンダーを同期中...");
+          const params = new URLSearchParams({
+            singleEvents: "true",
+            orderBy: "startTime",
+            timeMin: timeMin.toISOString(),
+            timeMax: timeMax.toISOString(),
+            maxResults: "120",
+          });
+          const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?${params}`, {
+            headers: { Authorization: `Bearer ${googleCalendarData.accessToken}` },
+          });
+          if (response.status === 401) {
+            googleCalendarData.expiresAt = 0;
+            saveGoogleCalendarData();
+            await requestGoogleCalendarAccess();
+            return;
+          }
+          if (!response.ok) throw new Error("sync failed");
+          const payload = await response.json();
+          googleCalendarData.events = (payload.items || []).map((item) => ({
+            id: item.id,
+            title: item.summary || "(無題)",
+            start: item.start?.dateTime || item.start?.date || "",
+            end: item.end?.dateTime || item.end?.date || "",
+            allDay: Boolean(item.start?.date && !item.start?.dateTime),
+            location: item.location || "",
+            htmlLink: item.htmlLink || "",
+          }));
+          googleCalendarData.lastSyncAt = new Date().toISOString();
+          saveGoogleCalendarData();
+          updateGoogleCalendarButton();
+          initializeGoogleCalendarAutoSync();
+          renderCalendar();
+        } catch (error) {
+          console.warn("Google Calendar sync failed", error);
+          setGoogleCalendarStatus("Googleカレンダーの同期に失敗しました。再度連携をお試しください。");
+        }
+      }
+
+      function handleGoogleCalendarConnectClick() {
+        if (!isGoogleCalendarConfigured()) {
+          const settingsFold = document.getElementById("google-calendar-settings-section");
+          if (settingsFold) settingsFold.open = true;
+          scrollToSection("google-calendar-settings-section");
+          setGoogleCalendarStatus(
+            "設定の「Googleカレンダー」で OAuth クライアント ID を確認してください。"
+          );
+          return;
+        }
+        if (isGoogleCalendarConnected()) {
+          syncGoogleCalendarEvents();
+          return;
+        }
+        requestGoogleCalendarAccess();
+      }
+
+      function initializeGoogleCalendarAutoSync() {
+        if (googleCalendarAutoSyncTimer) window.clearInterval(googleCalendarAutoSyncTimer);
+        if (!isGoogleCalendarConnected()) return;
+        googleCalendarAutoSyncTimer = window.setInterval(() => {
+          if (isGoogleCalendarConnected()) syncGoogleCalendarEvents();
+        }, GOOGLE_CALENDAR_AUTO_SYNC_MS);
+      }
+
+      async function enableScheduleNotifications() {
+        if (!("Notification" in window)) {
+          setGoogleCalendarStatus("このブラウザは通知に対応していません。");
+          return;
+        }
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          setGoogleCalendarStatus("予定の通知を許可しました。開始時刻になるとポップアップが表示されます。");
+        } else if (permission === "denied") {
+          setGoogleCalendarStatus("通知がブロックされています。ブラウザ設定から許可してください。");
+        } else {
+          setGoogleCalendarStatus("通知の許可がキャンセルされました。");
+        }
+      }
+
+      function getGoogleEventsForDate(dateKey) {
+        return googleCalendarData.events
+          .filter((event) => getEventDateKey(event.start) === dateKey)
+          .map((event) => ({
+            id: `google-${event.id}`,
+            source: "google",
+            title: event.title,
+            startTime: event.allDay ? "" : formatTimeFromIso(event.start),
+            endTime: event.allDay ? "" : formatTimeFromIso(event.end),
+            location: event.location,
+            done: false,
+            category: "その他",
+            allDay: event.allDay,
+            htmlLink: event.htmlLink,
+          }));
+      }
+
+      function getEventDateKey(value) {
+        if (!value) return "";
+        if (value.length === 10) return value;
+        return getDateKeyFromValue(value);
+      }
+
+      function formatTimeFromIso(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${hours}:${minutes}`;
+      }
+
+      function formatScheduleTimeRange(item) {
+        if (item.allDay) return "終日";
+        if (item.startTime && item.endTime) return `${item.startTime} - ${item.endTime}`;
+        if (item.startTime) return item.startTime;
+        return "時間未設定";
+      }
+
+      function getMileScheduleItemsForDate(dateKey) {
+        const todayKey = getTodayKey();
+        return goalsByTab.today
+          .filter((goal) => {
+            const dueDate = goal.dueDate || "";
+            if (dueDate) return dueDate === dateKey;
+            if (dateKey === todayKey) return true;
+            return getDateKeyFromValue(goal.completedAt) === dateKey;
+          })
+          .map((goal) => ({
+            id: goal.id,
+            source: "mile",
+            title: goal.title,
+            startTime: goal.startTime || "",
+            endTime: goal.endTime || "",
+            location: "",
+            done: Boolean(goal.done),
+            category: goal.category || "その他",
+            allDay: !goal.startTime,
+          }));
+      }
+
+      function getScheduleItemsForDate(dateKey) {
+        const items = [...getMileScheduleItemsForDate(dateKey), ...getGoogleEventsForDate(dateKey)];
+        return items.sort((a, b) => {
+          const aRank = a.startTime ? Number(a.startTime.replace(":", "")) : 9999;
+          const bRank = b.startTime ? Number(b.startTime.replace(":", "")) : 9999;
+          return aRank - bRank;
+        });
+      }
+
+      function formatJapaneseDateLabel(dateKey) {
+        const date = new Date(`${dateKey}T00:00:00`);
+        if (Number.isNaN(date.getTime())) return dateKey;
+        const weekday = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
+        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 (${weekday})`;
+      }
+
+      function getCalendarCells(year, month) {
+        const firstDay = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay.getDay() + 6) % 7;
+        const cells = [];
+
+        for (let index = 0; index < startOffset; index += 1) {
+          const day = new Date(year, month, -startOffset + index + 1);
+          cells.push({ dateKey: formatDateKey(day), isCurrentMonth: false });
+        }
+
+        for (let day = 1; day <= daysInMonth; day += 1) {
+          cells.push({ dateKey: formatDateKey(new Date(year, month, day)), isCurrentMonth: true });
+        }
+
+        while (cells.length % 7 !== 0) {
+          const nextIndex = cells.length - (startOffset + daysInMonth) + 1;
+          const day = new Date(year, month + 1, nextIndex);
+          cells.push({ dateKey: formatDateKey(day), isCurrentMonth: false });
+        }
+
+        return cells;
+      }
+
+      function shiftCalendarMonth(delta) {
+        const date = new Date(calendarViewYear, calendarViewMonth + delta, 1);
+        calendarViewYear = date.getFullYear();
+        calendarViewMonth = date.getMonth();
+        if (isGoogleCalendarConnected()) syncGoogleCalendarEvents();
+        else renderCalendar();
+      }
+
+      function jumpCalendarToToday() {
+        const now = new Date();
+        calendarViewYear = now.getFullYear();
+        calendarViewMonth = now.getMonth();
+        calendarSelectedDateKey = getTodayKey();
+        if (isGoogleCalendarConnected()) syncGoogleCalendarEvents();
+        else renderCalendar();
+      }
+
+      function handleCalendarCellClick(event) {
+        const cell = event.target.closest("[data-calendar-date]");
+        if (!cell) return;
+        calendarSelectedDateKey = cell.dataset.calendarDate;
+        renderCalendar();
+      }
+
+      function renderCalendarScheduleItem(item) {
+        const accent = item.source === "google" ? "var(--orange)" : CATEGORY_CALENDAR_COLORS[item.category] || "var(--cyan)";
+        const metaParts = [];
+        if (item.location) metaParts.push(item.location);
+        if (item.done) metaParts.push("完了済み");
+        const sourceLabel = item.source === "google" ? "Googleカレンダー" : "MILE ToDo";
+
+        return `
+          <article class="calendar-schedule-item ${item.done ? "is-done" : ""}">
+            <span class="calendar-schedule-accent" style="--accent:${accent}"></span>
+            <div>
+              <p class="calendar-schedule-time">${escapeHtml(formatScheduleTimeRange(item))}</p>
+              <p class="calendar-schedule-title">${escapeHtml(item.title)}</p>
+              ${metaParts.length ? `<p class="calendar-schedule-meta">${escapeHtml(metaParts.join(" / "))}</p>` : ""}
+              <span class="calendar-schedule-source ${item.source === "google" ? "is-google" : ""}">${sourceLabel}</span>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderCalendar() {
+        if (!calendarGrid) return;
+
+        if (!calendarSelectedDateKey) calendarSelectedDateKey = getTodayKey();
+
+        calendarMonthNumber.textContent = String(calendarViewMonth + 1);
+        calendarYearLabel.textContent = `${calendarViewYear}年`;
+        calendarSelectedDateLabel.textContent = formatJapaneseDateLabel(calendarSelectedDateKey);
+
+        const todayKey = getTodayKey();
+        const cells = getCalendarCells(calendarViewYear, calendarViewMonth);
+        calendarGrid.innerHTML = cells
+          .map((cell) => {
+            const dayNumber = Number(cell.dateKey.split("-")[2]);
+            const items = getScheduleItemsForDate(cell.dateKey).slice(0, 2);
+            const chips = items
+              .map(
+                (item) =>
+                  `<span class="calendar-cell-chip" style="--chip-color:${
+                    item.source === "google" ? "var(--orange)" : CATEGORY_CALENDAR_COLORS[item.category] || "var(--cyan)"
+                  }">${escapeHtml(item.title)}</span>`
+              )
+              .join("");
+
+            return `
+              <button
+                type="button"
+                class="calendar-cell ${cell.isCurrentMonth ? "" : "is-other-month"} ${
+                  cell.dateKey === todayKey ? "is-today" : ""
+                } ${cell.dateKey === calendarSelectedDateKey ? "is-selected" : ""}"
+                data-calendar-date="${cell.dateKey}"
+                aria-label="${formatJapaneseDateLabel(cell.dateKey)}"
+                aria-pressed="${cell.dateKey === calendarSelectedDateKey}"
+              >
+                <span class="calendar-cell-date">${dayNumber}</span>
+                <span class="calendar-cell-events">${chips}</span>
+              </button>
+            `;
+          })
+          .join("");
+
+        const scheduleItems = getScheduleItemsForDate(calendarSelectedDateKey);
+        calendarScheduleList.innerHTML = scheduleItems.length
+          ? scheduleItems.map(renderCalendarScheduleItem).join("")
+          : `<p class="calendar-empty">この日の予定はありません</p>`;
+
+        const showTodayTodos = calendarSelectedDateKey === todayKey;
+        calendarTodayTodosHeading.hidden = !showTodayTodos;
+        if (showTodayTodos) {
+          const todayTodos = getDashboardTodayGoals();
+          calendarTodayTodos.innerHTML = todayTodos.length
+            ? todayTodos.map((goal) =>
+                renderCalendarScheduleItem({
+                  id: goal.id,
+                  source: "mile",
+                  title: goal.title,
+                  startTime: goal.startTime || "",
+                  endTime: goal.endTime || "",
+                  location: "",
+                  done: goal.done,
+                  category: goal.category || "その他",
+                  allDay: !goal.startTime,
+                })
+              ).join("")
+            : `<p class="calendar-empty">今日のToDoはありません</p>`;
+        } else {
+          calendarTodayTodos.innerHTML = "";
+        }
+
+        renderGoogleCalendarSettingsUI();
+        if (isGoogleCalendarConnected() && !googleCalendarData.lastSyncAt) {
+          syncGoogleCalendarEvents();
+        }
+      }
+
+      function getReminderKey(item, dateKey) {
+        return `${dateKey}:${item.id}:${item.startTime || "allday"}`;
+      }
+
+      function checkScheduleReminders() {
+        const now = new Date();
+        const dateKey = getTodayKey();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const items = getScheduleItemsForDate(dateKey).filter((item) => item.startTime && !item.done);
+
+        items.forEach((item) => {
+          const [hours, minutes] = item.startTime.split(":").map(Number);
+          if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return;
+          const startMinutes = hours * 60 + minutes;
+          const diff = currentMinutes - startMinutes;
+          if (diff < 0 || diff > 1) return;
+
+          const key = getReminderKey(item, dateKey);
+          if (scheduleNotifiedKeys.has(key)) return;
+          scheduleNotifiedKeys.add(key);
+          saveScheduleNotifiedKeys();
+          showScheduleReminder(item);
+        });
+      }
+
+      function showScheduleReminder(item) {
+        const timeLabel = formatScheduleTimeRange(item);
+        scheduleReminderTime.textContent = timeLabel;
+        scheduleReminderTitle.textContent = item.title;
+        scheduleReminderMeta.textContent = item.location
+          ? `${item.location} / ${item.source === "google" ? "Googleカレンダー" : "MILE ToDo"}`
+          : item.source === "google"
+            ? "Googleカレンダーの予定です"
+            : "MILEのToDoです。タップして進めましょう。";
+        scheduleReminderOverlay.hidden = false;
+
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification(`予定: ${item.title}`, {
+            body: `${timeLabel}${item.location ? ` @ ${item.location}` : ""}`,
+            tag: getReminderKey(item, getTodayKey()),
+          });
+        }
+      }
+
+      function dismissScheduleReminder() {
+        scheduleReminderOverlay.hidden = true;
+      }
+
+      function initializeScheduleReminders() {
+        if (scheduleReminderTimer) window.clearInterval(scheduleReminderTimer);
+        scheduleReminderTimer = window.setInterval(checkScheduleReminders, SCHEDULE_REMINDER_CHECK_MS);
+        checkScheduleReminders();
+      }
+
       function render() {
         renderYearlyGoal();
         renderMonthlyGoals();
@@ -9639,6 +10934,8 @@
         renderProgress();
         renderDashboard();
         renderMileWorld();
+        renderVisionBoard();
+        renderCalendar();
         renderWeeklyProgress();
         renderAchievementHistory();
         renderStreakProgress();
@@ -9657,6 +10954,7 @@
       }
 
       selectedMonthKey = getCurrentMonthKey();
+      calendarSelectedDateKey = getTodayKey();
       render();
       renderReflectionNotes();
       initializeProfileSettingsUI();
@@ -9666,6 +10964,11 @@
       restoreCloudLoginResendCooldown();
       updateCloudSyncStatusUI();
       initializeSupabaseAuth();
+      initializeScheduleReminders();
+      initializeGoogleCalendarAutoSync();
+      if (isGoogleCalendarConnected() && !googleCalendarData.lastSyncAt) {
+        syncGoogleCalendarEvents();
+      }
     </script>
   </body>
 </html>
