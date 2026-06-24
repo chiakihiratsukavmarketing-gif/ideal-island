@@ -2126,7 +2126,10 @@
         padding: 0;
         margin: 0;
         gap: 0;
-        background: #ffffff;
+      }
+
+      .profile-settings-card.settings-fold {
+        margin: 0;
       }
 
       .goal-scope-card {
@@ -2141,6 +2144,25 @@
         box-sizing: border-box;
       }
 
+      .goal-scope-monthly.goal-scope-card {
+        background: linear-gradient(180deg, #f9fcf4 0%, #f2f8e6 100%);
+        border-color: rgba(143, 179, 63, 0.32);
+      }
+
+      .goal-scope-yearly.goal-scope-card {
+        background: linear-gradient(180deg, #f6fafd 0%, #ecf3fa 100%);
+        border-color: rgba(123, 168, 212, 0.34);
+      }
+
+      .settings-fold {
+        background: linear-gradient(180deg, #fcfdf9 0%, #f5f9ee 100%);
+        border-color: rgba(143, 179, 63, 0.24);
+      }
+
+      .settings-fold[open] .settings-fold-summary {
+        background: rgba(255, 255, 255, 0.55);
+      }
+
       .goal-scope-headline {
         display: flex;
         flex-wrap: wrap;
@@ -2151,9 +2173,11 @@
       }
 
       .goal-scope-header .monthly-add-button {
-        min-height: 34px;
-        padding: 0 10px;
-        font-size: 0.76rem;
+        display: none;
+      }
+
+      .goal-scope-header .icon-button {
+        flex: 0 0 auto;
       }
 
       .goal-scope-monthly {
@@ -2302,10 +2326,83 @@
       }
 
       .monthly-goal-icon {
-        width: 28px;
-        height: 28px;
-        border-radius: 10px;
-        font-size: 0.95rem;
+        width: 24px;
+        height: 24px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 0.88rem;
+        opacity: 0.72;
+      }
+
+      .monthly-goal-meta .goal-meta,
+      .yearly-goal-meta .goal-meta {
+        border: none;
+        background: transparent;
+        padding: 0;
+        color: #a8aea4;
+        font-size: 0.66rem;
+        font-weight: 650;
+      }
+
+      .progress-state-pill {
+        border: none;
+        background: transparent;
+        padding: 0;
+        min-height: unset;
+        color: #a8aea4;
+        font-size: 0.66rem;
+        font-weight: 700;
+      }
+
+      .progress-state-pill.is-active {
+        color: var(--lime-deep);
+      }
+
+      .progress-state-pill.is-complete {
+        color: #6f8733;
+      }
+
+      .monthly-goal-item,
+      .yearly-goal-item {
+        background: rgba(255, 255, 255, 0.88);
+        border-color: rgba(143, 179, 63, 0.22);
+      }
+
+      .yearly-goal-item {
+        border-color: rgba(123, 168, 212, 0.24);
+      }
+
+      .calendar-today-panel.today-tasks-card {
+        background: #f5f9ef;
+        border-color: rgba(143, 179, 63, 0.24);
+      }
+
+      .calendar-today-panel .task-filter,
+      .calendar-today-panel .category-filter {
+        margin: 0 0 6px;
+        gap: 4px;
+        padding: 0;
+      }
+
+      .calendar-today-panel .category-filter-button {
+        border: none;
+        background: transparent;
+        color: #a8aea4;
+        padding: 2px 7px;
+        font-size: 0.68rem;
+        font-weight: 650;
+      }
+
+      .calendar-today-panel .category-filter-button.is-active {
+        border: 1px solid rgba(143, 179, 63, 0.35);
+        background: rgba(238, 246, 220, 0.9);
+        color: #4a5742;
+      }
+
+      .calendar-today-panel .task-filter-button {
+        padding: 4px 9px;
+        font-size: 0.72rem;
       }
 
       .monthly-goal-title,
@@ -3120,6 +3217,24 @@
         font: inherit;
         line-height: 1.6;
         outline: none;
+      }
+
+      .goal-edit-form input[type="time"] {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.84rem;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .goal-edit-form .time-fields-row .field label {
+        font-size: 0.74rem;
+        letter-spacing: -0.01em;
+      }
+
+      .goal-edit-form .time-fields-row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 8px;
       }
 
       .goal-edit-form input:focus,
@@ -5553,7 +5668,6 @@
       .monthly-goal-card,
       .yearly-goal-card {
         border-color: rgba(36, 38, 34, 0.1);
-        background: #ffffff;
       }
 
       .settings-fold {
@@ -5561,9 +5675,9 @@
         gap: 0;
         width: min(100%, 720px);
         margin: 0;
-        border: 1.5px solid var(--line-soft);
+        border: 1.5px solid rgba(143, 179, 63, 0.24);
         border-radius: 16px;
-        background: #ffffff;
+        background: linear-gradient(180deg, #fcfdf9 0%, #f5f9ee 100%);
         box-shadow: var(--shadow-soft);
         box-sizing: border-box;
         overflow: hidden;
@@ -5613,7 +5727,7 @@
 
       .settings-fold.profile-settings-card,
       .settings-fold.cloud-card {
-        margin-bottom: 12px;
+        margin-bottom: 0;
         padding: 0;
         gap: 0;
       }
@@ -6003,14 +6117,14 @@
       }
 
       .calendar-today-panel .goal-item.goal-schedule-item {
-        grid-template-columns: 4px minmax(0, 1fr) auto;
-        gap: 10px;
+        grid-template-columns: 4px 28px minmax(0, 1fr) auto;
+        gap: 8px;
         align-items: center;
         min-height: unset;
-        padding: 10px 12px;
+        padding: 8px 10px;
         border-radius: 12px;
-        background: #f8faf5;
-        border: 1px solid var(--line-soft);
+        background: #ffffff;
+        border: 1px solid rgba(143, 179, 63, 0.2);
         box-shadow: none;
       }
 
@@ -6030,65 +6144,105 @@
       }
 
       .calendar-today-panel .goal-schedule-item .calendar-schedule-time {
-        margin: 0 0 2px;
-        color: var(--muted);
-        font-size: 0.76rem;
-        font-weight: 700;
+        display: none;
+      }
+
+      .calendar-today-panel .goal-schedule-sub {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 2px 0 0;
+        color: #8f968a;
+        font-size: 0.68rem;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+
+      .calendar-today-panel .goal-schedule-time-text {
+        color: #6f7768;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.01em;
+      }
+
+      .calendar-today-panel .goal-schedule-due-text {
+        color: #a0a79b;
+      }
+
+      .calendar-today-panel .goal-schedule-due-text.has-sep::before {
+        content: "·";
+        margin-right: 6px;
+        color: #c5cbc0;
       }
 
       .calendar-today-panel .goal-schedule-item .calendar-schedule-title {
         margin: 0;
-        font-size: 0.92rem;
+        font-size: 0.98rem;
         font-weight: 800;
         line-height: 1.35;
+        color: var(--text);
       }
 
       .calendar-today-panel .goal-schedule-meta {
-        margin-top: 4px;
-        gap: 4px;
-      }
-
-      .calendar-today-panel .goal-schedule-meta .goal-meta,
-      .calendar-today-panel .goal-schedule-meta .due-badge {
-        margin-top: 0;
-        min-height: unset;
-        padding: 1px 6px;
-        font-size: 0.64rem;
+        display: none;
       }
 
       .calendar-today-panel .goal-schedule-actions {
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
       }
 
-      .calendar-today-panel .goal-schedule-actions .goal-check {
-        width: 26px;
-        height: 26px;
-        font-size: 0.78rem;
+      .calendar-today-panel .goal-schedule-item > .goal-check {
+        width: 24px;
+        height: 24px;
+        font-size: 0.72rem;
       }
 
       .calendar-today-panel .goal-schedule-actions .goal-postpone-button {
-        min-height: 28px;
-        height: 28px;
-        padding: 0 7px;
-        font-size: 0.62rem;
-        border-radius: 10px;
+        display: none;
       }
 
       .calendar-today-panel .goal-schedule-actions .goal-edit-button,
       .calendar-today-panel .goal-schedule-actions .goal-delete-button {
-        width: 28px;
-        min-width: 28px;
-        height: 28px;
-        min-height: 28px;
-        border-radius: 10px;
+        width: 26px;
+        min-width: 26px;
+        height: 26px;
+        min-height: 26px;
+        border-radius: 9px;
+        opacity: 0.72;
       }
 
       .calendar-today-panel .goal-schedule-item.is-editing .goal-edit-form {
         grid-column: 1 / -1;
         margin-top: 8px;
+        padding: 10px;
+        gap: 8px;
+        border-radius: 14px;
+      }
+
+      .calendar-today-panel .goal-edit-form .field label {
+        font-size: 0.72rem;
+      }
+
+      .calendar-today-panel .goal-edit-form input,
+      .calendar-today-panel .goal-edit-form select {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.88rem;
+        border-radius: 12px;
+      }
+
+      .calendar-today-panel .goal-edit-form input[type="time"] {
+        min-height: 36px;
+        padding: 6px 8px;
+        font-size: 0.8rem;
+      }
+
+      .calendar-today-panel .goal-edit-form .time-fields-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
       }
 
       .calendar-schedule-list[hidden] {
@@ -6132,8 +6286,25 @@
 
       .time-fields-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 8px;
+        width: 100%;
+      }
+
+      .time-fields-row .field {
+        min-width: 0;
+      }
+
+      .time-fields-row input[type="time"] {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.84rem;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .time-fields-row .field label {
+        font-size: 0.74rem;
       }
 
       .schedule-reminder-overlay {
@@ -6483,11 +6654,11 @@
           </div>
           <div class="time-fields-row">
             <div class="field">
-              <label for="goalStartTime">リマインド時刻</label>
+              <label for="goalStartTime">リマインド</label>
               <input id="goalStartTime" type="time" />
             </div>
             <div class="field">
-              <label for="goalEndTime">終了時刻（任意）</label>
+              <label for="goalEndTime">終了（任意）</label>
               <input id="goalEndTime" type="time" />
             </div>
           </div>
@@ -6514,9 +6685,14 @@
               <span class="goal-scope-count" id="monthlyGoalCount">0件</span>
             </p>
           </div>
-          <button class="monthly-add-button" type="button" id="toggleMonthlyGoalFormButton" aria-expanded="false">
-            ＋ 追加
-          </button>
+          <button
+            class="icon-button"
+            type="button"
+            id="toggleMonthlyGoalFormButton"
+            aria-expanded="false"
+            aria-label="月間目標を追加"
+            title="追加"
+          >＋</button>
         </header>
 
         <div class="monthly-goal-month-nav" aria-label="月を選択">
@@ -9175,14 +9351,18 @@
         editingMonthlyGoalId = "";
         monthlyGoalForm.classList.remove("is-collapsed");
         toggleMonthlyGoalFormButton.setAttribute("aria-expanded", "true");
-        toggleMonthlyGoalFormButton.textContent = "閉じる";
+        toggleMonthlyGoalFormButton.setAttribute("aria-label", "月間目標フォームを閉じる");
+        toggleMonthlyGoalFormButton.setAttribute("title", "閉じる");
+        toggleMonthlyGoalFormButton.innerHTML = renderIcon("minus");
         monthlyGoalInput.focus();
       }
 
       function closeMonthlyGoalForm() {
         monthlyGoalForm.classList.add("is-collapsed");
         toggleMonthlyGoalFormButton.setAttribute("aria-expanded", "false");
-        toggleMonthlyGoalFormButton.textContent = "＋ 追加";
+        toggleMonthlyGoalFormButton.setAttribute("aria-label", "月間目標を追加");
+        toggleMonthlyGoalFormButton.setAttribute("title", "追加");
+        toggleMonthlyGoalFormButton.innerHTML = renderIcon("plus");
         monthlyGoalForm.reset();
         monthlyGoalCategory.value = "その他";
         monthlyGoalIcon.value = getDefaultIconForCategory("その他");
@@ -10298,7 +10478,7 @@
                     </div>
                     <div class="time-fields-row">
                       <div class="field">
-                        <label for="goal-edit-start-${escapeHtml(goal.id)}">リマインド時刻</label>
+                        <label for="goal-edit-start-${escapeHtml(goal.id)}">リマインド</label>
                         <input
                           id="goal-edit-start-${escapeHtml(goal.id)}"
                           type="time"
@@ -10307,7 +10487,7 @@
                         />
                       </div>
                       <div class="field">
-                        <label for="goal-edit-end-${escapeHtml(goal.id)}">終了時刻（任意）</label>
+                        <label for="goal-edit-end-${escapeHtml(goal.id)}">終了（任意）</label>
                         <input
                           id="goal-edit-end-${escapeHtml(goal.id)}"
                           type="time"
@@ -10348,44 +10528,33 @@
           ? goal.endTime
             ? `${goal.startTime} - ${goal.endTime}`
             : goal.startTime
-          : "時間未設定";
-        const metaBits = [
-          `<span class="goal-meta is-${getCategoryTone(goal.category)}">${escapeHtml(goal.category)}</span>`,
-          dueMeta ? `<span class="due-badge is-${dueMeta.tone}">${escapeHtml(dueMeta.label)}</span>` : "",
-        ]
-          .filter(Boolean)
-          .join("");
+          : "";
+        const subLine = timeLabel || dueMeta
+          ? `<p class="goal-schedule-sub">${
+              timeLabel ? `<span class="goal-schedule-time-text">${escapeHtml(timeLabel)}</span>` : ""
+            }${
+              dueMeta
+                ? `<span class="goal-schedule-due-text${timeLabel ? " has-sep" : ""}">${escapeHtml(dueMeta.label)}</span>`
+                : ""
+            }</p>`
+          : "";
         const isEditing = goal.id === editingGoalId;
-        const showPostponeButton = canRescheduleGoalToTomorrow(goal);
 
         return `
           <article class="goal-item goal-schedule-item ${goal.done ? "is-done" : ""} ${isEditing ? "is-editing" : ""}">
             <span class="calendar-schedule-accent" style="--accent:${accent}"></span>
+            <button
+              class="goal-check"
+              type="button"
+              data-action="toggle"
+              data-id="${escapeHtml(goal.id)}"
+              aria-label="${goal.done ? "未達成に戻す" : "達成にする"}"
+            >${goal.done ? "✓" : ""}</button>
             <div class="goal-schedule-main">
-              <p class="calendar-schedule-time">${escapeHtml(timeLabel)}</p>
               <p class="calendar-schedule-title">${escapeHtml(goal.title)}</p>
-              ${metaBits ? `<div class="goal-meta-row goal-schedule-meta">${metaBits}</div>` : ""}
+              ${subLine}
             </div>
             <div class="goal-actions goal-schedule-actions">
-              <button
-                class="goal-check"
-                type="button"
-                data-action="toggle"
-                data-id="${escapeHtml(goal.id)}"
-                aria-label="${goal.done ? "未達成に戻す" : "達成にする"}"
-              >${goal.done ? "✓" : ""}</button>
-              ${
-                showPostponeButton
-                  ? `<button
-                class="button secondary goal-postpone-button"
-                type="button"
-                data-action="reschedule-tomorrow"
-                data-id="${escapeHtml(goal.id)}"
-                aria-label="明日へ回す"
-                title="明日へ回す"
-              >明日へ</button>`
-                  : ""
-              }
               <button
                 class="goal-edit-button"
                 type="button"
@@ -11464,6 +11633,7 @@
 
       selectedMonthKey = getCurrentMonthKey();
       calendarSelectedDateKey = getTodayKey();
+      closeMonthlyGoalForm();
       render();
       renderReflectionNotes();
       initializeProfileSettingsUI();
